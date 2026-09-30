@@ -9,31 +9,54 @@ Public Class Login
 
     Private Sub btnIniciarSesion_Click(sender As Object, e As EventArgs) Handles btnIniciarSesion.Click
         Try
-            ' Obtenemos los valores de tus cajas de texto
             Dim email As String = txtCorreo.Text.Trim()
             Dim password As String = txtContraseña.Text
 
-            ' Llamamos a la lógica de negocio
             Dim usuarioValido As Usuario = negocioUsuario.IniciarSesion(email, password)
 
-            ' Mensaje de éxito si las credenciales coinciden
-            MessageBox.Show($"¡Bienvenido al sistema, {usuarioValido.NombreCompleto}!" & vbCrLf &
-                            $"Rol: {usuarioValido.NombreRol}",
-                            "Acceso Correcto",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information)
-
-            ' Abrir la pantalla principal y ocultar el login
+            MessageBox.Show($"¡Bienvenido al sistema, {usuarioValido.NombreCompleto}!" & vbCrLf & $"Rol: {usuarioValido.NombreRol}", "Acceso Correcto", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Dim principal As New frmPrincipal()
             principal.Show()
             Me.Hide()
 
         Catch ex As ArgumentException
-            ' Avisos de validación (por ejemplo, si dejan cajas vacías)
             MessageBox.Show(ex.Message, "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         Catch ex As Exception
-            ' Errores de credenciales incorrectas o problemas de conexión a SQL Server
             MessageBox.Show(ex.Message, "Error de autenticación", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
+    End Sub
+
+    Private Sub lblOlvide_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles lblOlvide.LinkClicked
+        Dim email As String = txtCorreo.Text.Trim()
+
+        ' Paso 3: Solicitar correo si está vacío
+        If String.IsNullOrWhiteSpace(email) Then
+            MessageBox.Show("Por favor, ingresa tu correo electrónico en el campo correspondiente para recuperar tu contraseña.", "Correo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtCorreo.Focus()
+            Return
+        End If
+
+        Try
+            ' Validar que el correo exista antes de abrir la ventana
+            Dim pregunta As String = negocioUsuario.ObtenerPregunta(email)
+
+            ' Paso 4 y 5: Abrir formulario pasando el correo y la pregunta
+            Dim frmRecuperar As New RecuperarContraseña(email, pregunta)
+            frmRecuperar.StartPosition = FormStartPosition.CenterScreen
+            frmRecuperar.Show()
+            Me.Hide()
+
+        Catch ex As Exception
+            MessageBox.Show(ex.Message, "Atención", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
+    End Sub
+    Private Sub checkMostrar_CheckedChanged(sender As Object, e As EventArgs) Handles checkMostrar.CheckedChanged
+        txtContraseña.UseSystemPasswordChar = Not checkMostrar.Checked
+    End Sub
+
+    Private Sub lblRegistrate_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles lblRegistrate.LinkClicked
+        Dim frm As New RegistrarLector()
+        frm.Show()
+        Me.Hide()
     End Sub
 End Class
