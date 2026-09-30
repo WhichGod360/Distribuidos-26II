@@ -94,19 +94,7 @@ Partial Class frmLibro
         Label4.Size = New Size(36, 17)
         Label4.TabIndex = 4
         Label4.Text = "LOGO"
-        ' 
-        ' PictureBox1
-        ' 
-        PictureBox1.Image = My.Resources.Resources.usuario
-        PictureBox1.Location = New Point(970, 10)
-        PictureBox1.Name = "PictureBox1"
-        PictureBox1.Size = New Size(30, 33)
-        PictureBox1.SizeMode = PictureBoxSizeMode.StretchImage
-        PictureBox1.TabIndex = 2
-        PictureBox1.TabStop = False
-        ' 
-        ' Label3
-        ' 
+
         Label3.AutoSize = True
         Label3.BackColor = Color.SlateGray
         Label3.BorderStyle = BorderStyle.FixedSingle
@@ -169,20 +157,7 @@ Partial Class frmLibro
         Panel2.Name = "Panel2"
         Panel2.Size = New Size(498, 31)
         Panel2.TabIndex = 8
-        ' 
-        ' PictureBox2
-        ' 
-        PictureBox2.BackgroundImageLayout = ImageLayout.None
-        PictureBox2.Image = My.Resources.Resources.search
-        PictureBox2.Location = New Point(12, 3)
-        PictureBox2.Name = "PictureBox2"
-        PictureBox2.Size = New Size(25, 23)
-        PictureBox2.SizeMode = PictureBoxSizeMode.Zoom
-        PictureBox2.TabIndex = 9
-        PictureBox2.TabStop = False
-        ' 
-        ' cboEstado
-        ' 
+
         cboEstado.DrawMode = DrawMode.OwnerDrawFixed
         cboEstado.DropDownStyle = ComboBoxStyle.DropDownList
         cboEstado.FormattingEnabled = True
