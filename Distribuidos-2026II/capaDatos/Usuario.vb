@@ -10,11 +10,11 @@
     Public Property EstadoUsuario As String
     Public Property Contrasena As String
     Public Property IdRolUsuario As Integer
+    Public Property PreguntaSegura As String
+    Public Property RptaSegura As String
 
-    ' Propiedad auxiliar para guardar el texto del rol traído desde RolUsuario (INNER JOIN)
     Public Property NombreRol As String
 
-    ' Propiedad de solo lectura para mostrar el nombre completo en pantalla
     Public ReadOnly Property NombreCompleto As String
         Get
             Return $"{NombreUsuario} {ApPaterno} {ApMaterno}".Trim()

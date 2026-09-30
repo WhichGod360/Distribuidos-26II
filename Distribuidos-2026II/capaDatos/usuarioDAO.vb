@@ -57,10 +57,7 @@ Public Class usuarioDAO
 
         Using cn As SqlConnection = Conexion.ObtenerInstancia().ObtenerConexion()
             Using cmd As New SqlCommand(query, cn)
-                ' Parámetro tipado para evitar inyección SQL
                 cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
-
-                ' ExecuteScalar devuelve la primera columna de la primera fila (el COUNT)
                 Dim resultado As Object = cmd.ExecuteScalar()
                 If resultado IsNot Nothing AndAlso Convert.ToInt32(resultado) > 0 Then
                     existe = True
@@ -69,6 +66,114 @@ Public Class usuarioDAO
         End Using
 
         Return existe
+    End Function
+
+
+    ' Obtener la pregunta secreta según el email del usuario
+    Public Function ObtenerPreguntaSeguridad(email As String) As String
+        Dim pregunta As String = String.Empty
+        Dim query As String = "SELECT preguntasegura FROM Usuario WHERE email_usuario = @email AND estado_usuario = 'ACTIVO'"
+
+        Using cn As SqlConnection = Conexion.ObtenerInstancia().ObtenerConexion()
+            Using cmd As New SqlCommand(query, cn)
+                cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
+                Dim resultado As Object = cmd.ExecuteScalar()
+                If resultado IsNot Nothing AndAlso Not IsDBNull(resultado) Then
+                    pregunta = resultado.ToString()
+                End If
+            End Using
+        End Using
+
+        Return pregunta
+    End Function
+
+    ' Validar si la respuesta ingresada coincide con la guardada en BD
+    Public Function ValidarRespuestaSeguridad(email As String, respuesta As String) As Boolean
+        Dim valida As Boolean = False
+        Dim query As String = "SELECT COUNT(1) FROM Usuario WHERE email_usuario = @email AND LOWER(RTRIM(LTRIM(rptasegura))) = LOWER(RTRIM(LTRIM(@rpta))) AND estado_usuario = 'ACTIVO'"
+
+        Using cn As SqlConnection = Conexion.ObtenerInstancia().ObtenerConexion()
+            Using cmd As New SqlCommand(query, cn)
+                cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
+                cmd.Parameters.Add("@rpta", SqlDbType.VarChar, 20).Value = respuesta.Trim()
+                Dim resultado As Object = cmd.ExecuteScalar()
+                If resultado IsNot Nothing AndAlso Convert.ToInt32(resultado) > 0 Then
+                    valida = True
+                End If
+            End Using
+        End Using
+
+        Return valida
+    End Function
+
+    ' Actualizar la contraseña en la base de datos
+    Public Function ActualizarContrasena(email As String, nuevaClave As String) As Boolean
+        Dim query As String = "UPDATE Usuario SET contrasena = @nuevaClave WHERE email_usuario = @email"
+
+        Using cn As SqlConnection = Conexion.ObtenerInstancia().ObtenerConexion()
+            Using cmd As New SqlCommand(query, cn)
+                cmd.Parameters.Add("@nuevaClave", SqlDbType.VarChar, 255).Value = nuevaClave
+                cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
+                Return cmd.ExecuteNonQuery() > 0
+            End Using
+        End Using
+    End Function
+
+    ' Valida si un DNI ya existe registrado
+    Public Function ExisteDNI(dni As String) As Boolean
+        Dim existe As Boolean = False
+        Dim query As String = "SELECT COUNT(1) FROM Usuario WHERE numero_dni_usuario = @dni"
+
+        Using cn As SqlConnection = Conexion.ObtenerInstancia().ObtenerConexion()
+            Using cmd As New SqlCommand(query, cn)
+                cmd.Parameters.Add("@dni", SqlDbType.VarChar, 8).Value = dni.Trim()
+                Dim resultado As Object = cmd.ExecuteScalar()
+                If resultado IsNot Nothing AndAlso Convert.ToInt32(resultado) > 0 Then
+                    existe = True
+                End If
+            End Using
+        End Using
+
+        Return existe
+    End Function
+
+    ' Registra un nuevo usuario obligatoriamente como Lector (id_rol_usuario = 3)
+    Public Function RegistrarLector(usuario As Usuario) As Boolean
+        Dim query As String =
+            "INSERT INTO Usuario (email_usuario, nombre_usuario, ap_paterno, ap_materno, " &
+            "                     numero_dni_usuario, fecha_nacimiento_usuario, genero_usuario, " &
+            "                     estado_usuario, contrasena, id_rol_usuario, preguntasegura, rptasegura) " &
+            "VALUES (@email, @nombre, @apPaterno, @apMaterno, " &
+            "        @dni, @fechaNac, @genero, " &
+            "        'Activo', @clave, 3, @pregunta, @rpta)"
+
+        Using cn As SqlConnection = Conexion.ObtenerInstancia().ObtenerConexion()
+            Using cmd As New SqlCommand(query, cn)
+                cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = usuario.EmailUsuario.Trim()
+                cmd.Parameters.Add("@nombre", SqlDbType.VarChar, 100).Value = usuario.NombreUsuario.Trim()
+                cmd.Parameters.Add("@apPaterno", SqlDbType.VarChar, 100).Value = usuario.ApPaterno.Trim()
+                cmd.Parameters.Add("@apMaterno", SqlDbType.VarChar, 100).Value = usuario.ApMaterno.Trim()
+                cmd.Parameters.Add("@dni", SqlDbType.VarChar, 8).Value = usuario.NumeroDniUsuario.Trim()
+
+                If usuario.FechaNacimientoUsuario.HasValue Then
+                    cmd.Parameters.Add("@fechaNac", SqlDbType.Date).Value = usuario.FechaNacimientoUsuario.Value
+                Else
+                    cmd.Parameters.Add("@fechaNac", SqlDbType.Date).Value = DBNull.Value
+                End If
+
+                If usuario.GeneroUsuario.HasValue Then
+                    cmd.Parameters.Add("@genero", SqlDbType.Bit).Value = usuario.GeneroUsuario.Value
+                Else
+                    cmd.Parameters.Add("@genero", SqlDbType.Bit).Value = DBNull.Value
+                End If
+
+                cmd.Parameters.Add("@clave", SqlDbType.VarChar, 255).Value = usuario.Contrasena
+                cmd.Parameters.Add("@pregunta", SqlDbType.VarChar, 255).Value = usuario.PreguntaSegura.Trim()
+                cmd.Parameters.Add("@rpta", SqlDbType.VarChar, 20).Value = usuario.RptaSegura.Trim()
+
+                Return cmd.ExecuteNonQuery() > 0
+            End Using
+        End Using
     End Function
 
 End Class
