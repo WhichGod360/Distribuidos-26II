@@ -5,7 +5,6 @@ Public Class usuarioDAO
 
     Public Function Autenticar(email As String, clave As String) As Usuario
         Dim usuarioLogueado As Usuario = Nothing
-
         Dim query As String =
             "SELECT u.id_usuario, u.email_usuario, u.nombre_usuario, u.ap_paterno, u.ap_materno, " &
             "       u.numero_dni_usuario, u.fecha_nacimiento_usuario, u.genero_usuario, " &
@@ -64,10 +63,8 @@ Public Class usuarioDAO
                 End If
             End Using
         End Using
-
         Return existe
     End Function
-
 
     ' Obtener la pregunta secreta según el email del usuario
     Public Function ObtenerPreguntaSeguridad(email As String) As String

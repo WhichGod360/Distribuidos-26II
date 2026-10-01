@@ -26,20 +26,6 @@ Public Class usuarioNegocio
         Return usuarioLogueado
     End Function
 
-    ''' 
-    ''' Valida si un correo ya se encuentra registrado en el sistema.
-    ''' 
-
-
-    Public Function ValidarCorreoExistente(email As String) As Boolean
-        If String.IsNullOrWhiteSpace(email) Then
-            Return False
-        End If
-
-        Return usuarioDao.ExisteEmail(email.Trim())
-    End Function
-
-
     Public Function ObtenerPregunta(email As String) As String
         If String.IsNullOrWhiteSpace(email) Then
             Throw New ArgumentException("Debe ingresar un correo electrónico.")
