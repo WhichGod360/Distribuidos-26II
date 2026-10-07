@@ -1,17 +1,23 @@
-﻿Imports capaDatos
+﻿Imports System.Data
+Imports capaDatos
 
 Public Class categoriaNegocio
-    Private ReadOnly dao As New categoriaDAO()
 
-    Public Function listarTodos() As List(Of Categoria)
-        Return dao.listarTodos()
+    Private dato As New categoriaDato()
+
+    Public Function listarCategoria() As DataTable
+        Return dato.Listar()
     End Function
 
-    Public Function buscarPorId(idCategoria As Integer) As Categoria
-        Return dao.buscarPorId(idCategoria)
+    Public Function agregarCategoria(nombre As String, estado As Integer) As Boolean
+        Dim tabla As DataTable = dato.Listar()
+        For Each fila As DataRow In tabla.Rows
+            If fila("nombre_categoria").ToString().ToLower() = nombre.ToLower() Then
+                Return False
+            End If
+        Next
+        dato.Insertar(nombre, estado)
+        Return True
     End Function
 
-    Public Function buscarPorNombre(nombre As String) As Categoria
-        Return dao.buscarPorNombre(nombre)
-    End Function
 End Class
