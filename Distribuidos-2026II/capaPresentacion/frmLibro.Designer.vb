@@ -22,7 +22,7 @@ Partial Class frmLibro
     'No lo modifique con el editor de código.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim DataGridViewCellStyle1 As DataGridViewCellStyle = New DataGridViewCellStyle()
+        Dim DataGridViewCellStyle3 As DataGridViewCellStyle = New DataGridViewCellStyle()
         Label1 = New Label()
         Panel1 = New Panel()
         Label4 = New Label()
@@ -33,11 +33,11 @@ Partial Class frmLibro
         Label6 = New Label()
         TextBox1 = New TextBox()
         Panel2 = New Panel()
-        PictureBox2 = New PictureBox()
+        pboxBuscar = New PictureBox()
         cboEstado = New ComboBox()
         Panel3 = New Panel()
-        Panel4 = New Panel()
         cboOrdenarLetra = New ComboBox()
+        Panel4 = New Panel()
         Panel5 = New Panel()
         Panel6 = New Panel()
         Button1 = New Button()
@@ -53,7 +53,7 @@ Partial Class frmLibro
         Panel1.SuspendLayout()
         CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
         Panel2.SuspendLayout()
-        CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
+        CType(pboxBuscar, ComponentModel.ISupportInitialize).BeginInit()
         Panel3.SuspendLayout()
         Panel6.SuspendLayout()
         CType(DataGridView1, ComponentModel.ISupportInitialize).BeginInit()
@@ -94,7 +94,17 @@ Partial Class frmLibro
         Label4.Size = New Size(36, 17)
         Label4.TabIndex = 4
         Label4.Text = "LOGO"
-
+        ' 
+        ' PictureBox1
+        ' 
+        PictureBox1.Location = New Point(0, 0)
+        PictureBox1.Name = "PictureBox1"
+        PictureBox1.Size = New Size(100, 50)
+        PictureBox1.TabIndex = 5
+        PictureBox1.TabStop = False
+        ' 
+        ' Label3
+        ' 
         Label3.AutoSize = True
         Label3.BackColor = Color.SlateGray
         Label3.BorderStyle = BorderStyle.FixedSingle
@@ -151,13 +161,25 @@ Partial Class frmLibro
         ' Panel2
         ' 
         Panel2.BorderStyle = BorderStyle.FixedSingle
-        Panel2.Controls.Add(PictureBox2)
+        Panel2.Controls.Add(pboxBuscar)
         Panel2.Controls.Add(TextBox1)
         Panel2.Location = New Point(196, 120)
         Panel2.Name = "Panel2"
         Panel2.Size = New Size(498, 31)
         Panel2.TabIndex = 8
-
+        ' 
+        ' pboxBuscar
+        ' 
+        pboxBuscar.Image = My.Resources.Resources.search
+        pboxBuscar.Location = New Point(14, 3)
+        pboxBuscar.Name = "pboxBuscar"
+        pboxBuscar.Size = New Size(23, 24)
+        pboxBuscar.SizeMode = PictureBoxSizeMode.Zoom
+        pboxBuscar.TabIndex = 0
+        pboxBuscar.TabStop = False
+        ' 
+        ' cboEstado
+        ' 
         cboEstado.DrawMode = DrawMode.OwnerDrawFixed
         cboEstado.DropDownStyle = ComboBoxStyle.DropDownList
         cboEstado.FormattingEnabled = True
@@ -174,13 +196,6 @@ Partial Class frmLibro
         Panel3.Size = New Size(127, 31)
         Panel3.TabIndex = 11
         ' 
-        ' Panel4
-        ' 
-        Panel4.Location = New Point(713, 120)
-        Panel4.Name = "Panel4"
-        Panel4.Size = New Size(127, 31)
-        Panel4.TabIndex = 11
-        ' 
         ' cboOrdenarLetra
         ' 
         cboOrdenarLetra.DrawMode = DrawMode.OwnerDrawFixed
@@ -190,6 +205,13 @@ Partial Class frmLibro
         cboOrdenarLetra.Name = "cboOrdenarLetra"
         cboOrdenarLetra.Size = New Size(121, 24)
         cboOrdenarLetra.TabIndex = 12
+        ' 
+        ' Panel4
+        ' 
+        Panel4.Location = New Point(713, 120)
+        Panel4.Name = "Panel4"
+        Panel4.Size = New Size(127, 31)
+        Panel4.TabIndex = 11
         ' 
         ' Panel5
         ' 
@@ -226,14 +248,14 @@ Partial Class frmLibro
         DataGridView1.BorderStyle = BorderStyle.None
         DataGridView1.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
         DataGridView1.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
-        DataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft
-        DataGridViewCellStyle1.BackColor = SystemColors.Control
-        DataGridViewCellStyle1.Font = New Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
-        DataGridViewCellStyle1.ForeColor = SystemColors.WindowText
-        DataGridViewCellStyle1.SelectionBackColor = Color.SlateGray
-        DataGridViewCellStyle1.SelectionForeColor = Color.MediumBlue
-        DataGridViewCellStyle1.WrapMode = DataGridViewTriState.True
-        DataGridView1.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle1
+        DataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft
+        DataGridViewCellStyle3.BackColor = SystemColors.Control
+        DataGridViewCellStyle3.Font = New Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, CByte(0))
+        DataGridViewCellStyle3.ForeColor = SystemColors.WindowText
+        DataGridViewCellStyle3.SelectionBackColor = Color.SlateGray
+        DataGridViewCellStyle3.SelectionForeColor = Color.MediumBlue
+        DataGridViewCellStyle3.WrapMode = DataGridViewTriState.True
+        DataGridView1.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle3
         DataGridView1.ColumnHeadersHeight = 42
         DataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
         DataGridView1.Columns.AddRange(New DataGridViewColumn() {colId, colTitulo, colEditorial, colAnio, colStock, colEstado, colEditar, colEliminar})
@@ -327,7 +349,7 @@ Partial Class frmLibro
         CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
         Panel2.ResumeLayout(False)
         Panel2.PerformLayout()
-        CType(PictureBox2, ComponentModel.ISupportInitialize).EndInit()
+        CType(pboxBuscar, ComponentModel.ISupportInitialize).EndInit()
         Panel3.ResumeLayout(False)
         Panel6.ResumeLayout(False)
         CType(DataGridView1, ComponentModel.ISupportInitialize).EndInit()
@@ -345,7 +367,7 @@ Partial Class frmLibro
     Friend WithEvents Label6 As Label
     Friend WithEvents TextBox1 As TextBox
     Friend WithEvents Panel2 As Panel
-    Friend WithEvents PictureBox2 As PictureBox
+    Friend WithEvents pboxBuscar As PictureBox
     Friend WithEvents cboEstado As ComboBox
     Friend WithEvents Panel3 As Panel
     Friend WithEvents Panel4 As Panel

@@ -93,4 +93,8 @@ Public Class RegistrarLector
             MessageBox.Show(ex.Message, "Error al registrar", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
     End Sub
+
+    Private Sub Label15_Click(sender As Object, e As EventArgs)
+
+    End Sub
 End Class

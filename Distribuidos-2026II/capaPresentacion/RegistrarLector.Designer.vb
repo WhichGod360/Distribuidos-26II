@@ -78,7 +78,7 @@ Partial Class RegistrarLector
         Label2.AutoSize = True
         Label2.BackColor = Color.Transparent
         Label2.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
-        Label2.Location = New Point(62, 214)
+        Label2.Location = New Point(62, 213)
         Label2.Name = "Label2"
         Label2.Size = New Size(171, 28)
         Label2.TabIndex = 1
@@ -89,7 +89,7 @@ Partial Class RegistrarLector
         Label3.AutoSize = True
         Label3.BackColor = Color.Transparent
         Label3.Font = New Font("Segoe UI", 12F, FontStyle.Bold)
-        Label3.Location = New Point(457, 214)
+        Label3.Location = New Point(457, 213)
         Label3.Name = "Label3"
         Label3.Size = New Size(177, 28)
         Label3.TabIndex = 2
@@ -133,7 +133,7 @@ Partial Class RegistrarLector
         cboFNacimiento.CustomFormat = "yyyy-MM-dd"
         cboFNacimiento.Font = New Font("Segoe UI", 12F)
         cboFNacimiento.Format = DateTimePickerFormat.Custom
-        cboFNacimiento.Location = New Point(62, 338)
+        cboFNacimiento.Location = New Point(62, 339)
         cboFNacimiento.Name = "cboFNacimiento"
         cboFNacimiento.Size = New Size(150, 34)
         cboFNacimiento.TabIndex = 6
@@ -143,7 +143,7 @@ Partial Class RegistrarLector
         cboSexo.Font = New Font("Segoe UI", 12F)
         cboSexo.FormattingEnabled = True
         cboSexo.Items.AddRange(New Object() {"Masculino", "Femenino"})
-        cboSexo.Location = New Point(263, 342)
+        cboSexo.Location = New Point(263, 341)
         cboSexo.Name = "cboSexo"
         cboSexo.Size = New Size(161, 36)
         cboSexo.TabIndex = 7
@@ -216,7 +216,7 @@ Partial Class RegistrarLector
         Label13.AutoSize = True
         Label13.BackColor = Color.Transparent
         Label13.Font = New Font("Segoe UI", 16F, FontStyle.Bold)
-        Label13.Location = New Point(563, 16)
+        Label13.Location = New Point(3, 173)
         Label13.Name = "Label13"
         Label13.Size = New Size(137, 37)
         Label13.TabIndex = 14
@@ -228,7 +228,7 @@ Partial Class RegistrarLector
         Label14.BackColor = Color.Transparent
         Label14.Font = New Font("Segoe UI Semibold", 10F, FontStyle.Bold Or FontStyle.Italic)
         Label14.ForeColor = Color.Gray
-        Label14.Location = New Point(477, 53)
+        Label14.Location = New Point(37, 87)
         Label14.Name = "Label14"
         Label14.Size = New Size(237, 23)
         Label14.TabIndex = 15
@@ -262,7 +262,7 @@ Partial Class RegistrarLector
         ' 
         txtDNI.BorderStyle = BorderStyle.FixedSingle
         txtDNI.Font = New Font("Segoe UI", 12F)
-        txtDNI.Location = New Point(60, 143)
+        txtDNI.Location = New Point(59, 143)
         txtDNI.Name = "txtDNI"
         txtDNI.Size = New Size(237, 34)
         txtDNI.TabIndex = 19
@@ -316,7 +316,7 @@ Partial Class RegistrarLector
         ' 
         txtPregunta.BorderStyle = BorderStyle.FixedSingle
         txtPregunta.Font = New Font("Segoe UI", 12F)
-        txtPregunta.Location = New Point(62, 574)
+        txtPregunta.Location = New Point(62, 573)
         txtPregunta.Name = "txtPregunta"
         txtPregunta.Size = New Size(235, 34)
         txtPregunta.TabIndex = 25
@@ -325,7 +325,7 @@ Partial Class RegistrarLector
         ' 
         txtRpta.BorderStyle = BorderStyle.FixedSingle
         txtRpta.Font = New Font("Segoe UI", 12F)
-        txtRpta.Location = New Point(457, 574)
+        txtRpta.Location = New Point(457, 573)
         txtRpta.Name = "txtRpta"
         txtRpta.Size = New Size(232, 34)
         txtRpta.TabIndex = 26
@@ -358,7 +358,7 @@ Partial Class RegistrarLector
         Label18.AutoSize = True
         Label18.BackColor = Color.Transparent
         Label18.Font = New Font("Segoe UI", 9F)
-        Label18.Location = New Point(62, 470)
+        Label18.Location = New Point(62, 469)
         Label18.Name = "Label18"
         Label18.Size = New Size(214, 20)
         Label18.TabIndex = 30
@@ -370,7 +370,7 @@ Partial Class RegistrarLector
         lblNumero.BackColor = Color.Transparent
         lblNumero.Font = New Font("Segoe UI", 10F, FontStyle.Bold)
         lblNumero.ForeColor = Color.Gray
-        lblNumero.Location = New Point(468, 502)
+        lblNumero.Location = New Point(469, 501)
         lblNumero.Name = "lblNumero"
         lblNumero.Size = New Size(97, 23)
         lblNumero.TabIndex = 33
@@ -382,7 +382,7 @@ Partial Class RegistrarLector
         lblMayuscula.BackColor = Color.Transparent
         lblMayuscula.Font = New Font("Segoe UI", 10F, FontStyle.Bold)
         lblMayuscula.ForeColor = Color.Gray
-        lblMayuscula.Location = New Point(293, 502)
+        lblMayuscula.Location = New Point(293, 501)
         lblMayuscula.Name = "lblMayuscula"
         lblMayuscula.Size = New Size(169, 23)
         lblMayuscula.TabIndex = 32
@@ -394,7 +394,7 @@ Partial Class RegistrarLector
         lblCaracteres.BackColor = Color.Transparent
         lblCaracteres.Font = New Font("Segoe UI", 10F, FontStyle.Bold)
         lblCaracteres.ForeColor = Color.Gray
-        lblCaracteres.Location = New Point(179, 502)
+        lblCaracteres.Location = New Point(179, 501)
         lblCaracteres.Name = "lblCaracteres"
         lblCaracteres.Size = New Size(105, 23)
         lblCaracteres.TabIndex = 31
@@ -416,9 +416,9 @@ Partial Class RegistrarLector
         PictureBox1.BackColor = Color.Transparent
         PictureBox1.BackgroundImage = CType(resources.GetObject("PictureBox1.BackgroundImage"), Image)
         PictureBox1.BackgroundImageLayout = ImageLayout.Stretch
-        PictureBox1.Location = New Point(298, 138)
+        PictureBox1.Location = New Point(600, 25)
         PictureBox1.Name = "PictureBox1"
-        PictureBox1.Size = New Size(154, 145)
+        PictureBox1.Size = New Size(83, 67)
         PictureBox1.TabIndex = 35
         PictureBox1.TabStop = False
         ' 
@@ -449,7 +449,7 @@ Partial Class RegistrarLector
         AutoScaleMode = AutoScaleMode.Font
         BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), Image)
         BackgroundImageLayout = ImageLayout.None
-        ClientSize = New Size(1205, 754)
+        ClientSize = New Size(1061, 755)
         Controls.Add(Label22)
         Controls.Add(Label15)
         Controls.Add(PictureBox1)
