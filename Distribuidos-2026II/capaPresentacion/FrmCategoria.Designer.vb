@@ -33,7 +33,7 @@ Partial Class FrmCategoria
         Button2 = New Button()
         Button1 = New Button()
         Label1 = New Label()
-        TextBox1 = New TextBox()
+        txtBuscar = New TextBox()
         Button9 = New Button()
         tbCategoria = New DataGridView()
         Panel3 = New Panel()
@@ -202,14 +202,14 @@ Partial Class FrmCategoria
         Label1.TabIndex = 2
         Label1.Text = "Mantenimiento categoría"
         ' 
-        ' TextBox1
+        ' txtBuscar
         ' 
-        TextBox1.BorderStyle = BorderStyle.FixedSingle
-        TextBox1.Location = New Point(298, 160)
-        TextBox1.Multiline = True
-        TextBox1.Name = "TextBox1"
-        TextBox1.Size = New Size(853, 40)
-        TextBox1.TabIndex = 3
+        txtBuscar.BorderStyle = BorderStyle.FixedSingle
+        txtBuscar.Location = New Point(298, 160)
+        txtBuscar.Multiline = True
+        txtBuscar.Name = "txtBuscar"
+        txtBuscar.Size = New Size(853, 40)
+        txtBuscar.TabIndex = 3
         ' 
         ' Button9
         ' 
@@ -285,7 +285,7 @@ Partial Class FrmCategoria
         ' 
         ' FrmCategoria
         ' 
-        AutoScaleDimensions = New SizeF(8.0F, 20.0F)
+        AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         BackColor = SystemColors.ButtonHighlight
         ClientSize = New Size(1382, 843)
@@ -294,7 +294,7 @@ Partial Class FrmCategoria
         Controls.Add(Panel3)
         Controls.Add(tbCategoria)
         Controls.Add(Button9)
-        Controls.Add(TextBox1)
+        Controls.Add(txtBuscar)
         Controls.Add(Label1)
         Controls.Add(Panel1)
         Controls.Add(Panel2)
@@ -319,7 +319,7 @@ Partial Class FrmCategoria
     Friend WithEvents Button7 As Button
     Friend WithEvents Button6 As Button
     Friend WithEvents Label1 As Label
-    Friend WithEvents TextBox1 As TextBox
+    Friend WithEvents txtBuscar As TextBox
     Friend WithEvents Button9 As Button
     Friend WithEvents tbCategoria As DataGridView
     Friend WithEvents Panel3 As Panel

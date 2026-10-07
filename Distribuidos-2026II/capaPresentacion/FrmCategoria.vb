@@ -3,6 +3,7 @@
 Public Class FrmCategoria
 
     Private negocio As New categoriaNegocio()
+    Private idCategoriaSeleccionada As Integer
 
     Private Sub listarCategoria()
         Dim tabla As DataTable = negocio.listarCategoria()
@@ -45,6 +46,32 @@ Public Class FrmCategoria
     End Sub
 
     Private Sub Button11_Click(sender As Object, e As EventArgs) Handles Button11.Click
+        If idCategoriaSeleccionada = 0 Then
+            MessageBox.Show("Seleccione una categoría.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Return
+        End If
+        Dim frm As New frmEditarCategoria(idCategoriaSeleccionada)
+        frm.ShowDialog()
+    End Sub
+
+    Private Sub tbCategoria_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles tbCategoria.CellClick
+        If e.RowIndex >= 0 Then
+            idCategoriaSeleccionada = Convert.ToInt32(tbCategoria.Rows(e.RowIndex).Cells("id_categoria").Value)
+        End If
+    End Sub
+
+    Private Sub Button9_Click(sender As Object, e As EventArgs) Handles Button9.Click
 
     End Sub
+
+    Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
+        Dim texto As String = txtBuscar.Text.Trim()
+        If texto = "" Then
+            listarCategoria()
+        Else
+            Dim tabla As DataTable = negocio.buscarCategoria(texto)
+            tbCategoria.DataSource = tabla
+        End If
+    End Sub
+
 End Class
