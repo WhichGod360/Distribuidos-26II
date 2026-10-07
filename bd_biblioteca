@@ -1,0 +1,186 @@
+--llamen a la bd : distribuidos-II
+-- 1. Tabla RolUsuario
+CREATE TABLE RolUsuario (
+    id_rol_usuario INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_rol_usuario VARCHAR(50) NOT NULL
+);
+GO
+
+-- 2. Tabla Usuario
+CREATE TABLE Usuario (
+    id_usuario INT IDENTITY(1,1) PRIMARY KEY,
+    email_usuario VARCHAR(100) NOT NULL UNIQUE,
+    nombre_usuario VARCHAR(100) NOT NULL,
+    ap_paterno VARCHAR(100)  NOT NULL,
+    ap_materno VARCHAR(100)  NOT NULL,
+    numero_dni_usuario VARCHAR(8) NOT NULL UNIQUE,
+    fecha_nacimiento_usuario DATE NULL,
+    genero_usuario BIT NULL, 
+    estado_usuario VARCHAR(30) NOT NULL,
+    contrasena VARCHAR(255) NOT NULL,
+    id_rol_usuario INT NOT NULL,
+    CONSTRAINT FK_Usuario_Rol FOREIGN KEY (id_rol_usuario) REFERENCES RolUsuario(id_rol_usuario)
+);
+GO
+
+-- 3. Tabla Autor
+CREATE TABLE Autor (
+    id_autor INT IDENTITY(1,1) PRIMARY KEY, 
+    nombre_autor VARCHAR(255) NOT NULL
+);
+GO
+
+-- 4. Tabla Libro
+CREATE TABLE Libro (
+    id_libro INT IDENTITY(1,1) PRIMARY KEY,
+    titulo_libro VARCHAR(255) NOT NULL,
+    editorial_libro VARCHAR(255) NULL, 
+    ano_publicacion SMALLINT NULL,
+    stock_total INT NOT NULL DEFAULT 0,
+    estado_libro BIT NOT NULL DEFAULT 1,
+    publico_libro VARCHAR(30) NULL
+);
+GO
+
+-- 5. Tabla DetalleLibro (Relación N:M Libro - Autor con restricción de unicidad)
+CREATE TABLE DetalleLibro (
+    id_detalle_libro INT IDENTITY(1,1) PRIMARY KEY,
+    id_libro INT NOT NULL,
+    id_autor INT NOT NULL,
+    CONSTRAINT FK_DetalleLibro_Libro FOREIGN KEY (id_libro) REFERENCES Libro(id_libro),
+    CONSTRAINT FK_DetalleLibro_Autor FOREIGN KEY (id_autor) REFERENCES Autor(id_autor),
+    CONSTRAINT UQ_Libro_Autor UNIQUE (id_libro, id_autor)
+);
+GO
+
+-- 6. Tabla Categoria
+CREATE TABLE Categoria (
+    id_categoria INT IDENTITY(1,1) PRIMARY KEY,
+    nombre_categoria VARCHAR(30) NOT NULL
+);
+GO
+
+-- 7. Tabla DetalleCategoria (Relación N:M Libro - Categoria con restricción de unicidad)
+CREATE TABLE DetalleCategoria (
+    id_detalleCategoria INT IDENTITY(1,1) PRIMARY KEY,
+    id_libro INT NOT NULL,
+    id_categoria INT NOT NULL,
+    CONSTRAINT FK_DetalleCategoria_Libro FOREIGN KEY (id_libro) REFERENCES Libro(id_libro),
+    CONSTRAINT FK_DetalleCategoria_Categoria FOREIGN KEY (id_categoria) REFERENCES Categoria(id_categoria),
+    CONSTRAINT UQ_Libro_Categoria UNIQUE (id_libro, id_categoria)
+);
+GO
+
+-- 8. Tabla Ejemplar
+CREATE TABLE Ejemplar (
+    id_ejemplar INT IDENTITY(1,1) PRIMARY KEY,
+    estado_ejemplar BIT NOT NULL DEFAULT 1, 
+    id_libro INT NOT NULL,
+    CONSTRAINT FK_Ejemplar_Libro FOREIGN KEY (id_libro) REFERENCES Libro(id_libro)
+);
+GO
+
+-- 9. Tabla Prestamo
+CREATE TABLE Prestamo (
+    id_prestamo INT IDENTITY(1,1) PRIMARY KEY,
+    fecha_inicio_prestamo DATE NOT NULL,
+    fecha_fin_prestamo DATE NOT NULL,
+    fecha_retorno_prestamo DATE NULL, 
+    estado_prestamo VARCHAR(30) NOT NULL,
+    dias_retraso_prestamo INT DEFAULT 0,
+    id_usuario INT NOT NULL,
+    id_bibliotecario INT NOT NULL,
+    id_ejemplar INT NOT NULL,
+    CONSTRAINT FK_Prestamo_Usuario FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario),
+    CONSTRAINT FK_Prestamo_Bibliotecario FOREIGN KEY (id_bibliotecario) REFERENCES Usuario(id_usuario),
+    CONSTRAINT FK_Prestamo_Ejemplar FOREIGN KEY (id_ejemplar) REFERENCES Ejemplar(id_ejemplar),
+    CONSTRAINT CHK_Prestamo_Fechas CHECK (fecha_fin_prestamo > fecha_inicio_prestamo)
+);
+GO
+
+-- 10. Tabla Penalizacion
+CREATE TABLE Penalizacion (
+    id_penalizacion INT IDENTITY(1,1) PRIMARY KEY,
+    tipo_penalizacion VARCHAR(30) NOT NULL,
+    descripcion_penalizacion VARCHAR(MAX) NULL,
+    monto_penalizacion DECIMAL(7,2) NOT NULL DEFAULT 0.00,
+    estado_penalizacion BIT NOT NULL DEFAULT 1, 
+    CONSTRAINT CHK_Penalizacion_Monto  CHECK (Monto_Penalizacion >= 0)
+);
+GO
+
+-- 11. Tabla DetallePenalizacion
+CREATE TABLE DetallePenalizacion (
+    id_detalle_penalizacion INT IDENTITY(1,1) PRIMARY KEY,
+    descripcion_detallepenalizacion VARCHAR(MAX) NULL,
+    id_penalizacion INT NOT NULL,
+    id_prestamo INT NOT NULL,
+    CONSTRAINT FK_DetallePenalizacion_Penalizacion FOREIGN KEY (id_penalizacion) REFERENCES Penalizacion(id_penalizacion),
+    CONSTRAINT FK_DetallePenalizacion_Prestamo FOREIGN KEY (id_prestamo) REFERENCES Prestamo(id_prestamo)
+);
+GO
+
+
+-- Roles
+INSERT INTO RolUsuario (nombre_rol_usuario) VALUES
+('Administrador'),
+('Bibliotecario'),
+('Estudiante');
+
+-- Usuarios
+-- id_rol_usuario: 1=Administrador, 2=Bibliotecario, 3=Estudiante
+INSERT INTO Usuario (email_usuario, nombre_usuario, ap_paterno, ap_materno, numero_dni_usuario, fecha_nacimiento_usuario, genero_usuario, estado_usuario, contrasena, id_rol_usuario) VALUES
+('admin@biblioteca.usat.edu.pe', 'Carlos', 'Diaz', 'Perez', '10000001', '1985-03-10', 1, 'Activo', 'luchos', 1),
+('bibliotecaria@biblioteca.usat.edu.pe', 'Maria', 'Torres', 'Vega', '10000002', '1990-07-22', 0, 'Activo', 'luchos', 2),
+('altair.lachos@usat.pe', 'Altair', 'Lachos', 'Briones', '70000001', '2003-01-15', 1, 'Activo', 'luchos', 3),
+('renzo.gonzales@usat.pe', 'Renzo', 'Gonzales', 'Campos', '70000002', '2003-05-20', 1, 'Activo', 'luchos', 3);
+
+
+-- Autores
+INSERT INTO Autor (nombre_autor) VALUES
+('Gabriel Garcia Marquez'),
+('Robert C. Martin'),
+('Martin Fowler');
+
+-- Libros
+INSERT INTO Libro (titulo_libro, editorial_libro, ano_publicacion, stock_total, estado_libro, publico_libro) VALUES
+('Cien Anios de Soledad', 'Sudamericana', 1967, 3, 1, 'General'),
+('Clean Code', 'Prentice Hall', 2008, 2, 1, 'Universitario'),
+('Refactoring', 'Addison-Wesley', 1999, 2, 1, 'Universitario');
+
+-- Relación Libro-Autor
+INSERT INTO DetalleLibro (id_libro, id_autor) VALUES
+(1, 1),
+(2, 2),
+(3, 3);
+
+-- Ejemplares (copias físicas)
+INSERT INTO Ejemplar (estado_ejemplar, id_libro) VALUES
+(1, 1), (1, 1), (1, 1),   -- 3 ejemplares de Cien Anios de Soledad
+(1, 2), (0, 2),           -- 2 ejemplares de Clean Code 
+(1, 3), (1, 3);           -- 2 ejemplares de Refactoring
+
+-- ============================================
+-- PRESTAMO 1: normal, devuelto a tiempo, sin penalización
+-- ============================================
+INSERT INTO Prestamo (fecha_inicio_prestamo, fecha_fin_prestamo, fecha_retorno_prestamo, estado_prestamo, dias_retraso_prestamo, id_usuario, id_bibliotecario, id_ejemplar) VALUES
+('2026-08-01', '2026-08-08', '2026-08-07', 'Devuelto', 0, 3, 2, 6);
+
+-- ============================================
+-- PRESTAMO 2: con retraso -> genera penalización
+-- ============================================
+INSERT INTO Prestamo (fecha_inicio_prestamo, fecha_fin_prestamo, fecha_retorno_prestamo, estado_prestamo, dias_retraso_prestamo, id_usuario, id_bibliotecario, id_ejemplar) VALUES
+('2026-08-01', '2026-08-08', '2026-08-13', 'Devuelto', 5, 4, 2, 4);
+
+-- Penalización asociada al préstamo 2 (5 días de mora, S/1.00 por día)
+INSERT INTO Penalizacion (tipo_penalizacion, descripcion_penalizacion, monto_penalizacion, estado_penalizacion) VALUES
+('Mora', 'Retraso de 5 dias en la devolucion del ejemplar', 5.00, 1); -- estado 1 = pendiente de pago
+
+INSERT INTO DetallePenalizacion (descripcion_detallepenalizacion, id_penalizacion, id_prestamo) VALUES
+('Penalizacion generada automaticamente por dias_retraso_prestamo', 1, 2);
+
+ALTER TABLE Categoria
+ADD estado BIT NOT NULL DEFAULT 1;
+
+alter table usuario add preguntasegura varchar(255) not null default 'Salvamos calidad y distribuidos? (si/no)';
+alter table usuario add rptasegura varchar (20) not null default 'no';
