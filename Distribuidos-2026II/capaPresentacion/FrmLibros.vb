@@ -1,5 +1,8 @@
-﻿\xEF\xBB\xBFImports System.Drawing.Drawing2D
-Imports System.Runtime.InteropServices
+﻿Imports System.Runtime.InteropServices
+Imports System
+Imports System.ComponentModel
+Imports System.Drawing
+Imports System.Drawing.Drawing2D
 
 Public Class FrmLibros
 
@@ -25,7 +28,7 @@ Public Class FrmLibros
     Private Sub FrmLibros_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         SendMessage(txtBuscar.Handle, EM_SETCUEBANNER, 1, "Buscar en libros...")
 
-        fuenteEstado = New Font(dgvLibros.Font, FontStyle.Bold)
+        fuenteEstado = New Font(DataGridView1.Font, FontStyle.Bold)
         fuenteSubNormal = New Font("Segoe UI", 9.5!)
         fuenteSubActivo = New Font("Segoe UI", 9.5!, FontStyle.Bold)
 
@@ -120,8 +123,8 @@ Public Class FrmLibros
             pagina.ImportRow(vista(i).Row)
         Next
 
-        dgvLibros.DataSource = pagina
-        dgvLibros.ClearSelection()
+        DataGridView1.DataSource = pagina
+        DataGridView1.ClearSelection()
         lblRegistros.Text = If(total = 0, "Sin registros",
                                "Mostrando " & (ini + 1) & "–" & (fin + 1) & " de " & total & " registros")
         ConstruirPaginacion(totalPaginas)
@@ -184,7 +187,7 @@ Public Class FrmLibros
     '  GRILLA
     ' =====================================================================
     Private Sub dgvLibros_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If e.RowIndex >= 0 AndAlso dgvLibros.Columns(e.ColumnIndex).Name = "colEstado" Then
+        If e.RowIndex >= 0 AndAlso DataGridView1.Columns(e.ColumnIndex).Name = "colEstado" Then
             Dim activo = Convert.ToString(e.Value) = "Activo"
             e.CellStyle.Font = fuenteEstado
             e.CellStyle.ForeColor = If(activo, Color.FromArgb(25, 35, 140), Color.FromArgb(90, 90, 100))
@@ -193,8 +196,8 @@ Public Class FrmLibros
 
     Private Sub dgvLibros_CellContentClick(sender As Object, e As DataGridViewCellEventArgs)
         If e.RowIndex < 0 Then Return
-        Dim id = CInt(dgvLibros.Rows(e.RowIndex).Cells("colId").Value)
-        Select Case dgvLibros.Columns(e.ColumnIndex).Name
+        Dim id = CInt(DataGridView1.Rows(e.RowIndex).Cells("colId").Value)
+        Select Case DataGridView1.Columns(e.ColumnIndex).Name
             Case "colEditar" : EditarLibro(id)
             Case "colEliminar" : EliminarLibro(id)
         End Select

@@ -22,7 +22,7 @@ Partial Class Login
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Login))
+        Dim resources As ComponentResourceManager = New ComponentResourceManager(GetType(Login))
         txtCorreo = New TextBox()
         txtContraseña = New TextBox()
         Label1 = New Label()
@@ -38,9 +38,9 @@ Partial Class Login
         Label3 = New Label()
         Label5 = New Label()
         Label6 = New Label()
-        CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PictureBox2, ComponentModel.ISupportInitialize).BeginInit()
-        CType(PictureBox3, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PictureBox1, ISupportInitialize).BeginInit()
+        CType(PictureBox2, ISupportInitialize).BeginInit()
+        CType(PictureBox3, ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' txtCorreo
@@ -89,7 +89,7 @@ Partial Class Login
         btnIniciarSesion.Location = New Point(695, 400)
         btnIniciarSesion.Name = "btnIniciarSesion"
         btnIniciarSesion.Size = New Size(302, 47)
-        btnIniciarSesion.TabIndex = 5
+        btnIniciarSesion.TabIndex = 3
         btnIniciarSesion.Text = "Ingresar"
         btnIniciarSesion.UseVisualStyleBackColor = False
         ' 
@@ -147,7 +147,7 @@ Partial Class Login
         checkMostrar.Location = New Point(895, 343)
         checkMostrar.Name = "checkMostrar"
         checkMostrar.Size = New Size(91, 27)
-        checkMostrar.TabIndex = 10
+        checkMostrar.TabIndex = 2
         checkMostrar.Text = "mostrar"
         checkMostrar.UseVisualStyleBackColor = False
         ' 
@@ -159,7 +159,7 @@ Partial Class Login
         lblOlvide.Location = New Point(695, 378)
         lblOlvide.Name = "lblOlvide"
         lblOlvide.Size = New Size(178, 20)
-        lblOlvide.TabIndex = 11
+        lblOlvide.TabIndex = 4
         lblOlvide.TabStop = True
         lblOlvide.Text = "¿Olvidaste tu contraseña?"
         ' 
@@ -182,7 +182,7 @@ Partial Class Login
         lblRegistrate.Location = New Point(933, 447)
         lblRegistrate.Name = "lblRegistrate"
         lblRegistrate.Size = New Size(82, 23)
-        lblRegistrate.TabIndex = 13
+        lblRegistrate.TabIndex = 5
         lblRegistrate.TabStop = True
         lblRegistrate.Text = "registrate"
         ' 
@@ -214,12 +214,13 @@ Partial Class Login
         Label6.BackColor = Color.Transparent
         Label6.Location = New Point(714, 540)
         Label6.Name = "Label6"
-        Label6.Size = New Size(348, 20)
+        Label6.Size = New Size(350, 20)
         Label6.TabIndex = 17
-        Label6.Text = "TotOs los derechos Reservados - @Grupo Marciano"
+        Label6.Text = "Todos los derechos Reservados - @Grupo Marciano"
         ' 
         ' Login
         ' 
+        AcceptButton = btnIniciarSesion
         AutoScaleMode = AutoScaleMode.None
         BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), Image)
         BackgroundImageLayout = ImageLayout.None
@@ -243,9 +244,9 @@ Partial Class Login
         Name = "Login"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Inicio  de sesion"
-        CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
-        CType(PictureBox2, ComponentModel.ISupportInitialize).EndInit()
-        CType(PictureBox3, ComponentModel.ISupportInitialize).EndInit()
+        CType(PictureBox1, ISupportInitialize).EndInit()
+        CType(PictureBox2, ISupportInitialize).EndInit()
+        CType(PictureBox3, ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub

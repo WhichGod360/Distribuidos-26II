@@ -22,7 +22,7 @@ Partial Class RegistrarLector
     'No lo modifique con el editor de código.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(RegistrarLector))
+        Dim resources As ComponentResourceManager = New ComponentResourceManager(GetType(RegistrarLector))
         Label1 = New Label()
         Label2 = New Label()
         Label3 = New Label()
@@ -59,7 +59,7 @@ Partial Class RegistrarLector
         PictureBox1 = New PictureBox()
         Label15 = New Label()
         Label22 = New Label()
-        CType(PictureBox1, ComponentModel.ISupportInitialize).BeginInit()
+        CType(PictureBox1, ISupportInitialize).BeginInit()
         SuspendLayout()
         ' 
         ' Label1
@@ -136,7 +136,7 @@ Partial Class RegistrarLector
         cboFNacimiento.Location = New Point(62, 339)
         cboFNacimiento.Name = "cboFNacimiento"
         cboFNacimiento.Size = New Size(150, 34)
-        cboFNacimiento.TabIndex = 6
+        cboFNacimiento.TabIndex = 4
         ' 
         ' cboSexo
         ' 
@@ -146,7 +146,7 @@ Partial Class RegistrarLector
         cboSexo.Location = New Point(263, 341)
         cboSexo.Name = "cboSexo"
         cboSexo.Size = New Size(161, 36)
-        cboSexo.TabIndex = 7
+        cboSexo.TabIndex = 5
         ' 
         ' Label7
         ' 
@@ -245,7 +245,7 @@ Partial Class RegistrarLector
         btnRegistrarse.Location = New Point(513, 667)
         btnRegistrarse.Name = "btnRegistrarse"
         btnRegistrarse.Size = New Size(170, 52)
-        btnRegistrarse.TabIndex = 17
+        btnRegistrarse.TabIndex = 11
         btnRegistrarse.Text = "Registrarse"
         btnRegistrarse.UseVisualStyleBackColor = False
         ' 
@@ -256,7 +256,7 @@ Partial Class RegistrarLector
         txtNombres.Location = New Point(454, 143)
         txtNombres.Name = "txtNombres"
         txtNombres.Size = New Size(232, 34)
-        txtNombres.TabIndex = 18
+        txtNombres.TabIndex = 1
         ' 
         ' txtDNI
         ' 
@@ -265,7 +265,7 @@ Partial Class RegistrarLector
         txtDNI.Location = New Point(59, 143)
         txtDNI.Name = "txtDNI"
         txtDNI.Size = New Size(237, 34)
-        txtDNI.TabIndex = 19
+        txtDNI.TabIndex = 0
         ' 
         ' txtApPaterno
         ' 
@@ -274,7 +274,7 @@ Partial Class RegistrarLector
         txtApPaterno.Location = New Point(62, 245)
         txtApPaterno.Name = "txtApPaterno"
         txtApPaterno.Size = New Size(235, 34)
-        txtApPaterno.TabIndex = 20
+        txtApPaterno.TabIndex = 2
         ' 
         ' txtApMaterno
         ' 
@@ -283,7 +283,7 @@ Partial Class RegistrarLector
         txtApMaterno.Location = New Point(454, 245)
         txtApMaterno.Name = "txtApMaterno"
         txtApMaterno.Size = New Size(232, 34)
-        txtApMaterno.TabIndex = 21
+        txtApMaterno.TabIndex = 3
         ' 
         ' txtCorreo
         ' 
@@ -292,7 +292,7 @@ Partial Class RegistrarLector
         txtCorreo.Location = New Point(457, 340)
         txtCorreo.Name = "txtCorreo"
         txtCorreo.Size = New Size(229, 34)
-        txtCorreo.TabIndex = 22
+        txtCorreo.TabIndex = 6
         ' 
         ' txtContraseña
         ' 
@@ -301,7 +301,7 @@ Partial Class RegistrarLector
         txtContraseña.Location = New Point(62, 431)
         txtContraseña.Name = "txtContraseña"
         txtContraseña.Size = New Size(235, 34)
-        txtContraseña.TabIndex = 23
+        txtContraseña.TabIndex = 7
         ' 
         ' txtConfirmar
         ' 
@@ -310,7 +310,7 @@ Partial Class RegistrarLector
         txtConfirmar.Location = New Point(459, 431)
         txtConfirmar.Name = "txtConfirmar"
         txtConfirmar.Size = New Size(227, 34)
-        txtConfirmar.TabIndex = 24
+        txtConfirmar.TabIndex = 8
         ' 
         ' txtPregunta
         ' 
@@ -319,7 +319,7 @@ Partial Class RegistrarLector
         txtPregunta.Location = New Point(62, 573)
         txtPregunta.Name = "txtPregunta"
         txtPregunta.Size = New Size(235, 34)
-        txtPregunta.TabIndex = 25
+        txtPregunta.TabIndex = 9
         ' 
         ' txtRpta
         ' 
@@ -328,7 +328,7 @@ Partial Class RegistrarLector
         txtRpta.Location = New Point(457, 573)
         txtRpta.Name = "txtRpta"
         txtRpta.Size = New Size(232, 34)
-        txtRpta.TabIndex = 26
+        txtRpta.TabIndex = 10
         ' 
         ' linkLogin
         ' 
@@ -445,10 +445,12 @@ Partial Class RegistrarLector
         ' 
         ' RegistrarLector
         ' 
+        AcceptButton = btnRegistrarse
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
         BackgroundImage = CType(resources.GetObject("$this.BackgroundImage"), Image)
         BackgroundImageLayout = ImageLayout.None
+        CancelButton = linkLogin
         ClientSize = New Size(1061, 755)
         Controls.Add(Label22)
         Controls.Add(Label15)
@@ -490,7 +492,7 @@ Partial Class RegistrarLector
         Name = "RegistrarLector"
         StartPosition = FormStartPosition.CenterScreen
         Text = "Registrar Lector"
-        CType(PictureBox1, ComponentModel.ISupportInitialize).EndInit()
+        CType(PictureBox1, ISupportInitialize).EndInit()
         ResumeLayout(False)
         PerformLayout()
     End Sub

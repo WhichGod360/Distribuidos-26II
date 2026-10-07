@@ -1,5 +1,4 @@
-﻿\xEF\xBB\xBFImports System.Drawing
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class FrmConfirmacion

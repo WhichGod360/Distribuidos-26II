@@ -45,7 +45,7 @@ Partial Class NuevaContraseña
         txtRpta.Name = "txtRpta"
         txtRpta.PasswordChar = "*"c
         txtRpta.Size = New Size(277, 30)
-        txtRpta.TabIndex = 15
+        txtRpta.TabIndex = 1
         ' 
         ' btnGuardar
         ' 
@@ -126,7 +126,7 @@ Partial Class NuevaContraseña
         TextBox1.Name = "TextBox1"
         TextBox1.PasswordChar = "*"c
         TextBox1.Size = New Size(277, 30)
-        TextBox1.TabIndex = 16
+        TextBox1.TabIndex = 0
         ' 
         ' lblCaracteres
         ' 
@@ -174,8 +174,10 @@ Partial Class NuevaContraseña
         ' 
         ' NuevaContraseña
         ' 
+        AcceptButton = btnGuardar
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
+        CancelButton = btnCancelar
         ClientSize = New Size(380, 327)
         Controls.Add(lblNumero)
         Controls.Add(Label7)

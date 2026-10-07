@@ -1,5 +1,6 @@
-﻿\xEF\xBB\xBFImports System.Drawing
-Imports System.Windows.Forms
+﻿Imports System.Windows.Forms
+Imports System
+Imports System.ComponentModel
 
 <Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class FrmLibros

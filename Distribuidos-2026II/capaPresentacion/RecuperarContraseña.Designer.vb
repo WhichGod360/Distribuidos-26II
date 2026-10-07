@@ -98,7 +98,7 @@ Partial Class RecuperarContraseña
         btonVerificar.Location = New Point(289, 243)
         btonVerificar.Name = "btonVerificar"
         btonVerificar.Size = New Size(123, 41)
-        btonVerificar.TabIndex = 5
+        btonVerificar.TabIndex = 1
         btonVerificar.Text = "Verificar"
         btonVerificar.UseVisualStyleBackColor = False
         ' 
@@ -122,12 +122,14 @@ Partial Class RecuperarContraseña
         txtRpta.Location = New Point(55, 181)
         txtRpta.Name = "txtRpta"
         txtRpta.Size = New Size(331, 30)
-        txtRpta.TabIndex = 7
+        txtRpta.TabIndex = 0
         ' 
         ' RecuperarContraseña
         ' 
+        AcceptButton = btonVerificar
         AutoScaleDimensions = New SizeF(8F, 20F)
         AutoScaleMode = AutoScaleMode.Font
+        CancelButton = btonCancelar
         ClientSize = New Size(437, 302)
         Controls.Add(txtRpta)
         Controls.Add(txtPregunta)
