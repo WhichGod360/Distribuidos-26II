@@ -20,4 +20,16 @@ Public Class categoriaNegocio
         Return True
     End Function
 
+    Public Function obtenerCategoria(id As Integer) As DataTable
+        Return dato.ObtenerPorId(id)
+    End Function
+
+    Public Function actualizarCategoria(id As Integer, nombre As String, estado As Integer) As Boolean
+        Return dato.Actualizar(id, nombre, estado)
+    End Function
+
+    Public Function buscarCategoria(nombre As String) As DataTable
+        Return dato.BuscarCategoria(nombre)
+    End Function
+
 End Class
