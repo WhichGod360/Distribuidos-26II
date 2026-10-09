@@ -5,7 +5,7 @@ using capaDatos;
 using capaNegocio;
 using capaInterfaz;
 
-internal static class Program
+internal static partial class Program
 {
     private static int checks;
 
@@ -54,9 +54,14 @@ internal static class Program
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             VerifyForms(today);
+            VerifyDesignerForms();
             Console.WriteLine($"RESULTADO: {checks} comprobaciones correctas sin escrituras en SQL.");
             if (args.Contains("--sql-lectura")) ProbeSql();
-            if (database is not null) VerifySqlOperations();
+            if (database is not null)
+            {
+                VerifyDashboardAndReader();
+                VerifySqlOperations();
+            }
             return 0;
         }
         catch (Exception ex)
@@ -125,7 +130,7 @@ internal static class Program
         // Renderizar el contenido desprendido evita mostrar ventanas y disparar Load/consultas.
         var content = form.Controls[0];
         form.Controls.Remove(content);
-        using var surface = new Panel { Size = size, BackColor = Color.White };
+        using var surface = new Panel { Size = size, BackColor = Color.White, Font = form.Font };
         surface.Controls.Add(content);
         surface.CreateControl();
         content.CreateControl();

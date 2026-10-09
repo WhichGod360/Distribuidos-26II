@@ -343,13 +343,13 @@ Partial Class frmPrestamoDetalle
         Me.busqueda.Controls.Add(Me.buscar)
         Me.busqueda.Controls.Add(Me.btnBuscar)
         Me.guardar.Text = "Registrar"
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(660, 702)
         Me.Name = "frmPrestamoDetalle"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Nuevo préstamo"
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable
         Me.MinimizeBox = False
         Me.MaximizeBox = False

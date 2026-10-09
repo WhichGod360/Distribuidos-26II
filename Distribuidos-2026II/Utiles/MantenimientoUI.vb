@@ -163,6 +163,8 @@ Namespace Global.Utiles
         Public Shared Function MostrarDialogo(formulario As Form, origen As Control) As DialogResult
             Dim propietario As Form = TryCast(origen.TopLevelControl, Form)
             If propietario Is Nothing Then propietario = origen.FindForm()
+            Dim area = Screen.FromControl(origen).WorkingArea
+            formulario.Size = New Size(Math.Min(formulario.Width, area.Width - 32), Math.Min(formulario.Height, area.Height - 48))
             Return formulario.ShowDialog(propietario)
         End Function
 

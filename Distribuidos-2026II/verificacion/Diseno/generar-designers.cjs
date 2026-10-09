@@ -15,14 +15,13 @@ class Designer {
   label(n,text,props={}) {return this.add(n,'Label',{Text:q(text),ForeColor:ink,AutoSize:'False',...props});}
   button(n,text,primary=false,props={}) {return this.add(n,'Button',{Text:q(text),Size:'New System.Drawing.Size(170, 38)',AutoSize:'False',FlatStyle:'System.Windows.Forms.FlatStyle.Flat','FlatAppearance.BorderSize':primary?'0':'1','FlatAppearance.BorderColor':color('215, 222, 237'),BackColor:primary?blue:'System.Drawing.Color.White',ForeColor:primary?'System.Drawing.Color.White':blue,Font:'New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)',Cursor:'System.Windows.Forms.Cursors.Hand',Margin:'New System.Windows.Forms.Padding(0, 0, 10, 4)',UseVisualStyleBackColor:'False',...props});}
   combo(n,items=[],props={}) {this.add(n,'ComboBox',{DropDownStyle:'System.Windows.Forms.ComboBoxStyle.DropDownList',...props}); if(items.length)this.line(`Me.${n}.Items.AddRange(New Object() {${items.map(q).join(', ')}})`);}
+  style(n,props) { this.items.set(n,'DataGridViewCellStyle'); this.set(n,props); return `Me.${n}`; }
   grid(n,cols,fill=false) {
     this.add(n,'DataGridView',{Dock:'System.Windows.Forms.DockStyle.Fill',ReadOnly:'True',AllowUserToAddRows:'False',AllowUserToDeleteRows:'False',MultiSelect:'False',SelectionMode:'System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect',RowHeadersVisible:'False',AutoGenerateColumns:'False',AutoSizeColumnsMode:`System.Windows.Forms.DataGridViewAutoSizeColumnsMode.${fill?'Fill':'None'}`,BackgroundColor:'System.Drawing.Color.White',BorderStyle:'System.Windows.Forms.BorderStyle.None',GridColor:color('231, 235, 246'),EnableHeadersVisualStyles:'False',ColumnHeadersHeight:'40','RowTemplate.Height':'36',Margin:'New System.Windows.Forms.Padding(0)',AccessibleName:q('Tabla de resultados')});
-    this.line(`Me.${n}.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = ${color('234, 239, 255')}, .ForeColor = ${ink}, .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}`);
-    this.line(`Me.${n}.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = ${color('222, 229, 255')}, .SelectionForeColor = ${ink}, .NullValue = "—"}`);
-    this.line(`Me.${n}.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = ${color('248, 250, 255')}}`);
+    this.set(n,{ColumnHeadersDefaultCellStyle:this.style(n+'Cabecera',{BackColor:color('234, 239, 255'),ForeColor:ink,Font:'New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)'}),DefaultCellStyle:this.style(n+'Celdas',{SelectionBackColor:color('222, 229, 255'),SelectionForeColor:ink,NullValue:q('—')}),AlternatingRowsDefaultCellStyle:this.style(n+'Alternas',{BackColor:color('248, 250, 255')})});
     for(const [field,text,prop,width,format='',name=field] of cols) {
       this.add(field,'DataGridViewTextBoxColumn',{Name:q(name),HeaderText:q(text),DataPropertyName:q(prop),Width:String(width),FillWeight:String(width),ReadOnly:'True',SortMode:'System.Windows.Forms.DataGridViewColumnSortMode.NotSortable'});
-      if(format)this.line(`Me.${field}.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = ${q(format)}, .NullValue = "—"}`);
+      if(format)this.set(field,{DefaultCellStyle:this.style(field+'Formato',{Format:q(format),NullValue:q('—')})});
       this.line(`Me.${n}.Columns.Add(Me.${field})`);
     }
   }
@@ -32,6 +31,7 @@ class Designer {
     rows.forEach(v=>this.line(`Me.${n}.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.${v==='auto'?'AutoSize':typeof v==='number'?'Absolute':'Percent'}${v==='auto'?'':`, ${parseFloat(v)}!`}))`));
   }
   header(title,desc) {
+    this.title=title;
     this.table('encabezado',[80],['72px',100]);
     this.add('imagenModulo','PictureBox',{Dock:'System.Windows.Forms.DockStyle.Fill',Image:'Global.capaInterfaz.My.Resources.Resources.no',SizeMode:'System.Windows.Forms.PictureBoxSizeMode.Zoom',Margin:'New System.Windows.Forms.Padding(0, 0, 16, 10)',TabStop:'False',AccessibleName:q('Lecturae, biblioteca y comunidad')});
     this.add('textoEncabezado','Panel',{Dock:'System.Windows.Forms.DockStyle.Fill'});
@@ -56,7 +56,7 @@ class Designer {
     const head=`<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>\nPartial Class ${this.name}\n    Inherits System.Windows.Forms.Form\n\n    Private components As System.ComponentModel.IContainer\n    <System.Diagnostics.DebuggerNonUserCode()>\n    Protected Overrides Sub Dispose(disposing As Boolean)\n        Try\n            If disposing AndAlso components IsNot Nothing Then components.Dispose()\n        Finally\n            MyBase.Dispose(disposing)\n        End Try\n    End Sub\n\n    <System.Diagnostics.DebuggerStepThrough()>\n    Private Sub InitializeComponent()\n        Me.components = New System.ComponentModel.Container()\n`;
     const out=[...init].map(([n,t])=>`Me.${n} = New System.Windows.Forms.${t}()`);
     out.push(...begin.map(n=>`CType(Me.${n}, System.ComponentModel.ISupportInitialize).BeginInit()`),...containers.map(n=>`Me.${n}.SuspendLayout()`),'Me.SuspendLayout()',...this.lines);
-    out.push('Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)','Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font','Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)','Me.BackColor = System.Drawing.Color.White',`Me.ClientSize = New System.Drawing.Size(${width}, ${height})`,`Me.Name = ${q(this.name)}`,`Me.Text = Me.lblTituloVista.Text`);
+    out.push('Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)','Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi','Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)','Me.BackColor = System.Drawing.Color.White',`Me.ClientSize = New System.Drawing.Size(${width}, ${height})`,`Me.Name = ${q(this.name)}`,`Me.Text = ${q(this.title||this.name)}`);
     if(dialog)out.push('Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable','Me.MinimizeBox = False','Me.MaximizeBox = False','Me.ShowInTaskbar = False','Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent', 'Me.MinimumSize = New System.Drawing.Size(500, 360)');
     out.push(...begin.map(n=>`CType(Me.${n}, System.ComponentModel.ISupportInitialize).EndInit()`),...containers.reverse().flatMap(n=>[`Me.${n}.ResumeLayout(False)`,`Me.${n}.PerformLayout()`]),'Me.ResumeLayout(False)');
     fs.writeFileSync(path.join(root,this.name+'.Designer.vb'),head+out.map(s=>'        '+s).join('\n')+'\n    End Sub\n\n'+[...init].map(([n,t])=>`    Friend WithEvents ${n} As System.Windows.Forms.${t}`).join('\n')+'\nEnd Class\n','utf8');
@@ -67,7 +67,7 @@ class Designer {
 
 function list(name,title,desc,grid,search,buttons,summary,filters,columns,extra) {
  const d=new Designer(name); d.header(title,desc);
- d.table('layoutVista',[84,'auto','auto','100%',36],[100],{Padding:'New System.Windows.Forms.Padding(24, 18, 24, 12)'});
+ d.table('layoutVista',[84,'auto','auto','100%',52],[100],{Padding:'New System.Windows.Forms.Padding(24, 18, 24, 12)'});
  d.add('barraFiltros','FlowLayoutPanel',{Dock:'System.Windows.Forms.DockStyle.Fill',AutoSize:'True',WrapContents:'True'});
  d.field('barraFiltros',search,'TextBox','Buscar',[],{PlaceholderText:q('Buscar...')},30,320);
  for(const [n,label,items]of filters)d.field('barraFiltros',n,'ComboBox',label,items,{},30,180);
@@ -87,8 +87,8 @@ list('frmEjemplares','Ejemplares','Selecciona un libro desde el catálogo para c
 list('frmPenalizacion','Penalizaciones','Administra las sanciones, sus montos y su estado.','DataGridView1','txtBuscar',[['btnNuevo','Agregar penalización'],['btnGuardar','Editar',false],['btnCambiarEstado','Desactivar',false],['btnVerDetalles','Ver detalles',false]],'lblResumen',[['cboFiltroEstado','Estado',['Todos','Activo','Inactivo']]],[['colId','ID','',10],['colTipo','Tipo','',23],['colMonto','Monto','',12],['colDescripcion','Descripción','',37],['colEstado','Estado','',18]]);
 list('frmDetallePenalizacion','Detalle de penalizaciones','Consulta las sanciones asociadas a los préstamos.','DataGridView1','buscar',[['btnAgregar','Agregar detalle'],['btnEditar','Editar',false],['btnVolver','Volver a penalizaciones']],'lblResumen',[['cboFiltroSancion','Penalización',[]]],[['colId','ID','',55],['colSancion','Penalización','',160],['colMonto','Monto','',85],['colIdPrestamo','Préstamo','',85],['colUsuario','Lector','',180],['colLibro','Libro','',180],['colInicio','Inicio','',100],['colVence','Vence','',100],['colRetorno','Retorno','',100],['colDias','Retraso','',80],['colEstadoPrestamo','Estado','',95],['colDescripcion','Descripción','',220]]);
 list('FrmLibros','Libros','Administra el catálogo y las copias de cada libro.','DataGridView1','txtBuscar',[['btnAgregar','Agregar libro'],['btnEditar','Editar',false],['btnDesactivar','Desactivar',false],['btnEjemplares','Ver ejemplares',false]],'lblRegistros',[['cboEstado','Estado',['Todos','Activo','Inactivo']],['cboOrden','Ordenar',['Título A–Z','Título Z–A','Año ascendente','Año descendente']]],[['colId','ID','id',10],['colTitulo','Título','titulo',34],['colEditorial','Editorial','editorial',20],['colAnio','Año','anio',10],['colStock','Ejemplares','stock',10],['colEstado','Estado','estado',16]],d=>{
- d.add('pnlPaginacion','FlowLayoutPanel',{Dock:'System.Windows.Forms.DockStyle.Right',Width:'300'});d.button('btnPagPrev','‹',false,{Width:'40'});d.add('flpNumeros','FlowLayoutPanel',{Width:'205',Height:'40'});d.button('btnPagNext','›',false,{Width:'40'});d.child('pnlPaginacion','btnPagPrev');d.child('pnlPaginacion','flpNumeros');d.child('pnlPaginacion','btnPagNext');
- d.add('pieListado','Panel',{Dock:'System.Windows.Forms.DockStyle.Fill'});d.line('Me.layoutVista.Controls.Remove(Me.lblRegistros)');d.child('pieListado','lblRegistros');d.child('pieListado','pnlPaginacion');d.child('layoutVista','pieListado',0,4);
+ d.add('pnlPaginacion','FlowLayoutPanel',{Dock:'System.Windows.Forms.DockStyle.Right',Width:'330',WrapContents:'False'});d.button('btnPagPrev','‹',false,{Width:'40'});d.add('flpNumeros','FlowLayoutPanel',{Width:'205',Height:'40'});d.button('btnPagNext','›',false,{Width:'40'});d.child('pnlPaginacion','btnPagPrev');d.child('pnlPaginacion','flpNumeros');d.child('pnlPaginacion','btnPagNext');
+ d.add('pieListado','Panel',{Dock:'System.Windows.Forms.DockStyle.Fill'});d.lines=d.lines.filter(line=>line!=='Me.layoutVista.Controls.Add(Me.lblRegistros, 0, 4)');d.child('pieListado','lblRegistros');d.child('pieListado','pnlPaginacion');d.child('layoutVista','pieListado',0,4);
 });
 
 function dialog(name,title,desc,fields,save='guardar',cancel='cancelar',extra) {

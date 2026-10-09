@@ -54,6 +54,7 @@ Public Class frmPrincipal
     End Sub
 
     Private Async Function CargarCategoriasAsync() As Task
+        If ContextoDiseno.Activo(Me) OrElse IdUsuario <= 0 OrElse IsDisposed Then Return
         Try
             Dim categorias = Await Task.Run(Function() negocio.categorias())
             If cerrado Then Return
@@ -375,5 +376,9 @@ Public Class frmPrincipal
     Private Sub Principal_Cerrado(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
         cerrado = True
         If Not ContextoDiseno.Activo(Me) Then Application.Exit()
+    End Sub
+
+    Private Sub Principal_Liberado(sender As Object, e As EventArgs) Handles MyBase.Disposed
+        cerrado = True
     End Sub
 End Class

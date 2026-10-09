@@ -28,6 +28,9 @@ Partial Class frmBuscarLector
         Me.btnBuscar = New System.Windows.Forms.Button()
         Me.btnLimpiar = New System.Windows.Forms.Button()
         Me.tablaLectores = New System.Windows.Forms.DataGridView()
+        Me.tablaLectoresCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaLectoresCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaLectoresAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colLectorId = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colLectorNombre = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colLectorDni = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -38,14 +41,20 @@ Partial Class frmBuscarLector
         Me.btnDevolver = New System.Windows.Forms.Button()
         Me.lblLector = New System.Windows.Forms.Label()
         Me.tablaPrestamos = New System.Windows.Forms.DataGridView()
+        Me.tablaPrestamosCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaPrestamosCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaPrestamosAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colPrestamo = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colEjemplar = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colLibro = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colFin = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colFinFormato = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colEstado = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colRetorno = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colRetornoFormato = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colDias = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colInicio = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colInicioFormato = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colBibliotecario = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.lblResumen = New System.Windows.Forms.Label()
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -177,9 +186,16 @@ Partial Class frmBuscarLector
         Me.tablaLectores.RowTemplate.Height = 36
         Me.tablaLectores.Margin = New System.Windows.Forms.Padding(0)
         Me.tablaLectores.AccessibleName = "Tabla de resultados"
-        Me.tablaLectores.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tablaLectores.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tablaLectores.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tablaLectoresCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tablaLectoresCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaLectoresCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tablaLectoresCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tablaLectoresCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaLectoresCeldas.NullValue = "—"
+        Me.tablaLectoresAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tablaLectores.ColumnHeadersDefaultCellStyle = Me.tablaLectoresCabecera
+        Me.tablaLectores.DefaultCellStyle = Me.tablaLectoresCeldas
+        Me.tablaLectores.AlternatingRowsDefaultCellStyle = Me.tablaLectoresAlternas
         Me.colLectorId.Name = "colLectorId"
         Me.colLectorId.HeaderText = "ID"
         Me.colLectorId.DataPropertyName = "IdUsuario"
@@ -289,9 +305,16 @@ Partial Class frmBuscarLector
         Me.tablaPrestamos.RowTemplate.Height = 36
         Me.tablaPrestamos.Margin = New System.Windows.Forms.Padding(0)
         Me.tablaPrestamos.AccessibleName = "Tabla de resultados"
-        Me.tablaPrestamos.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tablaPrestamos.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tablaPrestamos.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tablaPrestamosCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tablaPrestamosCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaPrestamosCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tablaPrestamosCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tablaPrestamosCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaPrestamosCeldas.NullValue = "—"
+        Me.tablaPrestamosAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tablaPrestamos.ColumnHeadersDefaultCellStyle = Me.tablaPrestamosCabecera
+        Me.tablaPrestamos.DefaultCellStyle = Me.tablaPrestamosCeldas
+        Me.tablaPrestamos.AlternatingRowsDefaultCellStyle = Me.tablaPrestamosAlternas
         Me.colPrestamo.Name = "IdPrestamo"
         Me.colPrestamo.HeaderText = "Préstamo"
         Me.colPrestamo.DataPropertyName = "IdPrestamo"
@@ -323,7 +346,9 @@ Partial Class frmBuscarLector
         Me.colFin.FillWeight = 100
         Me.colFin.ReadOnly = True
         Me.colFin.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colFin.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = "dd/MM/yyyy", .NullValue = "—"}
+        Me.colFinFormato.Format = "dd/MM/yyyy"
+        Me.colFinFormato.NullValue = "—"
+        Me.colFin.DefaultCellStyle = Me.colFinFormato
         Me.tablaPrestamos.Columns.Add(Me.colFin)
         Me.colEstado.Name = "EstadoPrestamo"
         Me.colEstado.HeaderText = "Estado"
@@ -340,7 +365,9 @@ Partial Class frmBuscarLector
         Me.colRetorno.FillWeight = 100
         Me.colRetorno.ReadOnly = True
         Me.colRetorno.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colRetorno.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = "dd/MM/yyyy", .NullValue = "—"}
+        Me.colRetornoFormato.Format = "dd/MM/yyyy"
+        Me.colRetornoFormato.NullValue = "—"
+        Me.colRetorno.DefaultCellStyle = Me.colRetornoFormato
         Me.tablaPrestamos.Columns.Add(Me.colRetorno)
         Me.colDias.Name = "DiasRetraso"
         Me.colDias.HeaderText = "Días de retraso"
@@ -357,7 +384,9 @@ Partial Class frmBuscarLector
         Me.colInicio.FillWeight = 100
         Me.colInicio.ReadOnly = True
         Me.colInicio.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colInicio.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = "dd/MM/yyyy", .NullValue = "—"}
+        Me.colInicioFormato.Format = "dd/MM/yyyy"
+        Me.colInicioFormato.NullValue = "—"
+        Me.colInicio.DefaultCellStyle = Me.colInicioFormato
         Me.tablaPrestamos.Columns.Add(Me.colInicio)
         Me.colBibliotecario.Name = "NombreBibliotecario"
         Me.colBibliotecario.HeaderText = "Bibliotecario"
@@ -383,13 +412,13 @@ Partial Class frmBuscarLector
         Me.layoutLectores.Controls.Add(Me.lblResumen, 0, 6)
         Me.Controls.Add(Me.layoutLectores)
         Me.AcceptButton = Me.btnBuscar
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1100, 760)
         Me.Name = "frmBuscarLector"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Buscar lectores"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tablaLectores, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tablaPrestamos, System.ComponentModel.ISupportInitialize).EndInit()
@@ -421,6 +450,9 @@ Partial Class frmBuscarLector
     Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents btnLimpiar As System.Windows.Forms.Button
     Friend WithEvents tablaLectores As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaLectoresCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaLectoresCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaLectoresAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colLectorId As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colLectorNombre As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colLectorDni As System.Windows.Forms.DataGridViewTextBoxColumn
@@ -431,14 +463,20 @@ Partial Class frmBuscarLector
     Friend WithEvents btnDevolver As System.Windows.Forms.Button
     Friend WithEvents lblLector As System.Windows.Forms.Label
     Friend WithEvents tablaPrestamos As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaPrestamosCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaPrestamosCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaPrestamosAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colPrestamo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colEjemplar As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colLibro As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colFin As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colFinFormato As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colEstado As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colRetorno As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colRetornoFormato As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colDias As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colInicio As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colInicioFormato As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colBibliotecario As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents lblResumen As System.Windows.Forms.Label
 End Class

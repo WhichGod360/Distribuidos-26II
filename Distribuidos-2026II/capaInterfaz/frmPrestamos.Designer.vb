@@ -33,15 +33,21 @@ Partial Class frmPrestamos
         Me.btnDevolver = New System.Windows.Forms.Button()
         Me.btnActualizar = New System.Windows.Forms.Button()
         Me.tabla = New System.Windows.Forms.DataGridView()
+        Me.tablaCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colPrestamo = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colLector = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colEjemplar = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colLibro = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colFin = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colFinFormato = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colEstado = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colRetorno = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colRetornoFormato = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colDias = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colInicio = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colInicioFormato = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colDni = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colCorreo = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colBibliotecario = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -100,7 +106,7 @@ Partial Class frmPrestamos
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100!))
-        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36!))
+        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52!))
         Me.barraFiltros.Name = "barraFiltros"
         Me.barraFiltros.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraFiltros.AutoSize = True
@@ -210,9 +216,16 @@ Partial Class frmPrestamos
         Me.tabla.RowTemplate.Height = 36
         Me.tabla.Margin = New System.Windows.Forms.Padding(0)
         Me.tabla.AccessibleName = "Tabla de resultados"
-        Me.tabla.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tabla.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tabla.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tablaCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tablaCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tablaCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tablaCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaCeldas.NullValue = "—"
+        Me.tablaAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tabla.ColumnHeadersDefaultCellStyle = Me.tablaCabecera
+        Me.tabla.DefaultCellStyle = Me.tablaCeldas
+        Me.tabla.AlternatingRowsDefaultCellStyle = Me.tablaAlternas
         Me.colPrestamo.Name = "IdPrestamo"
         Me.colPrestamo.HeaderText = "Préstamo"
         Me.colPrestamo.DataPropertyName = "IdPrestamo"
@@ -252,7 +265,9 @@ Partial Class frmPrestamos
         Me.colFin.FillWeight = 100
         Me.colFin.ReadOnly = True
         Me.colFin.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colFin.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = "dd/MM/yyyy", .NullValue = "—"}
+        Me.colFinFormato.Format = "dd/MM/yyyy"
+        Me.colFinFormato.NullValue = "—"
+        Me.colFin.DefaultCellStyle = Me.colFinFormato
         Me.tabla.Columns.Add(Me.colFin)
         Me.colEstado.Name = "EstadoPrestamo"
         Me.colEstado.HeaderText = "Estado"
@@ -269,7 +284,9 @@ Partial Class frmPrestamos
         Me.colRetorno.FillWeight = 100
         Me.colRetorno.ReadOnly = True
         Me.colRetorno.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colRetorno.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = "dd/MM/yyyy", .NullValue = "—"}
+        Me.colRetornoFormato.Format = "dd/MM/yyyy"
+        Me.colRetornoFormato.NullValue = "—"
+        Me.colRetorno.DefaultCellStyle = Me.colRetornoFormato
         Me.tabla.Columns.Add(Me.colRetorno)
         Me.colDias.Name = "DiasRetraso"
         Me.colDias.HeaderText = "Días de retraso"
@@ -286,7 +303,9 @@ Partial Class frmPrestamos
         Me.colInicio.FillWeight = 100
         Me.colInicio.ReadOnly = True
         Me.colInicio.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colInicio.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = "dd/MM/yyyy", .NullValue = "—"}
+        Me.colInicioFormato.Format = "dd/MM/yyyy"
+        Me.colInicioFormato.NullValue = "—"
+        Me.colInicio.DefaultCellStyle = Me.colInicioFormato
         Me.tabla.Columns.Add(Me.colInicio)
         Me.colDni.Name = "DniLector"
         Me.colDni.HeaderText = "DNI"
@@ -325,13 +344,13 @@ Partial Class frmPrestamos
         Me.layoutVista.Controls.Add(Me.tabla, 0, 3)
         Me.layoutVista.Controls.Add(Me.resumen, 0, 4)
         Me.Controls.Add(Me.layoutVista)
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1100, 680)
         Me.Name = "frmPrestamos"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Préstamos"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tabla, System.ComponentModel.ISupportInitialize).EndInit()
         Me.barraAcciones.ResumeLayout(False)
@@ -369,15 +388,21 @@ Partial Class frmPrestamos
     Friend WithEvents btnDevolver As System.Windows.Forms.Button
     Friend WithEvents btnActualizar As System.Windows.Forms.Button
     Friend WithEvents tabla As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colPrestamo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colLector As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colEjemplar As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colLibro As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colFin As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colFinFormato As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colEstado As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colRetorno As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colRetornoFormato As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colDias As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colInicio As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colInicioFormato As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colDni As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colCorreo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colBibliotecario As System.Windows.Forms.DataGridViewTextBoxColumn

@@ -30,6 +30,9 @@ Partial Class frmAutor
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnEliminar = New System.Windows.Forms.Button()
         Me.tablaAutores = New System.Windows.Forms.DataGridView()
+        Me.tablaAutoresCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaAutoresCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaAutoresAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colIdAutor = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colNombreAutor = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.lblResumen = New System.Windows.Forms.Label()
@@ -86,7 +89,7 @@ Partial Class frmAutor
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100!))
-        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36!))
+        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52!))
         Me.barraFiltros.Name = "barraFiltros"
         Me.barraFiltros.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraFiltros.AutoSize = True
@@ -177,9 +180,16 @@ Partial Class frmAutor
         Me.tablaAutores.RowTemplate.Height = 36
         Me.tablaAutores.Margin = New System.Windows.Forms.Padding(0)
         Me.tablaAutores.AccessibleName = "Tabla de resultados"
-        Me.tablaAutores.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tablaAutores.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tablaAutores.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tablaAutoresCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tablaAutoresCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaAutoresCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tablaAutoresCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tablaAutoresCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaAutoresCeldas.NullValue = "—"
+        Me.tablaAutoresAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tablaAutores.ColumnHeadersDefaultCellStyle = Me.tablaAutoresCabecera
+        Me.tablaAutores.DefaultCellStyle = Me.tablaAutoresCeldas
+        Me.tablaAutores.AlternatingRowsDefaultCellStyle = Me.tablaAutoresAlternas
         Me.colIdAutor.Name = "colIdAutor"
         Me.colIdAutor.HeaderText = "ID"
         Me.colIdAutor.DataPropertyName = "IdAutor"
@@ -209,13 +219,13 @@ Partial Class frmAutor
         Me.layoutVista.Controls.Add(Me.tablaAutores, 0, 3)
         Me.layoutVista.Controls.Add(Me.lblResumen, 0, 4)
         Me.Controls.Add(Me.layoutVista)
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1100, 680)
         Me.Name = "frmAutor"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Autores"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tablaAutores, System.ComponentModel.ISupportInitialize).EndInit()
         Me.barraAcciones.ResumeLayout(False)
@@ -248,6 +258,9 @@ Partial Class frmAutor
     Friend WithEvents btnEditar As System.Windows.Forms.Button
     Friend WithEvents btnEliminar As System.Windows.Forms.Button
     Friend WithEvents tablaAutores As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaAutoresCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaAutoresCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaAutoresAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colIdAutor As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colNombreAutor As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents lblResumen As System.Windows.Forms.Label

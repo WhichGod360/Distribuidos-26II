@@ -32,6 +32,9 @@ Partial Class FrmCategoria
         Me.Button10 = New System.Windows.Forms.Button()
         Me.Button11 = New System.Windows.Forms.Button()
         Me.tbCategoria = New System.Windows.Forms.DataGridView()
+        Me.tbCategoriaCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tbCategoriaCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tbCategoriaAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colIdCategoria = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colNombreCategoria = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colEstadoCategoria = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -90,7 +93,7 @@ Partial Class FrmCategoria
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100!))
-        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36!))
+        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52!))
         Me.barraFiltros.Name = "barraFiltros"
         Me.barraFiltros.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraFiltros.AutoSize = True
@@ -185,9 +188,16 @@ Partial Class FrmCategoria
         Me.tbCategoria.RowTemplate.Height = 36
         Me.tbCategoria.Margin = New System.Windows.Forms.Padding(0)
         Me.tbCategoria.AccessibleName = "Tabla de resultados"
-        Me.tbCategoria.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tbCategoria.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tbCategoria.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tbCategoriaCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tbCategoriaCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tbCategoriaCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tbCategoriaCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tbCategoriaCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tbCategoriaCeldas.NullValue = "—"
+        Me.tbCategoriaAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tbCategoria.ColumnHeadersDefaultCellStyle = Me.tbCategoriaCabecera
+        Me.tbCategoria.DefaultCellStyle = Me.tbCategoriaCeldas
+        Me.tbCategoria.AlternatingRowsDefaultCellStyle = Me.tbCategoriaAlternas
         Me.colIdCategoria.Name = "id_categoria"
         Me.colIdCategoria.HeaderText = "ID"
         Me.colIdCategoria.DataPropertyName = "id_categoria"
@@ -225,13 +235,13 @@ Partial Class FrmCategoria
         Me.layoutVista.Controls.Add(Me.tbCategoria, 0, 3)
         Me.layoutVista.Controls.Add(Me.lblResumen, 0, 4)
         Me.Controls.Add(Me.layoutVista)
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1100, 680)
         Me.Name = "FrmCategoria"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Categorías"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tbCategoria, System.ComponentModel.ISupportInitialize).EndInit()
         Me.barraAcciones.ResumeLayout(False)
@@ -268,6 +278,9 @@ Partial Class FrmCategoria
     Friend WithEvents Button10 As System.Windows.Forms.Button
     Friend WithEvents Button11 As System.Windows.Forms.Button
     Friend WithEvents tbCategoria As System.Windows.Forms.DataGridView
+    Friend WithEvents tbCategoriaCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tbCategoriaCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tbCategoriaAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colIdCategoria As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colNombreCategoria As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colEstadoCategoria As System.Windows.Forms.DataGridViewTextBoxColumn

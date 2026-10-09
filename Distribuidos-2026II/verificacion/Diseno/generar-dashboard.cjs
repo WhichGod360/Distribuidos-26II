@@ -13,12 +13,12 @@ d.add('pnlSide','Panel',{Dock:'System.Windows.Forms.DockStyle.Fill',BackColor:co
 d.add('flpMenu','FlowLayoutPanel',{Dock:'System.Windows.Forms.DockStyle.Fill',FlowDirection:'System.Windows.Forms.FlowDirection.TopDown',WrapContents:'False',AutoScroll:'True'});
 d.label('lblNavegacion','TU BIBLIOTECA',{Size:'New System.Drawing.Size(175, 32)',ForeColor:muted,Font:'New System.Drawing.Font("Segoe UI", 9.0!, System.Drawing.FontStyle.Bold)'});d.child('flpMenu','lblNavegacion');
 for(const [n,t,key]of [['btnInicio','Inicio','inicio'],['btnBuscar','Buscar lectores','lectores'],['btnPrestamos','Préstamos','prestamos'],['btnLibros','Libros y ejemplares','libros'],['btnAutores','Autores','autores'],['btnCategorias','Categorías','categorias'],['btnPenalizaciones','Penalizaciones','penalizaciones']]){
- d.button(n,t,false,{Tag:q(key),Size:'New System.Drawing.Size(177, 43)',TextAlign:'System.Drawing.ContentAlignment.MiddleLeft',Padding:'New System.Windows.Forms.Padding(8, 0, 0, 0)',BackColor:color('244, 246, 253'),'FlatAppearance.BorderSize':'0',Margin:'New System.Windows.Forms.Padding(0, 0, 0, 7)'});d.child('flpMenu',n);
+ d.button(n,t,false,{Tag:q(key),Size:'New System.Drawing.Size(170, 43)',TextAlign:'System.Drawing.ContentAlignment.MiddleLeft',Padding:'New System.Windows.Forms.Padding(8, 0, 0, 0)',BackColor:color('244, 246, 253'),'FlatAppearance.BorderSize':'0',Margin:'New System.Windows.Forms.Padding(0, 0, 0, 7)'});d.child('flpMenu',n);
 }
-d.label('lblAyudaMenu','Cada préstamo corresponde a una copia física.',{Size:'New System.Drawing.Size(170, 74)',ForeColor:muted,Margin:'New System.Windows.Forms.Padding(8, 28, 0, 8)'});d.child('flpMenu','lblAyudaMenu');d.button('btnSalir','Cerrar sesión',false,{Size:'New System.Drawing.Size(177, 38)'});d.child('flpMenu','btnSalir');d.child('pnlSide','flpMenu');d.child('layoutPrincipal','pnlSide',0,1);
+d.label('lblAyudaMenu','Cada préstamo corresponde a una copia física.',{Size:'New System.Drawing.Size(170, 74)',ForeColor:muted,Margin:'New System.Windows.Forms.Padding(8, 28, 0, 8)'});d.child('flpMenu','lblAyudaMenu');d.button('btnSalir','Cerrar sesión',false,{Size:'New System.Drawing.Size(170, 38)',Margin:'New System.Windows.Forms.Padding(0)'});d.child('flpMenu','btnSalir');d.child('pnlSide','flpMenu');d.child('layoutPrincipal','pnlSide',0,1);
 d.add('pnlMain','Panel',{Dock:'System.Windows.Forms.DockStyle.Fill',BackColor:color('249, 250, 254')});
 d.add('panelDashboard','Panel',{Dock:'System.Windows.Forms.DockStyle.Fill',AutoScroll:'True'});
-d.table('layoutDashboard',[76,'auto','auto',106,42,236,228,38],[100],{Dock:'System.Windows.Forms.DockStyle.Top',AutoSize:'True',Padding:'New System.Windows.Forms.Padding(22, 16, 22, 16)'});
+d.table('layoutDashboard',[76,'auto','auto',140,42,236,228,38],[100],{Dock:'System.Windows.Forms.DockStyle.Top',AutoSize:'True',Padding:'New System.Windows.Forms.Padding(22, 16, 22, 16)'});
 d.header('Panel de biblioteca','Actividad, disponibilidad y accesos para la gestión diaria.');d.child('layoutDashboard','encabezado',0,0);
 d.add('pnlFiltros','FlowLayoutPanel',{Dock:'System.Windows.Forms.DockStyle.Fill',AutoSize:'True',WrapContents:'True'});
 d.field('pnlFiltros','dtDesde','DateTimePicker','Préstamos desde',[],{Format:'System.Windows.Forms.DateTimePickerFormat.Short'},30,140);
@@ -28,7 +28,7 @@ d.field('pnlFiltros','cboEst','ComboBox','Estado',['Todos','Activos','Vencidos',
 d.button('btnAplicar','Actualizar',true,{Size:'New System.Drawing.Size(115, 35)',Margin:'New System.Windows.Forms.Padding(0, 24, 8, 6)'});d.button('btnLimpiar','Limpiar',false,{Size:'New System.Drawing.Size(92, 35)',Margin:'New System.Windows.Forms.Padding(0, 24, 0, 6)'});d.child('pnlFiltros','btnAplicar');d.child('pnlFiltros','btnLimpiar');d.child('layoutDashboard','pnlFiltros',0,1);
 d.add('accesosRapidos','FlowLayoutPanel',{Dock:'System.Windows.Forms.DockStyle.Fill',AutoSize:'True',WrapContents:'True',Padding:'New System.Windows.Forms.Padding(0, 6, 0, 10)'});
 for(const[n,t]of [['btnNuevoRapido','Nuevo préstamo'],['btnDevolverRapido','Registrar devolución'],['btnLectorRapido','Buscar lector'],['btnCatalogoRapido','Consultar libros']]){d.button(n,t,n==='btnNuevoRapido',{Width:n==='btnDevolverRapido'?'195':'172'});d.child('accesosRapidos',n);}d.child('layoutDashboard','accesosRapidos',0,2);
-d.table('tlpStats',[106],[25,25,25,25]);
+d.table('tlpStats',[140],[25,25,25,25]);
 for(let i=0;i<4;i++){
  const caps=['Activos en selección','Vencidos en selección','Devueltos en selección','Ejemplares disponibles'];
  d.add('cardStat'+i,'Panel',{Dock:'System.Windows.Forms.DockStyle.Fill',BackColor:'System.Drawing.Color.White',BorderStyle:'System.Windows.Forms.BorderStyle.FixedSingle',Padding:'New System.Windows.Forms.Padding(14, 10, 10, 8)',Margin:`New System.Windows.Forms.Padding(0, 0, ${i===3?0:12}, 0)`,Cursor:'System.Windows.Forms.Cursors.Hand'});

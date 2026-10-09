@@ -33,6 +33,9 @@ Partial Class frmEjemplares
         Me.btnEstado = New System.Windows.Forms.Button()
         Me.btnVolver = New System.Windows.Forms.Button()
         Me.tabla = New System.Windows.Forms.DataGridView()
+        Me.tablaCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colIdEjemplar = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colActivo = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colEstadoEjemplar = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -91,7 +94,7 @@ Partial Class frmEjemplares
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100!))
-        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36!))
+        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52!))
         Me.barraFiltros.Name = "barraFiltros"
         Me.barraFiltros.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraFiltros.AutoSize = True
@@ -201,9 +204,16 @@ Partial Class frmEjemplares
         Me.tabla.RowTemplate.Height = 36
         Me.tabla.Margin = New System.Windows.Forms.Padding(0)
         Me.tabla.AccessibleName = "Tabla de resultados"
-        Me.tabla.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tabla.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tabla.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tablaCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tablaCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tablaCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tablaCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaCeldas.NullValue = "—"
+        Me.tablaAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tabla.ColumnHeadersDefaultCellStyle = Me.tablaCabecera
+        Me.tabla.DefaultCellStyle = Me.tablaCeldas
+        Me.tabla.AlternatingRowsDefaultCellStyle = Me.tablaAlternas
         Me.colIdEjemplar.Name = "id_ejemplar"
         Me.colIdEjemplar.HeaderText = "ID del ejemplar"
         Me.colIdEjemplar.DataPropertyName = "id_ejemplar"
@@ -242,13 +252,13 @@ Partial Class frmEjemplares
         Me.layoutVista.Controls.Add(Me.lblResumen, 0, 4)
         Me.colActivo.Visible = False
         Me.Controls.Add(Me.layoutVista)
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1100, 680)
         Me.Name = "frmEjemplares"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Ejemplares"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.tabla, System.ComponentModel.ISupportInitialize).EndInit()
         Me.barraAcciones.ResumeLayout(False)
@@ -286,6 +296,9 @@ Partial Class frmEjemplares
     Friend WithEvents btnEstado As System.Windows.Forms.Button
     Friend WithEvents btnVolver As System.Windows.Forms.Button
     Friend WithEvents tabla As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colIdEjemplar As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colActivo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colEstadoEjemplar As System.Windows.Forms.DataGridViewTextBoxColumn

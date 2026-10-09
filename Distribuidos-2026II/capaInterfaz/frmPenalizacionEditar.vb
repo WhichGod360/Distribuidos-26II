@@ -23,9 +23,6 @@ Public Class frmPenalizacionEditar
             descripcion.Text = penalizacion.DescripcionPenalizacion
             activo.Checked = penalizacion.EstadoPenalizacion
         End If
-        Dim guardar As New Button With {.Text = "Guardar"}
-
-        AddHandler guardar.Click, AddressOf Guardar_Click
     End Sub
 
     Private Sub Guardar_Click(sender As Object, e As EventArgs)

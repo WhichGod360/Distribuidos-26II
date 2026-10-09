@@ -94,14 +94,21 @@ Partial Class frmPrincipal
         Me.cardPendientes = New System.Windows.Forms.Panel()
         Me.lblPendientes = New System.Windows.Forms.Label()
         Me.tablaPendientes = New System.Windows.Forms.DataGridView()
+        Me.tablaPendientesCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaPendientesCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaPendientesAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colPendienteId = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colPendienteLector = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colPendienteFin = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colPendienteFinFormato = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colPendienteEstado = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.lblSinPendientes = New System.Windows.Forms.Label()
         Me.cardCategorias = New System.Windows.Forms.Panel()
         Me.lblCategorias = New System.Windows.Forms.Label()
         Me.tablaCategorias = New System.Windows.Forms.DataGridView()
+        Me.tablaCategoriasCabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaCategoriasCeldas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.tablaCategoriasAlternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colCategoria = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colCantidad = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.lblNotaCategorias = New System.Windows.Forms.Label()
@@ -223,7 +230,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.lblNavegacion)
         Me.btnInicio.Name = "btnInicio"
         Me.btnInicio.Text = "Inicio"
-        Me.btnInicio.Size = New System.Drawing.Size(177, 43)
+        Me.btnInicio.Size = New System.Drawing.Size(170, 43)
         Me.btnInicio.AutoSize = False
         Me.btnInicio.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnInicio.FlatAppearance.BorderSize = 0
@@ -240,7 +247,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.btnInicio)
         Me.btnBuscar.Name = "btnBuscar"
         Me.btnBuscar.Text = "Buscar lectores"
-        Me.btnBuscar.Size = New System.Drawing.Size(177, 43)
+        Me.btnBuscar.Size = New System.Drawing.Size(170, 43)
         Me.btnBuscar.AutoSize = False
         Me.btnBuscar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnBuscar.FlatAppearance.BorderSize = 0
@@ -257,7 +264,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.btnBuscar)
         Me.btnPrestamos.Name = "btnPrestamos"
         Me.btnPrestamos.Text = "Préstamos"
-        Me.btnPrestamos.Size = New System.Drawing.Size(177, 43)
+        Me.btnPrestamos.Size = New System.Drawing.Size(170, 43)
         Me.btnPrestamos.AutoSize = False
         Me.btnPrestamos.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnPrestamos.FlatAppearance.BorderSize = 0
@@ -274,7 +281,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.btnPrestamos)
         Me.btnLibros.Name = "btnLibros"
         Me.btnLibros.Text = "Libros y ejemplares"
-        Me.btnLibros.Size = New System.Drawing.Size(177, 43)
+        Me.btnLibros.Size = New System.Drawing.Size(170, 43)
         Me.btnLibros.AutoSize = False
         Me.btnLibros.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnLibros.FlatAppearance.BorderSize = 0
@@ -291,7 +298,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.btnLibros)
         Me.btnAutores.Name = "btnAutores"
         Me.btnAutores.Text = "Autores"
-        Me.btnAutores.Size = New System.Drawing.Size(177, 43)
+        Me.btnAutores.Size = New System.Drawing.Size(170, 43)
         Me.btnAutores.AutoSize = False
         Me.btnAutores.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnAutores.FlatAppearance.BorderSize = 0
@@ -308,7 +315,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.btnAutores)
         Me.btnCategorias.Name = "btnCategorias"
         Me.btnCategorias.Text = "Categorías"
-        Me.btnCategorias.Size = New System.Drawing.Size(177, 43)
+        Me.btnCategorias.Size = New System.Drawing.Size(170, 43)
         Me.btnCategorias.AutoSize = False
         Me.btnCategorias.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnCategorias.FlatAppearance.BorderSize = 0
@@ -325,7 +332,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.btnCategorias)
         Me.btnPenalizaciones.Name = "btnPenalizaciones"
         Me.btnPenalizaciones.Text = "Penalizaciones"
-        Me.btnPenalizaciones.Size = New System.Drawing.Size(177, 43)
+        Me.btnPenalizaciones.Size = New System.Drawing.Size(170, 43)
         Me.btnPenalizaciones.AutoSize = False
         Me.btnPenalizaciones.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnPenalizaciones.FlatAppearance.BorderSize = 0
@@ -349,7 +356,7 @@ Partial Class frmPrincipal
         Me.flpMenu.Controls.Add(Me.lblAyudaMenu)
         Me.btnSalir.Name = "btnSalir"
         Me.btnSalir.Text = "Cerrar sesión"
-        Me.btnSalir.Size = New System.Drawing.Size(177, 38)
+        Me.btnSalir.Size = New System.Drawing.Size(170, 38)
         Me.btnSalir.AutoSize = False
         Me.btnSalir.FlatStyle = System.Windows.Forms.FlatStyle.Flat
         Me.btnSalir.FlatAppearance.BorderSize = 1
@@ -358,7 +365,7 @@ Partial Class frmPrincipal
         Me.btnSalir.ForeColor = System.Drawing.Color.FromArgb(72, 101, 244)
         Me.btnSalir.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
         Me.btnSalir.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.btnSalir.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnSalir.Margin = New System.Windows.Forms.Padding(0)
         Me.btnSalir.UseVisualStyleBackColor = False
         Me.flpMenu.Controls.Add(Me.btnSalir)
         Me.pnlSide.Controls.Add(Me.flpMenu)
@@ -380,7 +387,7 @@ Partial Class frmPrincipal
         Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 76!))
         Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
-        Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 106!))
+        Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 140!))
         Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42!))
         Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 236!))
         Me.layoutDashboard.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 228!))
@@ -600,7 +607,7 @@ Partial Class frmPrincipal
         Me.tlpStats.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25!))
         Me.tlpStats.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25!))
         Me.tlpStats.ColumnStyles.Add(New System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25!))
-        Me.tlpStats.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 106!))
+        Me.tlpStats.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 140!))
         Me.cardStat0.Name = "cardStat0"
         Me.cardStat0.Dock = System.Windows.Forms.DockStyle.Fill
         Me.cardStat0.BackColor = System.Drawing.Color.White
@@ -838,9 +845,16 @@ Partial Class frmPrincipal
         Me.tablaPendientes.RowTemplate.Height = 36
         Me.tablaPendientes.Margin = New System.Windows.Forms.Padding(0)
         Me.tablaPendientes.AccessibleName = "Tabla de resultados"
-        Me.tablaPendientes.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tablaPendientes.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tablaPendientes.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tablaPendientesCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tablaPendientesCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaPendientesCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tablaPendientesCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tablaPendientesCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaPendientesCeldas.NullValue = "—"
+        Me.tablaPendientesAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tablaPendientes.ColumnHeadersDefaultCellStyle = Me.tablaPendientesCabecera
+        Me.tablaPendientes.DefaultCellStyle = Me.tablaPendientesCeldas
+        Me.tablaPendientes.AlternatingRowsDefaultCellStyle = Me.tablaPendientesAlternas
         Me.colPendienteId.Name = "colPendienteId"
         Me.colPendienteId.HeaderText = "ID"
         Me.colPendienteId.DataPropertyName = "IdPrestamo"
@@ -864,7 +878,9 @@ Partial Class frmPrincipal
         Me.colPendienteFin.FillWeight = 25
         Me.colPendienteFin.ReadOnly = True
         Me.colPendienteFin.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.colPendienteFin.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.Format = "dd/MM/yyyy", .NullValue = "—"}
+        Me.colPendienteFinFormato.Format = "dd/MM/yyyy"
+        Me.colPendienteFinFormato.NullValue = "—"
+        Me.colPendienteFin.DefaultCellStyle = Me.colPendienteFinFormato
         Me.tablaPendientes.Columns.Add(Me.colPendienteFin)
         Me.colPendienteEstado.Name = "colPendienteEstado"
         Me.colPendienteEstado.HeaderText = "Estado"
@@ -915,9 +931,16 @@ Partial Class frmPrincipal
         Me.tablaCategorias.RowTemplate.Height = 36
         Me.tablaCategorias.Margin = New System.Windows.Forms.Padding(0)
         Me.tablaCategorias.AccessibleName = "Tabla de resultados"
-        Me.tablaCategorias.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.tablaCategorias.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.tablaCategorias.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.tablaCategoriasCabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.tablaCategoriasCabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaCategoriasCabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.tablaCategoriasCeldas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.tablaCategoriasCeldas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.tablaCategoriasCeldas.NullValue = "—"
+        Me.tablaCategoriasAlternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.tablaCategorias.ColumnHeadersDefaultCellStyle = Me.tablaCategoriasCabecera
+        Me.tablaCategorias.DefaultCellStyle = Me.tablaCategoriasCeldas
+        Me.tablaCategorias.AlternatingRowsDefaultCellStyle = Me.tablaCategoriasAlternas
         Me.colCategoria.Name = "colCategoria"
         Me.colCategoria.HeaderText = "Categoría"
         Me.colCategoria.DataPropertyName = "Etiqueta"
@@ -970,13 +993,13 @@ Partial Class frmPrincipal
         Me.Controls.Add(Me.layoutPrincipal)
         Me.MinimumSize = New System.Drawing.Size(1000, 650)
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1280, 850)
         Me.Name = "frmPrincipal"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Panel de biblioteca"
         CType(Me.imagenMarca, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.imagenUsuario, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
@@ -1122,14 +1145,21 @@ Partial Class frmPrincipal
     Friend WithEvents cardPendientes As System.Windows.Forms.Panel
     Friend WithEvents lblPendientes As System.Windows.Forms.Label
     Friend WithEvents tablaPendientes As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaPendientesCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaPendientesCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaPendientesAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colPendienteId As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colPendienteLector As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colPendienteFin As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colPendienteFinFormato As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colPendienteEstado As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents lblSinPendientes As System.Windows.Forms.Label
     Friend WithEvents cardCategorias As System.Windows.Forms.Panel
     Friend WithEvents lblCategorias As System.Windows.Forms.Label
     Friend WithEvents tablaCategorias As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaCategoriasCabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaCategoriasCeldas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents tablaCategoriasAlternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colCategoria As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colCantidad As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents lblNotaCategorias As System.Windows.Forms.Label

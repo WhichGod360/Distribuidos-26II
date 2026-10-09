@@ -74,7 +74,7 @@ Public Class frmPrestamoDetalle
             lector.DataSource = resultados
             lector.SelectedIndex = -1
             If resultados.Count = 0 Then MessageBox.Show("No se encontraron estudiantes activos con esos datos.", "Buscar lector", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            lector.DroppedDown = resultados.Count > 0
+            lector.DroppedDown = resultados.Count > 0 AndAlso Visible
         Catch ex As Exception
             MessageBox.Show("No se pudieron buscar los lectores: " & ex.Message, "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try

@@ -176,13 +176,13 @@ Partial Class frmAgregarCategoria
         Me.Controls.Add(Me.layoutEditor)
         Me.AcceptButton = Me.Button10
         Me.CancelButton = Me.Button11
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(660, 318)
         Me.Name = "frmAgregarCategoria"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Agregar categoría"
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable
         Me.MinimizeBox = False
         Me.MaximizeBox = False

@@ -34,6 +34,9 @@ Partial Class frmPenalizacion
         Me.btnCambiarEstado = New System.Windows.Forms.Button()
         Me.btnVerDetalles = New System.Windows.Forms.Button()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.DataGridView1Cabecera = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.DataGridView1Celdas = New System.Windows.Forms.DataGridViewCellStyle()
+        Me.DataGridView1Alternas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.colId = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colTipo = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colMonto = New System.Windows.Forms.DataGridViewTextBoxColumn()
@@ -94,7 +97,7 @@ Partial Class frmPenalizacion
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.AutoSize))
         Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100!))
-        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36!))
+        Me.layoutVista.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 52!))
         Me.barraFiltros.Name = "barraFiltros"
         Me.barraFiltros.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraFiltros.AutoSize = True
@@ -219,9 +222,16 @@ Partial Class frmPenalizacion
         Me.DataGridView1.RowTemplate.Height = 36
         Me.DataGridView1.Margin = New System.Windows.Forms.Padding(0)
         Me.DataGridView1.AccessibleName = "Tabla de resultados"
-        Me.DataGridView1.ColumnHeadersDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(234, 239, 255), .ForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)}
-        Me.DataGridView1.DefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255), .SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55), .NullValue = "—"}
-        Me.DataGridView1.AlternatingRowsDefaultCellStyle = New System.Windows.Forms.DataGridViewCellStyle() With {.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)}
+        Me.DataGridView1Cabecera.BackColor = System.Drawing.Color.FromArgb(234, 239, 255)
+        Me.DataGridView1Cabecera.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.DataGridView1Cabecera.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.DataGridView1Celdas.SelectionBackColor = System.Drawing.Color.FromArgb(222, 229, 255)
+        Me.DataGridView1Celdas.SelectionForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
+        Me.DataGridView1Celdas.NullValue = "—"
+        Me.DataGridView1Alternas.BackColor = System.Drawing.Color.FromArgb(248, 250, 255)
+        Me.DataGridView1.ColumnHeadersDefaultCellStyle = Me.DataGridView1Cabecera
+        Me.DataGridView1.DefaultCellStyle = Me.DataGridView1Celdas
+        Me.DataGridView1.AlternatingRowsDefaultCellStyle = Me.DataGridView1Alternas
         Me.colId.Name = "colId"
         Me.colId.HeaderText = "ID"
         Me.colId.DataPropertyName = ""
@@ -275,13 +285,13 @@ Partial Class frmPenalizacion
         Me.layoutVista.Controls.Add(Me.DataGridView1, 0, 3)
         Me.layoutVista.Controls.Add(Me.lblResumen, 0, 4)
         Me.Controls.Add(Me.layoutVista)
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(7.0!, 15.0!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
+        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
         Me.ClientSize = New System.Drawing.Size(1100, 680)
         Me.Name = "frmPenalizacion"
-        Me.Text = Me.lblTituloVista.Text
+        Me.Text = "Penalizaciones"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.barraAcciones.ResumeLayout(False)
@@ -320,6 +330,9 @@ Partial Class frmPenalizacion
     Friend WithEvents btnCambiarEstado As System.Windows.Forms.Button
     Friend WithEvents btnVerDetalles As System.Windows.Forms.Button
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
+    Friend WithEvents DataGridView1Cabecera As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents DataGridView1Celdas As System.Windows.Forms.DataGridViewCellStyle
+    Friend WithEvents DataGridView1Alternas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents colId As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colTipo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colMonto As System.Windows.Forms.DataGridViewTextBoxColumn

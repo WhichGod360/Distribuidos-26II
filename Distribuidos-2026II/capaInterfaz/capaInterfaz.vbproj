@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>capaInterfaz</RootNamespace>
@@ -43,4 +43,81 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="frmAgregarCategoria.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmAgregarCategoria.Designer.vb"><DependentUpon>frmAgregarCategoria.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmAgregarCategoria.resx"><DependentUpon>frmAgregarCategoria.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmAutor.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmAutor.Designer.vb"><DependentUpon>frmAutor.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmAutor.resx"><DependentUpon>frmAutor.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmAutorDetalle.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmAutorDetalle.Designer.vb"><DependentUpon>frmAutorDetalle.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmAutorDetalle.resx"><DependentUpon>frmAutorDetalle.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmBuscarLector.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmBuscarLector.Designer.vb"><DependentUpon>frmBuscarLector.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmBuscarLector.resx"><DependentUpon>frmBuscarLector.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="FrmCategoria.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="FrmCategoria.Designer.vb"><DependentUpon>FrmCategoria.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="FrmCategoria.resx"><DependentUpon>FrmCategoria.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="FrmConfirmacion.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="FrmConfirmacion.Designer.vb"><DependentUpon>FrmConfirmacion.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="FrmConfirmacion.resx"><DependentUpon>FrmConfirmacion.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmDetallePenalizacion.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmDetallePenalizacion.Designer.vb"><DependentUpon>frmDetallePenalizacion.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmDetallePenalizacion.resx"><DependentUpon>frmDetallePenalizacion.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmDetallePenalizacionEditar.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmDetallePenalizacionEditar.Designer.vb"><DependentUpon>frmDetallePenalizacionEditar.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmDetallePenalizacionEditar.resx"><DependentUpon>frmDetallePenalizacionEditar.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmEditarCategoria.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmEditarCategoria.Designer.vb"><DependentUpon>frmEditarCategoria.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmEditarCategoria.resx"><DependentUpon>frmEditarCategoria.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmEjemplarDetalle.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmEjemplarDetalle.Designer.vb"><DependentUpon>frmEjemplarDetalle.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmEjemplarDetalle.resx"><DependentUpon>frmEjemplarDetalle.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmEjemplares.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmEjemplares.Designer.vb"><DependentUpon>frmEjemplares.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmEjemplares.resx"><DependentUpon>frmEjemplares.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmLibro.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmLibro.Designer.vb"><DependentUpon>frmLibro.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmLibro.resx"><DependentUpon>frmLibro.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="FrmLibroDetalle.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="FrmLibroDetalle.Designer.vb"><DependentUpon>FrmLibroDetalle.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="FrmLibroDetalle.resx"><DependentUpon>FrmLibroDetalle.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="FrmLibros.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="FrmLibros.Designer.vb"><DependentUpon>FrmLibros.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="FrmLibros.resx"><DependentUpon>FrmLibros.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmPenalizacion.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPenalizacion.Designer.vb"><DependentUpon>frmPenalizacion.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmPenalizacion.resx"><DependentUpon>frmPenalizacion.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmPenalizacionEditar.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPenalizacionEditar.Designer.vb"><DependentUpon>frmPenalizacionEditar.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmPenalizacionEditar.resx"><DependentUpon>frmPenalizacionEditar.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmPrestamoDetalle.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPrestamoDetalle.Designer.vb"><DependentUpon>frmPrestamoDetalle.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmPrestamoDetalle.resx"><DependentUpon>frmPrestamoDetalle.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmPrestamoDevolucion.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPrestamoDevolucion.Designer.vb"><DependentUpon>frmPrestamoDevolucion.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmPrestamoDevolucion.resx"><DependentUpon>frmPrestamoDevolucion.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmPrestamos.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPrestamos.Designer.vb"><DependentUpon>frmPrestamos.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmPrestamos.resx"><DependentUpon>frmPrestamos.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmPrincipal.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPrincipal.Designer.vb"><DependentUpon>frmPrincipal.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmPrincipal.resx"><DependentUpon>frmPrincipal.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="frmSeleccionCatalogo.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmSeleccionCatalogo.Designer.vb"><DependentUpon>frmSeleccionCatalogo.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="frmSeleccionCatalogo.resx"><DependentUpon>frmSeleccionCatalogo.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="Login.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="Login.Designer.vb"><DependentUpon>Login.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="Login.resx"><DependentUpon>Login.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="NuevaContraseña.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="NuevaContraseña.Designer.vb"><DependentUpon>NuevaContraseña.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="NuevaContraseña.resx"><DependentUpon>NuevaContraseña.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="RecuperarContraseña.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="RecuperarContraseña.Designer.vb"><DependentUpon>RecuperarContraseña.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="RecuperarContraseña.resx"><DependentUpon>RecuperarContraseña.vb</DependentUpon></EmbeddedResource>
+    <Compile Update="RegistrarLector.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="RegistrarLector.Designer.vb"><DependentUpon>RegistrarLector.vb</DependentUpon></Compile>
+    <EmbeddedResource Update="RegistrarLector.resx"><DependentUpon>RegistrarLector.vb</DependentUpon></EmbeddedResource>
+  </ItemGroup>
 </Project>
