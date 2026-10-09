@@ -1,28 +1,58 @@
 ﻿Imports capaNegocio
 Imports capaDatos
+Imports System.Data.SqlClient
+Imports System.Threading.Tasks
 Public Class Login
     Private ReadOnly negocioUsuario As New usuarioNegocio()
     Private Sub Login_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        txtCorreo.Text = "bibliotecaria@biblioteca.usat.edu.pe"
-        txtContraseña.Text = "luchos"
+        Me.AcceptButton = btnIniciarSesion
+        txtContraseña.UseSystemPasswordChar = True
+        txtCorreo.Focus()
     End Sub
 
-    Private Sub btnIniciarSesion_Click(sender As Object, e As EventArgs) Handles btnIniciarSesion.Click
-        Try
-            Dim email As String = txtCorreo.Text.Trim()
-            Dim password As String = txtContraseña.Text
+    Private Async Sub btnIniciarSesion_Click(sender As Object, e As EventArgs) Handles btnIniciarSesion.Click
+        If Not btnIniciarSesion.Enabled Then Return
+        Dim email As String = txtCorreo.Text.Trim()
+        Dim password As String = txtContraseña.Text
+        If String.IsNullOrWhiteSpace(email) Then
+            MessageBox.Show("Debe ingresar su correo electrónico.", "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtCorreo.Focus()
+            Return
+        End If
+        If String.IsNullOrWhiteSpace(password) Then
+            MessageBox.Show("Debe ingresar su contraseña.", "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            txtContraseña.Focus()
+            Return
+        End If
 
-            Dim usuarioValido As Usuario = negocioUsuario.IniciarSesion(email, password)
+        btnIniciarSesion.Enabled = False
+        lblOlvide.Enabled = False
+        lblRegistrate.Enabled = False
+        UseWaitCursor = True
+        Try
+            Dim usuarioValido As Usuario = Await Task.Run(Function() negocioUsuario.IniciarSesion(email, password))
 
             MessageBox.Show($"¡Bienvenido al sistema, {usuarioValido.NombreCompleto}!" & vbCrLf & $"Rol: {usuarioValido.NombreRol}", "Acceso Correcto", MessageBoxButtons.OK, MessageBoxIcon.Information)
             Dim principal As New frmPrincipal()
             principal.Show()
             Me.Hide()
 
+        Catch ex As UnauthorizedAccessException
+            MessageBox.Show(ex.Message, "Acceso denegado", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        Catch ex As SqlException
+            MessageBox.Show("No se pudo conectar con la base de datos. Intente nuevamente.", "Error de conexión", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Catch ex As ArgumentException
             MessageBox.Show(ex.Message, "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         Catch ex As Exception
-            MessageBox.Show(ex.Message, "Error de autenticación", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            MessageBox.Show("No se pudo iniciar sesión. Intente nuevamente.", "Error de autenticación", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        Finally
+            txtContraseña.Clear()
+            checkMostrar.Checked = False
+            txtContraseña.UseSystemPasswordChar = True
+            UseWaitCursor = False
+            btnIniciarSesion.Enabled = True
+            lblOlvide.Enabled = True
+            lblRegistrate.Enabled = True
         End Try
     End Sub
 
