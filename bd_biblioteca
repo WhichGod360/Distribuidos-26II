@@ -127,13 +127,15 @@ INSERT INTO RolUsuario (nombre_rol_usuario) VALUES
 ('Bibliotecario'),
 ('Estudiante');
 
+-- Usuarios de demostración: contraseña DemoBiblioteca2026! (solo desarrollo).
+-- Cada cuenta tiene una sal aleatoria distinta; cambiar estas claves antes de uso real.
 -- Usuarios
 -- id_rol_usuario: 1=Administrador, 2=Bibliotecario, 3=Estudiante
 INSERT INTO Usuario (email_usuario, nombre_usuario, ap_paterno, ap_materno, numero_dni_usuario, fecha_nacimiento_usuario, genero_usuario, estado_usuario, contrasena, id_rol_usuario) VALUES
-('admin@biblioteca.usat.edu.pe', 'Carlos', 'Diaz', 'Perez', '10000001', '1985-03-10', 1, 'Activo', 'luchos', 1),
-('bibliotecaria@biblioteca.usat.edu.pe', 'Maria', 'Torres', 'Vega', '10000002', '1990-07-22', 0, 'Activo', 'luchos', 2),
-('altair.lachos@usat.pe', 'Altair', 'Lachos', 'Briones', '70000001', '2003-01-15', 1, 'Activo', 'luchos', 3),
-('renzo.gonzales@usat.pe', 'Renzo', 'Gonzales', 'Campos', '70000002', '2003-05-20', 1, 'Activo', 'luchos', 3);
+('admin@biblioteca.usat.edu.pe', 'Carlos', 'Diaz', 'Perez', '10000001', '1985-03-10', 1, 'Activo', 'PBKDF2-SHA256$600000$/rNxmCw9O1dg0weRfPlneg==$mJ9NI9MQWIJJdGED/Ts/qJvcHgFzjrEtL+cBfv7Wt2c=', 1),
+('bibliotecaria@biblioteca.usat.edu.pe', 'Maria', 'Torres', 'Vega', '10000002', '1990-07-22', 0, 'Activo', 'PBKDF2-SHA256$600000$l4bBlP/8LexcQQBKcLUGug==$cMnF1rDwZMuqzW4nanlhGxT+F0OaKi5PNhBaBFmBi6w=', 2),
+('altair.lachos@usat.pe', 'Altair', 'Lachos', 'Briones', '70000001', '2003-01-15', 1, 'Activo', 'PBKDF2-SHA256$600000$bj+zxgI39U42kYUZKRcXdw==$HSKItzaw7r9A/LewPstzTUSPiCG6GkuW2vJiqtXg0qk=', 3),
+('renzo.gonzales@usat.pe', 'Renzo', 'Gonzales', 'Campos', '70000002', '2003-05-20', 1, 'Activo', 'PBKDF2-SHA256$600000$PdL47nzI8eqsDGDSCquK9Q==$3dvmKkWYVXHLiOildvuh5sD5k2LsovXJE45gEHwiNMA=', 3);
 
 
 -- Autores
