@@ -54,11 +54,9 @@ Las consultas de búsqueda e historial se realizan fuera del hilo visual, limpia
 
 Se reutilizan las transacciones y validaciones del módulo de préstamos: copia reservada dentro de la transacción, usuario/operador activos y con rol correcto, libro habilitado, fechas válidas, retraso no negativo y rechazo de doble devolución. Sigue bloqueada la desactivación de libros o ejemplares con préstamos relacionados, incluso devueltos.
 
-## Políticas que siguen pendientes
+## Políticas confirmadas
 
-No se encontró una política documentada de duración del préstamo, máximo de ejemplares por lector ni bloqueo por multas pendientes. La fecha límite debe marcarse y elegirse explícitamente. No se impone un máximo ni se bloquea por multas.
-
-El comentario del script interpreta `estado_penalizacion = 1` como pendiente de pago; el mantenimiento existente lo presenta como activo. Esta ambigüedad sigue pendiente de decisión. No se cambió su semántica, no se calculan importes y no se generan penalizaciones automáticamente. Véase también `MODULO_PRESTAMOS.md`.
+El equipo confirmó plazo de cinco días calendario, máximo un ejemplar sin devolver y bloqueo por penalizaciones pendientes de pago. El editor calcula la fecha límite automáticamente. El estado del catálogo sigue indicando activo/inactivo. El pago se guarda por separado mediante la migración 001, que deja las filas antiguas PorRevisar. No se generan multas automáticamente. Ver POLITICAS_PRESTAMOS.md para la migración, revisión de datos y verificación.
 
 ## Abrir y ejecutar
 
@@ -72,9 +70,9 @@ Los scripts de `verificacion/Diseno` son herramientas de migración manual, no d
 
 ## Verificación y límites
 
-La solución compila. El verificador de `verificacion/Prestamos` cubre 110 comprobaciones: reglas de fechas, interfaz de préstamos, construcción y carga en contexto de diseño de 19 formularios, consultas del dashboard, filtros, categorías múltiples, búsqueda/historial, lector preseleccionado, navegación, roles, devolución y tres carreras simultáneas de reserva.
+La solución compila. El verificador de `verificacion/Prestamos` cubre 142 comprobaciones, incluidas las políticas confirmadas: reglas de fechas, interfaz de préstamos, construcción y carga en contexto de diseño de 19 formularios, consultas del dashboard, filtros, categorías múltiples, búsqueda/historial, lector preseleccionado, navegación, roles, devolución y tres carreras simultáneas de reserva.
 
-SQL Server Express estuvo disponible. Las pruebas de escritura crearon una base temporal con el script real `../bd_biblioteca` y la eliminaron al terminar. No modificaron la base `distribuidos-II`. Las imágenes `verificacion/Prestamos/evidencia` y el registro `resultado-dashboard.log` documentan las comprobaciones; los registros de prueba que aparecen en imágenes solo existieron en esa base temporal.
+SQL Server Express estuvo disponible. Las pruebas de escritura crearon una base temporal con el script real `../bd_biblioteca` y la eliminaron al terminar. No modificaron la base `distribuidos-II`. Las imágenes `verificacion/Prestamos/evidencia` y los registros `resultado-dashboard.log` y `resultado-politicas.log` documentan las comprobaciones; los registros de prueba que aparecen en imágenes solo existieron en esa base temporal.
 
 Se renderizaron controles WinForms y se comprobó una escala geométrica de 125 %. **No se abrió el diseñador real de Visual Studio ni se cambió la escala nativa de Windows**: su validación interactiva queda pendiente. Algunas partes nativas de ComboBox no pintan su texto en estas capturas sin ventana visible; las selecciones se comprobaron mediante sus valores. No se simularon datos operativos para la aplicación.
 

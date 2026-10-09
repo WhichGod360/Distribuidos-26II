@@ -59,6 +59,7 @@ internal static partial class Program
             if (args.Contains("--sql-lectura")) ProbeSql();
             if (database is not null)
             {
+                VerifyLoanPolicies();
                 VerifyDashboardAndReader();
                 VerifySqlOperations();
             }
@@ -109,7 +110,11 @@ internal static partial class Program
         Check(grid.Columns["FechaRetorno"].DefaultCellStyle.Format == "dd/MM/yyyy", "Formato de fechas de retorno nullable");
         Render(list, "listado.png", new(1100, 720));
         using var editor = new frmPrestamoDetalle(2, "Maria Torres Vega");
-        Check(!((DateTimePicker)Field(editor, "limite").GetValue(editor)!).Checked, "No se inventa una duración predeterminada");
+        var automaticLimit = (DateTimePicker)Field(editor, "limite").GetValue(editor)!;
+        Check(!automaticLimit.Enabled && !automaticLimit.ShowCheckBox && automaticLimit.Value.Date == today.AddDays(5), "Fecha límite automática de cinco días sin edición manual");
+        var initialDate = (DateTimePicker)Field(editor, "inicio").GetValue(editor)!;
+        initialDate.Value = today.AddDays(-1);
+        Check(automaticLimit.Value.Date == today.AddDays(4), "Cambiar inicio recalcula la fecha límite");
         Render(editor, "registro.png", editor.ClientSize);
         using var giveBack = new frmPrestamoDevolucion(overdue, 2, "Maria Torres Vega");
         Check(((Label)Field(giveBack, "retraso").GetValue(giveBack)!).Text == "1", "Vista previa de retraso en devolución");
@@ -214,17 +219,17 @@ internal static partial class Program
         Check(service.buscarLectores("10000002").Count == 0, "SQL excluye bibliotecarios de la búsqueda de lectores");
         ExecuteSql($"UPDATE Usuario SET estado_usuario='Inactivo' WHERE id_usuario={reader}");
         Check(service.buscarLectores("70000001").Count == 0, "SQL excluye lectores inactivos");
-        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(1)), "SQL revalida lector inactivo en el alta");
+        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2)), "SQL revalida lector inactivo en el alta");
         ExecuteSql($"UPDATE Usuario SET estado_usuario='Activo' WHERE id_usuario={reader}; UPDATE Usuario SET estado_usuario='Inactivo' WHERE id_usuario={librarian}");
-        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(1)), "SQL revalida bibliotecario inactivo");
+        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2)), "SQL revalida bibliotecario inactivo");
         ExecuteSql($"UPDATE Usuario SET estado_usuario='Activo' WHERE id_usuario={librarian}");
-        RejectOperation(() => service.registrar(librarian, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(1)), "SQL exige rol Estudiante al lector");
-        RejectOperation(() => service.registrar(reader, reader2, copy.IdEjemplar, today.AddDays(-7), today.AddDays(1)), "SQL exige rol Bibliotecario al operador");
+        RejectOperation(() => service.registrar(librarian, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2)), "SQL exige rol Estudiante al lector");
+        RejectOperation(() => service.registrar(reader, reader2, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2)), "SQL exige rol Bibliotecario al operador");
         ExecuteSql($"UPDATE Libro SET estado_libro=0 WHERE id_libro={book.IdLibro}");
         Check(copies.listarDisponiblesPorLibro(book.IdLibro).Count == 0, "SQL no ofrece copias de libro inactivo");
-        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(1)), "SQL rechaza libro inactivo");
+        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2)), "SQL rechaza libro inactivo");
         ExecuteSql($"UPDATE Libro SET estado_libro=1 WHERE id_libro={book.IdLibro}; UPDATE Ejemplar SET estado_ejemplar=0 WHERE id_ejemplar={copy.IdEjemplar}");
-        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(1)), "SQL rechaza ejemplar inactivo");
+        RejectOperation(() => service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2)), "SQL rechaza ejemplar inactivo");
         ExecuteSql($"UPDATE Ejemplar SET estado_ejemplar=1 WHERE id_ejemplar={copy.IdEjemplar}");
 
         int loan = service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2));
@@ -232,7 +237,7 @@ internal static partial class Program
         Check(stored.IdUsuario == reader && stored.IdBibliotecario == librarian && stored.IdEjemplar == copy.IdEjemplar, "SQL conserva lector, ID bibliotecario y copia");
         Check(stored.EstadoPrestamo == "Activo" && stored.FechaRetorno is null && stored.DiasRetraso == 0, "SQL registra Activo sin estado Vencido persistido");
         Check(!copies.listarDisponiblesPorLibro(book.IdLibro).Any(e => e.IdEjemplar == copy.IdEjemplar), "SQL reserva la copia");
-        RejectOperation(() => service.registrar(reader2, librarian, copy.IdEjemplar, today.AddDays(-7), today), "SQL rechaza copia ya prestada");
+        RejectOperation(() => service.registrar(reader2, librarian, copy.IdEjemplar, today.AddDays(-7), today.AddDays(-2)), "SQL rechaza copia ya prestada");
         Check(!copies.cambiarEstado(book.IdLibro, copy.IdEjemplar, false), "SQL bloquea desactivación de copia prestada");
         RejectOperation(() => books.eliminarLibro(book.IdLibro), "SQL bloquea desactivación de libro relacionado");
         RejectOperation(() => service.devolver(loan, librarian, today.AddDays(-8)), "SQL rechaza retorno anterior al inicio");
@@ -245,9 +250,9 @@ internal static partial class Program
         RejectOperation(() => books.eliminarLibro(book.IdLibro), "SQL conserva protección de libro con historial devuelto");
         Check(ScalarSql("SELECT COUNT(*) FROM Penalizacion") == 1 && ScalarSql("SELECT COUNT(*) FROM DetallePenalizacion") == 1, "SQL no genera penalizaciones ni cambia su semántica");
 
-        int early = service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-1), today.AddDays(5));
+        int early = service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-1), today.AddDays(4));
         Check(service.devolver(early, librarian, today) == 0, "SQL devolución anticipada guarda cero");
-        int onTime = service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-1), today);
+        int onTime = service.registrar(reader, librarian, copy.IdEjemplar, today.AddDays(-5), today);
         Check(service.devolver(onTime, librarian, today) == 0, "SQL devolución en límite guarda cero");
 
         for (int attempt = 0; attempt < 3; attempt++)
@@ -300,6 +305,16 @@ internal static partial class Program
                     using var cmd = new SqlCommand(batch, cn);
                     cmd.ExecuteNonQuery();
                 }
+                var service = new prestamoNegocio();
+                RejectMessage(() => service.registrar(3, 2, 1, DateTime.Today), "migración 001", "Base sin migración rechaza el préstamo con explicación");
+                string migration = File.ReadAllText("migraciones/001_estado_pago_detalle_penalizacion.sql");
+                foreach (string batch in Regex.Split(migration, @"^\s*GO\s*$", RegexOptions.Multiline | RegexOptions.IgnoreCase))
+                {
+                    if (string.IsNullOrWhiteSpace(batch)) continue;
+                    using var cmd = new SqlCommand(batch, cn);
+                    cmd.ExecuteNonQuery();
+                }
+                Check(true, "Migración esencial ejecutada una vez solo en SQL temporal");
                 Console.WriteLine("Base temporal creada con bd_biblioteca; se eliminará al terminar.");
             }
             catch { Dispose(); throw; }

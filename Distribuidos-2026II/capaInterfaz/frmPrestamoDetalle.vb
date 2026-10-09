@@ -12,6 +12,7 @@ Public Class frmPrestamoDetalle
 
     Public Sub New()
         InitializeComponent()
+        If Not ContextoDiseno.Activo(Me) Then ActualizarLimite()
         guardar.Enabled = False
         AddHandler Load, AddressOf Cargar
         AddHandler btnBuscar.Click, AddressOf BuscarLectores
@@ -22,6 +23,7 @@ Public Class frmPrestamoDetalle
                                   End Sub
         AddHandler libro.SelectedIndexChanged, Sub() CargarEjemplares()
         AddHandler guardar.Click, AddressOf Registrar
+        AddHandler inicio.ValueChanged, Sub() ActualizarLimite()
     End Sub
 
     Public Sub New(idUsuario As Integer, nombreUsuario As String, Optional lectorElegido As Usuario = Nothing)
@@ -37,8 +39,7 @@ Public Class frmPrestamoDetalle
         Try
             inicio.Value = Date.Today
             inicio.MaxDate = Date.Today
-            limite.Value = Date.Today
-            limite.Checked = False
+            ActualizarLimite()
             libro.DisplayMember = "TituloLibro"
             libro.ValueMember = "IdLibro"
             libro.DataSource = libros.listarDisponibles()
@@ -57,6 +58,11 @@ Public Class frmPrestamoDetalle
         Catch ex As Exception
             MessageBox.Show("No se pudo cargar el catálogo: " & ex.Message, "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Error)
         End Try
+    End Sub
+
+    Private Sub ActualizarLimite()
+        If ContextoDiseno.Activo(Me) Then Return
+        limite.Value = PoliticaPrestamo.FechaLimite(inicio.Value)
     End Sub
 
     Private Sub BuscarLectores(sender As Object, e As EventArgs)
@@ -101,14 +107,9 @@ Public Class frmPrestamoDetalle
             MessageBox.Show("Selecciona un lector y un ejemplar disponible.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
-        If Not limite.Checked Then
-            MessageBox.Show("Marca y elige la fecha límite. No hay una duración de préstamo predeterminada.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            limite.Focus()
-            Return
-        End If
         guardar.Enabled = False
         Try
-            Dim id = negocio.registrar(CInt(lector.SelectedValue), idBibliotecario, CInt(ejemplar.SelectedValue), inicio.Value, limite.Value)
+            Dim id = negocio.registrar(CInt(lector.SelectedValue), idBibliotecario, CInt(ejemplar.SelectedValue), inicio.Value)
             MessageBox.Show("Préstamo N.º " & id & " registrado.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
             DialogResult = DialogResult.OK
         Catch ex As Exception

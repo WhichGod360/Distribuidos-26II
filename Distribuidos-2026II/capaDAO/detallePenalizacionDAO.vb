@@ -6,8 +6,7 @@ Imports capaDatos
 Public Class detallePenalizacionDAO
     Private ReadOnly con As Conexion = Conexion.ObtenerInstancia()
 
-    ' VERIFICAR: nombre_usuario (Usuario), id_libro (Ejemplar) y titulo_libro (Libro)
-    ' son supuestos; solo se ajustan aquí.
+    ' Claves verificadas en bd_biblioteca; estado_pago_detalle se añade con la migración 001.
     Private Const NOMBRE_USUARIO_SQL As String =
     "LTRIM(RTRIM(u.nombre_usuario + ' ' + u.ap_paterno + ' ' + ISNULL(u.ap_materno, ''))) AS nombre_usuario"
     
@@ -18,7 +17,7 @@ Public Class detallePenalizacionDAO
         " INNER JOIN Libro l ON l.id_libro = e.id_libro "
 
     Private Const SELECT_DETALLE As String =
-        "SELECT dp.id_detalle_penalizacion, dp.descripcion_detallepenalizacion, dp.id_penalizacion, dp.id_prestamo, " &
+        "SELECT dp.id_detalle_penalizacion, dp.descripcion_detallepenalizacion, dp.id_penalizacion, dp.id_prestamo, dp.estado_pago_detalle, " &
         "p.tipo_penalizacion, p.monto_penalizacion, " & NOMBRE_USUARIO_SQL & ", l.titulo_libro, " &
         "pr.fecha_inicio_prestamo, pr.fecha_fin_prestamo, pr.fecha_retorno_prestamo, " &
         "pr.dias_retraso_prestamo, pr.estado_prestamo " &
@@ -34,6 +33,7 @@ Public Class detallePenalizacionDAO
             .DescripcionDetallePenalizacion = If(rs.IsDBNull(ordDesc), "", rs.GetString(ordDesc)),
             .IdPenalizacion = rs.GetInt32(rs.GetOrdinal("id_penalizacion")),
             .IdPrestamo = rs.GetInt32(rs.GetOrdinal("id_prestamo")),
+            .EstadoPago = rs.GetString(rs.GetOrdinal("estado_pago_detalle")),
             .TipoPenalizacion = rs.GetString(rs.GetOrdinal("tipo_penalizacion")),
             .MontoPenalizacion = rs.GetDecimal(rs.GetOrdinal("monto_penalizacion")),
             .NombreUsuario = rs.GetString(rs.GetOrdinal("nombre_usuario")),
@@ -52,6 +52,7 @@ Public Class detallePenalizacionDAO
         Dim cn As SqlConnection = con.ObtenerConexion()
 
         Try
+            EsquemaPago.ExigirColumna(cn, If(con.EnTransaccion, con.TransaccionActual, Nothing))
             Dim query As String = SELECT_DETALLE &
                 " WHERE (@idPen = 0 OR dp.id_penalizacion = @idPen) ORDER BY dp.id_detalle_penalizacion DESC"
             Using cmd As New SqlCommand(query, cn)
@@ -104,18 +105,20 @@ Public Class detallePenalizacionDAO
         Return lista
     End Function
 
-    Public Function agregarDetalle(descripcion As String, idPenalizacion As Integer, idPrestamo As Integer) As Boolean
+    Public Function agregarDetalle(descripcion As String, idPenalizacion As Integer, idPrestamo As Integer, Optional estadoPago As String = DetallePenalizacion.PagoPendiente) As Boolean
         Dim cn As SqlConnection = con.ObtenerConexion()
 
         Try
-            Dim query As String = "INSERT INTO DetallePenalizacion (descripcion_detallepenalizacion, id_penalizacion, id_prestamo) " &
-                                  "VALUES (@descripcion, @idPen, @idPrestamo)"
+            EsquemaPago.ExigirColumna(cn, If(con.EnTransaccion, con.TransaccionActual, Nothing))
+            Dim query As String = "INSERT INTO DetallePenalizacion (descripcion_detallepenalizacion, id_penalizacion, id_prestamo, estado_pago_detalle) " &
+                                  "VALUES (@descripcion, @idPen, @idPrestamo, @pago)"
             Using cmd As New SqlCommand(query, cn)
                 If con.EnTransaccion Then cmd.Transaction = con.TransaccionActual
                 cmd.Parameters.Add("@descripcion", SqlDbType.VarChar, -1).Value =
                     If(String.IsNullOrWhiteSpace(descripcion), DBNull.Value, CObj(descripcion))
                 cmd.Parameters.AddWithValue("@idPen", idPenalizacion)
                 cmd.Parameters.AddWithValue("@idPrestamo", idPrestamo)
+                cmd.Parameters.Add("@pago", SqlDbType.VarChar, 12).Value = estadoPago
                 Return cmd.ExecuteNonQuery() > 0
             End Using
         Finally
@@ -126,12 +129,13 @@ Public Class detallePenalizacionDAO
         End Try
     End Function
 
-    Public Function actualizarDetalle(idDetalle As Integer, descripcion As String, idPenalizacion As Integer, idPrestamo As Integer) As Boolean
+    Public Function actualizarDetalle(idDetalle As Integer, descripcion As String, idPenalizacion As Integer, idPrestamo As Integer, Optional estadoPago As String = Nothing) As Boolean
         Dim cn As SqlConnection = con.ObtenerConexion()
 
         Try
+            EsquemaPago.ExigirColumna(cn, If(con.EnTransaccion, con.TransaccionActual, Nothing))
             Dim query As String = "UPDATE DetallePenalizacion SET descripcion_detallepenalizacion = @descripcion, " &
-                                  "id_penalizacion = @idPen, id_prestamo = @idPrestamo WHERE id_detalle_penalizacion = @id"
+                                  "id_penalizacion = @idPen, id_prestamo = @idPrestamo, estado_pago_detalle = COALESCE(@pago, estado_pago_detalle) WHERE id_detalle_penalizacion = @id"
             Using cmd As New SqlCommand(query, cn)
                 If con.EnTransaccion Then cmd.Transaction = con.TransaccionActual
                 cmd.Parameters.AddWithValue("@id", idDetalle)
@@ -139,6 +143,7 @@ Public Class detallePenalizacionDAO
                     If(String.IsNullOrWhiteSpace(descripcion), DBNull.Value, CObj(descripcion))
                 cmd.Parameters.AddWithValue("@idPen", idPenalizacion)
                 cmd.Parameters.AddWithValue("@idPrestamo", idPrestamo)
+                cmd.Parameters.Add("@pago", SqlDbType.VarChar, 12).Value = If(estadoPago Is Nothing, DBNull.Value, CObj(estadoPago))
                 Return cmd.ExecuteNonQuery() > 0
             End Using
         Finally

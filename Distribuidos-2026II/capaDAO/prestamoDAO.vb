@@ -78,7 +78,9 @@ Public Class prestamoDAO
         If inicio.Date > Date.Today OrElse limite.Date <= inicio.Date Then
             Throw New ArgumentException("Fechas inválidas: el inicio no puede ser futuro y el límite debe ser posterior al inicio.")
         End If
+        If limite.Date <> PoliticaPrestamo.FechaLimite(inicio) Then Throw New ArgumentException("El préstamo debe durar exactamente cinco días.")
         Using cn = con.CrearConexionIndependiente()
+            EsquemaPago.ExigirColumna(cn)
             ' Solo localizar el libro; se revalida la relación bajo bloqueo antes de insertar.
             Dim idLibro As Integer
             Using cmd As New SqlCommand("SELECT id_libro FROM Ejemplar WHERE id_ejemplar = @id", cn)
@@ -88,7 +90,9 @@ Public Class prestamoDAO
                 idLibro = CInt(valor)
             End Using
             Using tx = cn.BeginTransaction(IsolationLevel.Serializable)
-                ' Orden común con los mantenimientos: libro, ejemplar y préstamos.
+                ' Serializar primero al lector: dos copias distintas tampoco pueden prestarse a la misma persona.
+                ValidarUsuario(cn, tx, idLector, "ESTUDIANTE", "El lector debe ser un estudiante activo.", True)
+                ' Después, libro, ejemplar y préstamos como en los mantenimientos.
                 Using cmd As New SqlCommand("SELECT estado_libro FROM Libro WITH (UPDLOCK, HOLDLOCK) WHERE id_libro = @id", cn, tx)
                     cmd.Parameters.Add("@id", SqlDbType.Int).Value = idLibro
                     Dim valor = cmd.ExecuteScalar()
@@ -101,8 +105,29 @@ Public Class prestamoDAO
                     Dim valor = cmd.ExecuteScalar()
                     If valor Is Nothing OrElse Not CBool(valor) Then Throw New InvalidOperationException("El ejemplar no existe o está inactivo.")
                 End Using
-                ValidarUsuario(cn, tx, idLector, "ESTUDIANTE", "El lector debe ser un estudiante activo.")
                 ValidarUsuario(cn, tx, idBibliotecario, "BIBLIOTECARIO", "La cuenta que registra la operación debe ser un bibliotecario activo.")
+                Using cmd As New SqlCommand("SELECT COUNT(1) FROM Prestamo p WITH (HOLDLOCK) " &
+                                             "WHERE p.id_usuario = @lector AND " & ejemplarDAO.PrestamoOcupaEjemplarSql, cn, tx)
+                    cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
+                    If CInt(cmd.ExecuteScalar()) >= PoliticaPrestamo.MaximoEjemplares Then
+                        Throw New InvalidOperationException("El lector ya tiene un ejemplar sin devolver. El máximo es uno, incluido cualquier préstamo vencido o por revisar.")
+                    End If
+                End Using
+                ' El pago pertenece a la penalización aplicada; la habilitación del catálogo no interviene.
+                Using cmd As New SqlCommand("SELECT dp.estado_pago_detalle FROM DetallePenalizacion dp WITH (HOLDLOCK) " &
+                                             "INNER JOIN Prestamo p WITH (HOLDLOCK) ON p.id_prestamo = dp.id_prestamo " &
+                                             "WHERE p.id_usuario = @lector AND dp.estado_pago_detalle <> @pagada", cn, tx)
+                    cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
+                    cmd.Parameters.Add("@pagada", SqlDbType.VarChar, 12).Value = DetallePenalizacion.PagoPagada
+                    Using rs = cmd.ExecuteReader()
+                        If rs.Read() Then
+                            If rs.GetString(0) = DetallePenalizacion.PagoPendiente Then
+                                Throw New InvalidOperationException("El lector tiene una penalización pendiente de pago. Debe regularizarla antes de recibir otro préstamo.")
+                            End If
+                            Throw New InvalidOperationException("El lector tiene una penalización con pago por revisar. Confirma su estado de pago antes de registrar otro préstamo.")
+                        End If
+                    End Using
+                End Using
                 ' El bloqueo de la copia dura hasta COMMIT. La consulta e INSERT son indivisibles.
                 Using cmd As New SqlCommand("SELECT COUNT(1) FROM Prestamo p WITH (UPDLOCK, HOLDLOCK) " &
                                              "WHERE p.id_ejemplar = @id AND " & ejemplarDAO.PrestamoOcupaEjemplarSql, cn, tx)
@@ -181,8 +206,8 @@ Public Class prestamoDAO
         End Using
     End Function
 
-    Private Shared Sub ValidarUsuario(cn As SqlConnection, tx As SqlTransaction, id As Integer, rol As String, mensaje As String)
-        Dim sql = "SELECT COUNT(1) FROM Usuario u WITH (HOLDLOCK) " &
+    Private Shared Sub ValidarUsuario(cn As SqlConnection, tx As SqlTransaction, id As Integer, rol As String, mensaje As String, Optional bloquearLector As Boolean = False)
+        Dim sql = "SELECT COUNT(1) FROM Usuario u WITH (" & If(bloquearLector, "UPDLOCK, HOLDLOCK", "HOLDLOCK") & ") " &
             "INNER JOIN RolUsuario r WITH (HOLDLOCK) ON r.id_rol_usuario = u.id_rol_usuario " &
             "WHERE u.id_usuario = @id AND UPPER(LTRIM(RTRIM(u.estado_usuario))) = 'ACTIVO' " &
             "AND UPPER(LTRIM(RTRIM(r.nombre_rol_usuario))) = @rol"

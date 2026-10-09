@@ -15,6 +15,7 @@ Partial Class frmDetallePenalizacion
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Me.colPago = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.encabezado = New System.Windows.Forms.TableLayoutPanel()
         Me.imagenModulo = New System.Windows.Forms.PictureBox()
         Me.textoEncabezado = New System.Windows.Forms.Panel()
@@ -318,6 +319,13 @@ Partial Class frmDetallePenalizacion
         Me.colDescripcion.ReadOnly = True
         Me.colDescripcion.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
         Me.DataGridView1.Columns.Add(Me.colDescripcion)
+        Me.colPago.Name = "colPago"
+        Me.colPago.HeaderText = "Estado de pago"
+        Me.colPago.Width = 125
+        Me.colPago.ReadOnly = True
+        Me.colPago.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.DataGridView1.Columns.Add(Me.colPago)
+        Me.colPago.DisplayIndex = 3
         Me.lblResumen.Name = "lblResumen"
         Me.lblResumen.Text = "Sin datos cargados. Abre la pantalla para consultar."
         Me.lblResumen.ForeColor = System.Drawing.Color.FromArgb(105, 116, 140)
@@ -390,5 +398,6 @@ Partial Class frmDetallePenalizacion
     Friend WithEvents colDias As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colEstadoPrestamo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colDescripcion As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colPago As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents lblResumen As System.Windows.Forms.Label
 End Class

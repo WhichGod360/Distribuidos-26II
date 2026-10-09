@@ -10,6 +10,7 @@ Public Class frmDetallePenalizacionEditar
 
     Public Sub New()
         InitializeComponent()
+        cboPago.SelectedIndex = 0
         AddHandler Load, AddressOf Cargar
         AddHandler guardar.Click, AddressOf Guardar_Click
     End Sub
@@ -37,6 +38,7 @@ Public Class frmDetallePenalizacionEditar
                 sancion.SelectedValue = detalle.IdPenalizacion
                 prestamo.SelectedValue = detalle.IdPrestamo
                 descripcion.Text = detalle.DescripcionDetallePenalizacion
+                cboPago.SelectedItem = detalle.EstadoPagoTexto
             ElseIf idInicial > 0 Then
                 sancion.SelectedValue = idInicial
             End If
@@ -57,9 +59,10 @@ Public Class frmDetallePenalizacionEditar
             Return
         End If
         Try
+            Dim estadoPago = If(CStr(cboPago.SelectedItem) = "Por revisar", DetallePenalizacion.PagoPorRevisar, CStr(cboPago.SelectedItem))
             Dim ok = If(detalle Is Nothing,
-                negocio.agregarDetalle(descripcion.Text.Trim(), CInt(sancion.SelectedValue), CInt(prestamo.SelectedValue)),
-                negocio.actualizarDetalle(detalle.IdDetallePenalizacion, descripcion.Text.Trim(), CInt(sancion.SelectedValue), CInt(prestamo.SelectedValue)))
+                negocio.agregarDetalle(descripcion.Text.Trim(), CInt(sancion.SelectedValue), CInt(prestamo.SelectedValue), estadoPago),
+                negocio.actualizarDetalle(detalle.IdDetallePenalizacion, descripcion.Text.Trim(), CInt(sancion.SelectedValue), CInt(prestamo.SelectedValue), estadoPago))
             If Not ok Then Throw New InvalidOperationException("No se pudo guardar el detalle.")
             DialogResult = DialogResult.OK
         Catch ex As Exception

@@ -27,6 +27,10 @@ Public Class prestamoNegocio
         Return dao.registrar(idLector, idBibliotecario, idEjemplar, fechaInicio.Date, fechaFin.Date)
     End Function
 
+    Public Function registrar(idLector As Integer, idBibliotecario As Integer, idEjemplar As Integer, fechaInicio As Date) As Integer
+        Return registrar(idLector, idBibliotecario, idEjemplar, fechaInicio, PoliticaPrestamo.FechaLimite(fechaInicio))
+    End Function
+
     Public Function devolver(idPrestamo As Integer, idBibliotecario As Integer, fechaRetorno As Date) As Integer
         If idPrestamo <= 0 Then Throw New ArgumentException("Selecciona un préstamo.")
         If idBibliotecario <= 0 Then Throw New ArgumentException("La sesión no identifica al bibliotecario.")
@@ -37,6 +41,7 @@ Public Class prestamoNegocio
     Public Shared Sub ValidarFechasPrestamo(inicio As Date, limite As Date, hoy As Date)
         If inicio.Date > hoy.Date Then Throw New ArgumentException("El inicio no puede tener una fecha futura.")
         If limite.Date <= inicio.Date Then Throw New ArgumentException("La fecha límite debe ser posterior al inicio.")
+        If limite.Date <> PoliticaPrestamo.FechaLimite(inicio) Then Throw New ArgumentException("El préstamo debe durar exactamente cinco días después de la fecha de inicio.")
     End Sub
 
     Public Shared Function CalcularDiasRetraso(inicio As Date, limite As Date, retorno As Date, hoy As Date) As Integer

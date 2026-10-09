@@ -1,4 +1,13 @@
 Public Class DetallePenalizacion
+    Public Const PagoPendiente As String = "Pendiente"
+    Public Const PagoPagada As String = "Pagada"
+    Public Const PagoPorRevisar As String = "PorRevisar"
+    Public Property EstadoPago As String = PagoPendiente
+    Public ReadOnly Property EstadoPagoTexto As String
+        Get
+            Return If(EstadoPago = PagoPorRevisar, "Por revisar", EstadoPago)
+        End Get
+    End Property
     ' Campos propios de la tabla
     Public Property IdDetallePenalizacion As Integer
     Public Property DescripcionDetallePenalizacion As String

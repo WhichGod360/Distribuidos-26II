@@ -70,10 +70,10 @@ Public Class frmDetallePenalizacion
         Dim texto = buscar.Text.Trim()
         DataGridView1.Rows.Clear()
         For Each d In listaActual
-            If texto <> "" AndAlso (d.NombreUsuario & " " & d.TituloLibro & " " & d.DescripcionDetallePenalizacion & " " & d.IdPrestamo).IndexOf(texto, StringComparison.OrdinalIgnoreCase) < 0 Then Continue For
+            If texto <> "" AndAlso (d.NombreUsuario & " " & d.TituloLibro & " " & d.DescripcionDetallePenalizacion & " " & d.IdPrestamo & " " & d.EstadoPagoTexto).IndexOf(texto, StringComparison.OrdinalIgnoreCase) < 0 Then Continue For
             DataGridView1.Rows.Add(d.IdDetallePenalizacion, d.TipoPenalizacion, "S/ " & d.MontoPenalizacion.ToString("N2"),
                 d.IdPrestamo, d.NombreUsuario, d.TituloLibro, d.FechaInicio.ToString("dd/MM/yyyy"), d.FechaFin.ToString("dd/MM/yyyy"),
-                If(d.FechaRetorno.HasValue, d.FechaRetorno.Value.ToString("dd/MM/yyyy"), "-"), d.DiasRetraso, d.EstadoPrestamo, d.DescripcionDetallePenalizacion)
+                If(d.FechaRetorno.HasValue, d.FechaRetorno.Value.ToString("dd/MM/yyyy"), "-"), d.DiasRetraso, d.EstadoPrestamo, d.DescripcionDetallePenalizacion, d.EstadoPagoTexto)
         Next
         DataGridView1.ClearSelection()
         btnEditar.Enabled = False

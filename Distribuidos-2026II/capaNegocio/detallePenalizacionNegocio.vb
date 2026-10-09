@@ -11,11 +11,19 @@ Public Class detallePenalizacionNegocio
         Return dao.listarPrestamos()
     End Function
 
-    Public Function agregarDetalle(descripcion As String, idPenalizacion As Integer, idPrestamo As Integer) As Boolean
-        Return dao.agregarDetalle(descripcion, idPenalizacion, idPrestamo)
+    Public Function agregarDetalle(descripcion As String, idPenalizacion As Integer, idPrestamo As Integer, Optional estadoPago As String = DetallePenalizacion.PagoPendiente) As Boolean
+        ValidarEstadoPago(estadoPago)
+        Return dao.agregarDetalle(descripcion, idPenalizacion, idPrestamo, estadoPago)
     End Function
 
-    Public Function actualizarDetalle(idDetalle As Integer, descripcion As String, idPenalizacion As Integer, idPrestamo As Integer) As Boolean
-        Return dao.actualizarDetalle(idDetalle, descripcion, idPenalizacion, idPrestamo)
+    Public Function actualizarDetalle(idDetalle As Integer, descripcion As String, idPenalizacion As Integer, idPrestamo As Integer, Optional estadoPago As String = Nothing) As Boolean
+        If estadoPago IsNot Nothing Then ValidarEstadoPago(estadoPago)
+        Return dao.actualizarDetalle(idDetalle, descripcion, idPenalizacion, idPrestamo, estadoPago)
     End Function
+
+    Private Shared Sub ValidarEstadoPago(estado As String)
+        If Not {DetallePenalizacion.PagoPendiente, DetallePenalizacion.PagoPagada, DetallePenalizacion.PagoPorRevisar}.Contains(estado) Then
+            Throw New ArgumentException("Selecciona un estado de pago válido: Pendiente, Pagada o Por revisar.")
+        End If
+    End Sub
 End Class

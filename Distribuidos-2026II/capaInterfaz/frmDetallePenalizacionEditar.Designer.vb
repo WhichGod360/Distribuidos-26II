@@ -15,6 +15,9 @@ Partial Class frmDetallePenalizacionEditar
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
+        Me.cboPago = New System.Windows.Forms.ComboBox()
+        Me.bloquePago = New System.Windows.Forms.Panel()
+        Me.etiquetaPago = New System.Windows.Forms.Label()
         Me.encabezado = New System.Windows.Forms.TableLayoutPanel()
         Me.imagenModulo = New System.Windows.Forms.PictureBox()
         Me.textoEncabezado = New System.Windows.Forms.Panel()
@@ -94,7 +97,7 @@ Partial Class frmDetallePenalizacionEditar
         Me.cuerpoEditor.AutoScroll = True
         Me.camposEditor.Name = "camposEditor"
         Me.camposEditor.Dock = System.Windows.Forms.DockStyle.Top
-        Me.camposEditor.RowCount = 3
+        Me.camposEditor.RowCount = 4
         Me.camposEditor.ColumnCount = 1
         Me.camposEditor.Margin = New System.Windows.Forms.Padding(0)
         Me.camposEditor.AutoSize = True
@@ -102,6 +105,21 @@ Partial Class frmDetallePenalizacionEditar
         Me.camposEditor.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64!))
         Me.camposEditor.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64!))
         Me.camposEditor.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 110!))
+        Me.camposEditor.RowStyles.Add(New System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 64!))
+        Me.bloquePago.Name = "bloquePago"
+        Me.bloquePago.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.bloquePago.Margin = New System.Windows.Forms.Padding(0, 0, 12, 6)
+        Me.etiquetaPago.Name = "etiquetaPago"
+        Me.etiquetaPago.Text = "Estado de pago de la penalización aplicada"
+        Me.etiquetaPago.Dock = System.Windows.Forms.DockStyle.Top
+        Me.etiquetaPago.Height = 24
+        Me.etiquetaPago.Font = New System.Drawing.Font("Segoe UI", 9.5!, System.Drawing.FontStyle.Bold)
+        Me.cboPago.Name = "cboPago"
+        Me.cboPago.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboPago.Items.AddRange(New Object() {"Pendiente", "Pagada", "Por revisar"})
+        Me.cboPago.Dock = System.Windows.Forms.DockStyle.Top
+        Me.bloquePago.Controls.Add(Me.cboPago)
+        Me.bloquePago.Controls.Add(Me.etiquetaPago)
         Me.sancion.Name = "sancion"
         Me.sancion.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.sancion.DropDownWidth = 520
@@ -159,6 +177,7 @@ Partial Class frmDetallePenalizacionEditar
         Me.bloque_descripcion.Controls.Add(Me.descripcion)
         Me.bloque_descripcion.Controls.Add(Me.etiqueta_descripcion)
         Me.camposEditor.Controls.Add(Me.bloque_descripcion)
+        Me.camposEditor.Controls.Add(Me.bloquePago)
         Me.accionesEditor.Name = "accionesEditor"
         Me.accionesEditor.Dock = System.Windows.Forms.DockStyle.Fill
         Me.accionesEditor.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
@@ -205,7 +224,7 @@ Partial Class frmDetallePenalizacionEditar
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
         Me.BackColor = System.Drawing.Color.White
-        Me.ClientSize = New System.Drawing.Size(660, 428)
+        Me.ClientSize = New System.Drawing.Size(660, 492)
         Me.Name = "frmDetallePenalizacionEditar"
         Me.Text = "Agregar detalle"
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable
@@ -237,6 +256,9 @@ Partial Class frmDetallePenalizacionEditar
     End Sub
 
     Friend WithEvents encabezado As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents cboPago As System.Windows.Forms.ComboBox
+    Friend WithEvents bloquePago As System.Windows.Forms.Panel
+    Friend WithEvents etiquetaPago As System.Windows.Forms.Label
     Friend WithEvents imagenModulo As System.Windows.Forms.PictureBox
     Friend WithEvents textoEncabezado As System.Windows.Forms.Panel
     Friend WithEvents lblTituloVista As System.Windows.Forms.Label

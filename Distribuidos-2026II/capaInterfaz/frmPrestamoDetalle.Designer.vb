@@ -242,14 +242,14 @@ Partial Class frmPrestamoDetalle
         Me.camposEditor.Controls.Add(Me.bloque_inicio)
         Me.limite.Name = "limite"
         Me.limite.Format = System.Windows.Forms.DateTimePickerFormat.Short
-        Me.limite.ShowCheckBox = True
-        Me.limite.Checked = False
+        Me.limite.ShowCheckBox = False
+        Me.limite.Enabled = False
         Me.bloque_limite.Name = "bloque_limite"
         Me.bloque_limite.Dock = System.Windows.Forms.DockStyle.Fill
         Me.bloque_limite.Size = New System.Drawing.Size(550, 58)
         Me.bloque_limite.Margin = New System.Windows.Forms.Padding(0, 0, 12, 6)
         Me.etiqueta_limite.Name = "etiqueta_limite"
-        Me.etiqueta_limite.Text = "Fecha límite: marcar y elegir"
+        Me.etiqueta_limite.Text = "Fecha límite automática: inicio + 5 días"
         Me.etiqueta_limite.ForeColor = System.Drawing.Color.FromArgb(28, 36, 55)
         Me.etiqueta_limite.AutoSize = False
         Me.etiqueta_limite.Dock = System.Windows.Forms.DockStyle.Top
@@ -261,7 +261,7 @@ Partial Class frmPrestamoDetalle
         Me.bloque_limite.Controls.Add(Me.etiqueta_limite)
         Me.camposEditor.Controls.Add(Me.bloque_limite)
         Me.lblPlazo.Name = "lblPlazo"
-        Me.lblPlazo.Text = "Elige la fecha límite. No hay un plazo predeterminado."
+        Me.lblPlazo.Text = "5 días · Máximo 1 ejemplar por lector · Sin penalizaciones pendientes"
         Me.lblPlazo.ForeColor = System.Drawing.Color.FromArgb(105, 116, 140)
         Me.bloque_lblPlazo.Name = "bloque_lblPlazo"
         Me.bloque_lblPlazo.Dock = System.Windows.Forms.DockStyle.Fill

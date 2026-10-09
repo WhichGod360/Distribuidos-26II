@@ -82,7 +82,7 @@ internal static partial class Program
         int categoryA = ScalarSql("SELECT id_categoria FROM Categoria WHERE nombre_categoria='Prueba dashboard A'");
         int categoryB = ScalarSql("SELECT id_categoria FROM Categoria WHERE nombre_categoria='Prueba dashboard B'");
         ExecuteSql($"INSERT INTO DetalleCategoria(id_libro,id_categoria) VALUES ({book.IdLibro},{categoryA}),({book.IdLibro},{categoryB})");
-        int loan = loans.registrar(reader.IdUsuario, librarian, copy.IdEjemplar, today.AddDays(-3), today.AddDays(-1));
+        int loan = loans.registrar(reader.IdUsuario, librarian, copy.IdEjemplar, today.AddDays(-6), today.AddDays(-1));
         var current = dashboard.consultar(from, to, 0, "Todos");
         Check(current.TotalPrestamos == initial.TotalPrestamos + 1 && current.Activos == 1 && current.Vencidos == 1, "Dashboard cuenta vencidos dentro de activos sin duplicar por categorías");
         Check(current.EjemplaresDisponibles == initial.EjemplaresDisponibles - 1, "Dashboard reduce disponibilidad después del préstamo");
@@ -93,7 +93,7 @@ internal static partial class Program
         {
             LoadForm(detail);
             Check(Convert.ToInt32(ControlOf<ComboBox>(detail, "lector").SelectedValue) == reader.IdUsuario, "Nuevo préstamo conserva el lector seleccionado");
-            Check(!ControlOf<DateTimePicker>(detail, "limite").Checked, "Carga del editor no introduce un plazo automático");
+            Check(!ControlOf<DateTimePicker>(detail, "limite").Enabled && ControlOf<DateTimePicker>(detail, "limite").Value.Date == today.AddDays(5), "Carga del editor conserva plazo automático de cinco días");
         }
 
         using (var form = new frmPrincipal { IdUsuario = librarian, Usuario = "Bibliotecario de prueba", Rol = "Bibliotecario" })
