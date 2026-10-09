@@ -4,6 +4,7 @@
     Public Property EditorialLibro As String
     Public Property AnoPublicacion As Integer?
     Public Property StockTotal As Integer
+    Public Property Disponibles As Integer
     Public Property EstadoLibro As Boolean
     Public Property PublicoLibro As String
 

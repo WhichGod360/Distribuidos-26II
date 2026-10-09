@@ -19,6 +19,8 @@ Public Class RecuperarContraseña
     Private Sub RecuperarContraseña_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.CenterToScreen()
         txtPregunta.Text = _pregunta
+        txtRpta.UseSystemPasswordChar = True
+        txtRpta.MaxLength = 200
         txtRpta.Focus()
     End Sub
 
@@ -28,16 +30,25 @@ Public Class RecuperarContraseña
         Me.Close()
     End Sub
 
-    Private Sub btonVerificar_Click(sender As Object, e As EventArgs) Handles btonVerificar.Click
+    Private Async Sub btonVerificar_Click(sender As Object, e As EventArgs) Handles btonVerificar.Click
+        If Not btonVerificar.Enabled Then Return
+        btonVerificar.Enabled = False
+        btonCancelar.Enabled = False
+        UseWaitCursor = True
         Try
             Dim rptaIngresada As String = txtRpta.Text.Trim()
 
             ' Paso 6: Si la respuesta es igual a la de la BD
-            If negocioUsuario.ValidarRespuesta(_email, rptaIngresada) Then
+            Dim autorizacion As String = Await Task.Run(Function() negocioUsuario.ValidarRespuesta(_email, rptaIngresada))
+            If IsDisposed Then
+                negocioUsuario.CancelarRecuperacion(autorizacion)
+                Return
+            End If
+            If Not String.IsNullOrEmpty(autorizacion) Then
                 MessageBox.Show("Respuesta correcta. Ahora puedes cambiar tu contraseña.", "Identidad confirmada", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
                 ' Abrir ventana de Nueva Contraseña enviando el correo del usuario
-                Dim frmNueva As New NuevaContraseña(_email)
+                Dim frmNueva As New NuevaContraseña(_email, autorizacion)
                 frmNueva.StartPosition = FormStartPosition.CenterScreen
                 frmNueva.Show()
                 Me.Close()
@@ -50,6 +61,13 @@ Public Class RecuperarContraseña
             MessageBox.Show(ex.Message, "Error de verificación", MessageBoxButtons.OK, MessageBoxIcon.Error)
             txtRpta.SelectAll()
             txtRpta.Focus()
+        Finally
+            If Not IsDisposed Then
+                btonVerificar.Enabled = True
+                btonCancelar.Enabled = True
+                UseWaitCursor = False
+                txtRpta.Clear()
+            End If
         End Try
     End Sub
 End Class

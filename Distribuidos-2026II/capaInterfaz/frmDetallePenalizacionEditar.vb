@@ -28,7 +28,8 @@ Public Class frmDetallePenalizacionEditar
         Try
             sancion.DisplayMember = "DescripcionCombo"
             sancion.ValueMember = "IdPenalizacion"
-            sancion.DataSource = New penalizacionNegocio().listarTodos()
+            Dim tipos=If(detalle Is Nothing,New penalizacionNegocio().listarActivas(),New penalizacionNegocio().listarTodos())
+            sancion.DataSource = tipos
             prestamo.DisplayMember = "Texto"
             prestamo.ValueMember = "IdPrestamo"
             prestamo.DataSource = negocio.listarPrestamos()
@@ -39,6 +40,9 @@ Public Class frmDetallePenalizacionEditar
                 prestamo.SelectedValue = detalle.IdPrestamo
                 descripcion.Text = detalle.DescripcionDetallePenalizacion
                 cboPago.SelectedItem = detalle.EstadoPagoTexto
+                sancion.Enabled=False
+                prestamo.Enabled=False
+                lblDescripcionVista.Text="Importe conservado: S/ " & detalle.MontoPenalizacion.ToString("0.00") & ". Edita el motivo o el pago."
             ElseIf idInicial > 0 Then
                 sancion.SelectedValue = idInicial
             End If
@@ -51,11 +55,6 @@ Public Class frmDetallePenalizacionEditar
     Private Sub Guardar_Click(sender As Object, e As EventArgs)
         If sancion.SelectedValue Is Nothing OrElse prestamo.SelectedValue Is Nothing Then
             MessageBox.Show("Selecciona una penalización y un préstamo.", "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            Return
-        End If
-        Dim p = TryCast(sancion.SelectedItem, Penalizacion)
-        If detalle Is Nothing AndAlso p IsNot Nothing AndAlso Not p.EstadoPenalizacion Then
-            MessageBox.Show("No se puede registrar un detalle con una penalización inactiva.", "Penalizaciones", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
         Try

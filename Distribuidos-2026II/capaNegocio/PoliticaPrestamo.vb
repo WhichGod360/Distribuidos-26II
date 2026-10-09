@@ -1,6 +1,7 @@
 Public NotInheritable Class PoliticaPrestamo
     Public Const PlazoDias As Integer = 5
-    Public Const MaximoEjemplares As Integer = 1
+    Public Const MaximoEjemplares As Integer = 5
+    ' Una solicitud vigente por lector. Cada título del carrito representa una copia.
 
     Private Sub New()
     End Sub

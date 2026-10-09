@@ -261,7 +261,7 @@ Partial Class frmPrestamoDetalle
         Me.bloque_limite.Controls.Add(Me.etiqueta_limite)
         Me.camposEditor.Controls.Add(Me.bloque_limite)
         Me.lblPlazo.Name = "lblPlazo"
-        Me.lblPlazo.Text = "5 días · Máximo 1 ejemplar por lector · Sin penalizaciones pendientes"
+        Me.lblPlazo.Text = "5 días · Máximo 5 libros pendientes de devolución por lector · Sin penalizaciones pendientes"
         Me.lblPlazo.ForeColor = System.Drawing.Color.FromArgb(105, 116, 140)
         Me.bloque_lblPlazo.Name = "bloque_lblPlazo"
         Me.bloque_lblPlazo.Dock = System.Windows.Forms.DockStyle.Fill

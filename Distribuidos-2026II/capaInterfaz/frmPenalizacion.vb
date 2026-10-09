@@ -13,6 +13,7 @@ Public Class frmPenalizacion
 
     Public Sub New()
         InitializeComponent()
+        DataGridView1.Columns.Add(New DataGridViewTextBoxColumn With {.Name="colTramo",.HeaderText="Aplicación",.FillWeight=20})
         btnNuevo.Text = "Agregar penalización"
         btnGuardar.Text = "Editar"
 
@@ -48,7 +49,7 @@ Public Class frmPenalizacion
             listaActual = negocio.buscar(txtBuscar.Text.Trim(), estado)
             DataGridView1.Rows.Clear()
             For Each p In listaActual
-                DataGridView1.Rows.Add(p.IdPenalizacion, p.TipoPenalizacion, "S/ " & p.MontoPenalizacion.ToString("N2"), p.DescripcionPenalizacion, p.EstadoTexto)
+                DataGridView1.Rows.Add(p.IdPenalizacion, p.TipoPenalizacion, "S/ " & p.MontoPenalizacion.ToString("N2"), p.DescripcionPenalizacion, p.EstadoTexto,p.TramoTexto)
             Next
             DataGridView1.ClearSelection()
             lblResumen.Text = listaActual.Count & " penalización(es)"

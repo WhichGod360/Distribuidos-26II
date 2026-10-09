@@ -1,4 +1,4 @@
-﻿Imports System.Runtime.InteropServices
+Imports System.Runtime.InteropServices
 Imports capaDatos
 Imports capaNegocio
 Imports Utiles
@@ -8,8 +8,6 @@ Public Class FrmLibros
 
     Public Event SolicitarEjemplares(idLibro As Integer, titulo As String)
     Private ReadOnly negocioLibro As New libroNegocio()
-    Private ReadOnly negocioAutor As New autorNegocio()
-    Private ReadOnly negocioCategoria As New categoriaNegocio()
     Private librosActuales As New List(Of Libro)()
     Private ReadOnly colorPrimario As Color = MantenimientoUI.Primario
     Private ReadOnly dtLibros As New DataTable("Libros")
@@ -258,10 +256,10 @@ Public Class FrmLibros
             Dim ok As Boolean
             If id = 0 Then
                 ok = negocioLibro.agregarLibroCompleto(editor.Titulo, editor.Editorial, CShort(editor.Anio.Year), editor.Publico,
-                    editor.Activo, ResolverAutores(editor.Autores), ResolverCategorias(editor.Categorias), editor.CantidadEjemplares)
+                    editor.Activo, negocioLibro.ResolverAutores(editor.Autores), negocioLibro.ResolverCategorias(editor.Categorias), editor.CantidadEjemplares)
             Else
                 ok = negocioLibro.actualizarLibroCompleto(id, editor.Titulo, editor.Editorial, CShort(editor.Anio.Year), editor.Publico,
-                    editor.Activo, ResolverAutores(editor.Autores), ResolverCategorias(editor.Categorias))
+                    editor.Activo, negocioLibro.ResolverAutores(editor.Autores), negocioLibro.ResolverCategorias(editor.Categorias))
             End If
             If Not ok Then Throw New InvalidOperationException("No se pudo guardar el libro.")
             Return True
@@ -282,29 +280,6 @@ Public Class FrmLibros
             MessageBox.Show(ex.Message, "Libros", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
     End Sub
-
-    Private Function ResolverAutores(nombres As IEnumerable(Of String)) As List(Of Integer)
-        Dim autores As List(Of Autor) = negocioAutor.listarTodos()
-        Dim ids As New List(Of Integer)()
-        For Each nombre As String In nombres
-            Dim autor As Autor = autores.FirstOrDefault(Function(x) String.Equals(x.NombreAutor.Trim(), nombre.Trim(), StringComparison.OrdinalIgnoreCase))
-            If autor Is Nothing Then Throw New InvalidOperationException("No existe el autor '" & nombre & "'. Regístralo primero en el mantenimiento de autores.")
-            ids.Add(autor.IdAutor)
-        Next
-        Return ids.Distinct().ToList()
-    End Function
-
-    Private Function ResolverCategorias(nombres As IEnumerable(Of String)) As List(Of Integer)
-        Dim tabla As DataTable = negocioCategoria.listarCategoria()
-        Dim ids As New List(Of Integer)()
-        For Each nombre As String In nombres
-            Dim fila As DataRow = tabla.AsEnumerable().FirstOrDefault(Function(x) String.Equals(x("nombre_categoria").ToString().Trim(), nombre.Trim(), StringComparison.OrdinalIgnoreCase) AndAlso
-                                                                       String.Equals(x("estado").ToString(), "Activo", StringComparison.OrdinalIgnoreCase))
-            If fila Is Nothing Then Throw New InvalidOperationException("No existe una categoría activa llamada '" & nombre & "'. Regístrala o actívala primero.")
-            ids.Add(CInt(fila("id_categoria")))
-        Next
-        Return ids.Distinct().ToList()
-    End Function
 
     Private Shared Function SepararNombres(valor As String) As IEnumerable(Of String)
         If String.IsNullOrWhiteSpace(valor) Then Return Array.Empty(Of String)()

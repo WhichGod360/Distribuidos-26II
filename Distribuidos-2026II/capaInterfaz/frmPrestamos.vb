@@ -13,10 +13,17 @@ Public Class frmPrestamos
     Private datos As New List(Of Prestamo)()
     Private lectorContexto As Integer
     Private prestamoContexto As Integer
+    Private ReadOnly btnEntrega As New Button With {.Text="Comprobante entrega",.Width=195,.Height=36}
+    Private ReadOnly btnRetorno As New Button With {.Text="Comprobante devolución",.Width=215,.Height=36}
     Public Event DatosCambiados()
 
     Public Sub New()
         InitializeComponent()
+        barraAcciones.Controls.AddRange({btnEntrega,btnRetorno})
+        MantenimientoUI.EstilizarBoton(btnEntrega)
+        MantenimientoUI.EstilizarBoton(btnRetorno)
+        AddHandler btnEntrega.Click, Sub() VerComprobante(False)
+        AddHandler btnRetorno.Click, Sub() VerComprobante(True)
         filtroEstado.SelectedIndex = 0
         btnNuevo.Enabled = False
         AddHandler Load, Sub() ActualizarDatos()
@@ -37,7 +44,7 @@ Public Class frmPrestamos
         Me.New()
         idBibliotecario = idUsuario
         nombreBibliotecario = nombreUsuario
-        puedeOperar = idUsuario > 0 AndAlso String.Equals(If(rol, "").Trim(), "Bibliotecario", StringComparison.OrdinalIgnoreCase)
+        puedeOperar = seguridadNegocio.PuedeOperar(idUsuario, rol)
         btnNuevo.Enabled = puedeOperar
         lblDescripcionVista.Text = "Sesión: " & nombreUsuario & " · " & rol & " · Una fila por ejemplar físico"
     End Sub
@@ -67,20 +74,7 @@ Public Class frmPrestamos
         Dim texto = buscar.Text.Trim()
         Dim filtro = CStr(filtroEstado.SelectedItem)
         Dim hoy = Date.Today
-        Dim filas = datos.Where(Function(p)
-                                    If lectorContexto > 0 AndAlso p.IdUsuario <> lectorContexto Then Return False
-                                    If prestamoContexto > 0 AndAlso p.IdPrestamo <> prestamoContexto Then Return False
-                                    Select Case filtro
-                                        Case "Activos"
-                                            If Not p.EstaActivo Then Return False
-                                        Case "Vencidos"
-                                            If Not p.EstaVencido(hoy) Then Return False
-                                        Case "Devueltos"
-                                            If Not p.FechaRetorno.HasValue OrElse Not String.Equals(p.EstadoPrestamo.Trim(), Prestamo.EstadoDevuelto, StringComparison.OrdinalIgnoreCase) Then Return False
-                                    End Select
-                                    Dim contenido = $"{p.IdPrestamo} {p.NombreLector} {p.DniLector} {p.CorreoLector} {p.IdEjemplar} {p.TituloLibro}"
-                                    Return contenido.IndexOf(texto, StringComparison.OrdinalIgnoreCase) >= 0
-                                End Function).ToList()
+        Dim filas = prestamoNegocio.FiltrarConsulta(datos, filtro, texto, lectorContexto, prestamoContexto, hoy)
         tabla.DataSource = filas
         tabla.ClearSelection()
         resumen.Text = filas.Count & " préstamo(s) · Activos incluye vencidos · Vencido: fecha límite anterior a hoy · Retraso guardado al devolver"
@@ -95,16 +89,28 @@ Public Class frmPrestamos
 
     Private Sub ActualizarSeleccion()
         Dim prestamo = Seleccionado()
-        btnDevolver.Enabled = puedeOperar AndAlso prestamo IsNot Nothing AndAlso prestamo.EstaActivo
+        btnDevolver.Enabled = puedeOperar AndAlso prestamoNegocio.PuedeDevolver(prestamo)
+        btnEntrega.Enabled=puedeOperar AndAlso prestamo IsNot Nothing
+        btnRetorno.Enabled=puedeOperar AndAlso prestamo IsNot Nothing AndAlso prestamo.FechaRetorno.HasValue
+    End Sub
+
+    Private Sub VerComprobante(devolucion As Boolean)
+        Dim actual=Seleccionado()
+        If actual Is Nothing Then Return
+        Try
+            ComprobanteImpresion.Mostrar(New comprobanteNegocio().PorPrestamo(actual.IdPrestamo,devolucion),Me)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message,"Comprobante",MessageBoxButtons.OK,MessageBoxIcon.Warning)
+        End Try
     End Sub
 
     Private Sub FormatearCelda(sender As Object, e As DataGridViewCellFormattingEventArgs)
         If e.RowIndex < 0 OrElse tabla.Columns(e.ColumnIndex).Name <> "EstadoPrestamo" Then Return
         Dim prestamo = TryCast(tabla.Rows(e.RowIndex).DataBoundItem, Prestamo)
         If prestamo Is Nothing Then Return
-        e.Value = prestamo.EstadoParaMostrar(Date.Today)
+        e.Value = prestamoNegocio.EstadoParaMostrar(prestamo, Date.Today)
         e.FormattingApplied = True
-        If prestamo.EstaVencido(Date.Today) Then e.CellStyle.ForeColor = Color.FromArgb(185, 45, 45)
+        If prestamoNegocio.EstaVencido(prestamo, Date.Today) Then e.CellStyle.ForeColor = Color.FromArgb(185, 45, 45)
     End Sub
 
     Private Sub Nuevo_Click(sender As Object, e As EventArgs)
@@ -123,7 +129,7 @@ Public Class frmPrestamos
 
     Private Sub Devolver_Click(sender As Object, e As EventArgs)
         Dim prestamo = Seleccionado()
-        If Not puedeOperar OrElse prestamo Is Nothing OrElse Not prestamo.EstaActivo Then Return
+        If Not puedeOperar OrElse Not prestamoNegocio.PuedeDevolver(prestamo) Then Return
         Using editor As New frmPrestamoDevolucion(prestamo, idBibliotecario, nombreBibliotecario)
             If MantenimientoUI.MostrarDialogo(editor, Me) = DialogResult.OK Then
                 ActualizarDatos()

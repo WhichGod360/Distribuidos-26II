@@ -7,6 +7,7 @@ Public Class frmPrestamoDevolucion
     Private ReadOnly prestamo As Prestamo
     Private ReadOnly idBibliotecario As Integer
     Private ReadOnly negocio As New prestamoNegocio()
+    Private calculo As DevolucionCalculada
 
     Public Sub New()
         InitializeComponent()
@@ -23,33 +24,46 @@ Public Class frmPrestamoDevolucion
         txtPrestamo.Text = "N.º " & prestamo.IdPrestamo & " · " & prestamo.NombreLector
         txtEjemplar.Text = prestamo.TituloLibro & " · Ejemplar " & prestamo.IdEjemplar
         lblFechas.Text = "Inicio: " & prestamo.FechaInicio.ToString("dd/MM/yyyy") & " · Límite: " & prestamo.FechaFin.ToString("dd/MM/yyyy")
-        retorno.Value = Date.Today
         retorno.MaxDate = Date.Today
-        guardar.Enabled = idUsuario > 0 AndAlso prestamo.EstaActivo
+        retorno.Value = Date.Today
+        etiqueta_retraso.Text="Retraso e importe de mora"
+        camposEditor.RowStyles(5).Height=140
+        bloque_retraso.Height=134
+        retraso.AutoSize=False
+        retraso.Dock=DockStyle.Fill
+        Size=New Size(720,760)
+        guardar.Width=240
         MostrarRetraso()
     End Sub
 
     Private Sub MostrarRetraso()
         If prestamo Is Nothing OrElse ContextoDiseno.Activo(Me) Then Return
         Try
-            retraso.Text = prestamoNegocio.CalcularDiasRetraso(prestamo.FechaInicio, prestamo.FechaFin, retorno.Value, Date.Today).ToString()
-        Catch ex As ArgumentException
+            calculo=negocio.PrevisualizarDevolucion(prestamo.IdPrestamo,retorno.Value)
+            retraso.Text = calculo.Resumen
+            guardar.Text=If(calculo.DiasRetraso>0 AndAlso Not calculo.YaRegistrada,"Devolver y registrar mora","Confirmar devolución")
+            guardar.Enabled=idBibliotecario>0 AndAlso prestamoNegocio.PuedeDevolver(prestamo)
+        Catch ex As Exception
+            calculo=Nothing
+            guardar.Enabled=False
             retraso.Text = ex.Message
         End Try
     End Sub
 
     Private Sub Devolver(sender As Object, e As EventArgs)
         If Not guardar.Enabled Then Return
+        If calculo Is Nothing Then Return
+        If MessageBox.Show(calculo.Resumen & vbCrLf & "¿Confirmar la devolución?", "Confirmar",MessageBoxButtons.YesNo,MessageBoxIcon.Question)<>DialogResult.Yes Then Return
         guardar.Enabled = False
         Try
             prestamoNegocio.CalcularDiasRetraso(prestamo.FechaInicio, prestamo.FechaFin, retorno.Value, Date.Today)
-            Dim dias = negocio.devolver(prestamo.IdPrestamo, idBibliotecario, retorno.Value)
-            MessageBox.Show("Devolución registrada. Días de retraso: " & dias & ".", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Dim resultado = negocio.DevolverConfirmado(calculo)
+            MessageBox.Show("Devolución registrada." & vbCrLf & resultado.Resumen & vbCrLf & "Puedes imprimir el comprobante desde Préstamos.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
             DialogResult = DialogResult.OK
         Catch ex As Exception
             MessageBox.Show(ex.Message, "No se pudo registrar la devolución", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         Finally
-            guardar.Enabled = True
+            If DialogResult<>DialogResult.OK Then MostrarRetraso()
         End Try
     End Sub
 End Class

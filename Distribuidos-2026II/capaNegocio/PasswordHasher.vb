@@ -41,7 +41,7 @@ Public NotInheritable Class PasswordHasher
         End Try
     End Function
 
-    ' Compatibilidad temporal: el DAO reemplaza el texto anterior por un hash.
+    ' Compatibilidad temporal: Negocio verifica y solicita a DAO reemplazar el texto anterior por un hash.
     Public Shared Function VerifyLegacy(password As String, stored As String) As Boolean
         If password Is Nothing OrElse stored Is Nothing OrElse IsHash(stored) Then Return False
         Return CryptographicOperations.FixedTimeEquals(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(stored))

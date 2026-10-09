@@ -1,28 +1,54 @@
-﻿Imports capaNegocio
+Imports capaNegocio
 Imports capaDatos
 Imports System.Threading.Tasks
 Public Class Login
     Private ReadOnly negocioUsuario As New usuarioNegocio()
-    Private Sub Login_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    ' Usa las mismas capas para actualizar respuestas existentes sin abrir una sesión.
+    Private ReadOnly soloMigracion As Boolean = Environment.GetCommandLineArgs().Any(
+        Function(a) String.Equals(a, "--migrar-seguridad", StringComparison.OrdinalIgnoreCase))
+
+    Public Sub New()
+        InitializeComponent()
+        If soloMigracion Then
+            Opacity = 0
+            ShowInTaskbar = False
+        End If
+    End Sub
+    Private Async Sub Login_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If ContextoDiseno.Activo(Me) Then Return
         Me.AcceptButton = btnIniciarSesion
         txtContraseña.UseSystemPasswordChar = True
         txtCorreo.Focus()
+        btnIniciarSesion.Enabled = False
+        lblOlvide.Enabled = False
+        lblRegistrate.Enabled = False
+        UseWaitCursor = True
+        Try
+            Await Task.Run(Sub() negocioUsuario.PrepararSeguridad())
+            If soloMigracion Then Console.WriteLine("Respuestas de seguridad actualizadas con PBKDF2-SHA256.")
+        Catch ex As Exception
+            If soloMigracion Then
+                Environment.ExitCode = 1
+                Console.Error.WriteLine(ex.Message)
+            Else
+                MessageBox.Show("No se pudo preparar la seguridad de las cuentas: " & ex.Message, "Inicio", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            End If
+        Finally
+            If soloMigracion Then
+                Application.Exit()
+            ElseIf Not IsDisposed Then
+                btnIniciarSesion.Enabled = True
+                lblOlvide.Enabled = True
+                lblRegistrate.Enabled = True
+                UseWaitCursor = False
+            End If
+        End Try
     End Sub
 
     Private Async Sub btnIniciarSesion_Click(sender As Object, e As EventArgs) Handles btnIniciarSesion.Click
         If Not btnIniciarSesion.Enabled Then Return
         Dim email As String = txtCorreo.Text.Trim()
         Dim password As String = txtContraseña.Text
-        If String.IsNullOrWhiteSpace(email) Then
-            MessageBox.Show("Debe ingresar su correo electrónico.", "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtCorreo.Focus()
-            Return
-        End If
-        If String.IsNullOrWhiteSpace(password) Then
-            MessageBox.Show("Debe ingresar su contraseña.", "Datos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtContraseña.Focus()
-            Return
-        End If
 
         btnIniciarSesion.Enabled = False
         lblOlvide.Enabled = False
@@ -32,10 +58,16 @@ Public Class Login
             Dim usuarioValido As Usuario = Await Task.Run(Function() negocioUsuario.IniciarSesion(email, password))
 
             MessageBox.Show($"¡Bienvenido al sistema, {usuarioValido.NombreCompleto}!" & vbCrLf & $"Rol: {usuarioValido.NombreRol}", "Acceso Correcto", MessageBoxButtons.OK, MessageBoxIcon.Information)
-            Dim principal As New frmPrincipal()
-            principal.IdUsuario = usuarioValido.IdUsuario
-            principal.Usuario = usuarioValido.NombreCompleto
-            principal.Rol = usuarioValido.NombreRol
+            Dim principal As Form
+            If seguridadNegocio.EsRolLector(usuarioValido.NombreRol) Then
+                principal = New frmLector()
+            ElseIf seguridadNegocio.EsRolPersonal(usuarioValido.NombreRol) Then
+                principal = New frmPrincipal With {.IdUsuario = usuarioValido.IdUsuario,
+                    .Usuario = usuarioValido.NombreCompleto, .Rol = usuarioValido.NombreRol}
+            Else
+                SesionUsuario.Cerrar()
+                Throw New UnauthorizedAccessException("El rol de esta cuenta no tiene una interfaz habilitada.")
+            End If
             principal.Show()
             Me.Hide()
 
@@ -58,13 +90,6 @@ Public Class Login
 
     Private Sub lblOlvide_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles lblOlvide.LinkClicked
         Dim email As String = txtCorreo.Text.Trim()
-
-        ' Paso 3: Solicitar correo si está vacío
-        If String.IsNullOrWhiteSpace(email) Then
-            MessageBox.Show("Por favor, ingresa tu correo electrónico en el campo correspondiente para recuperar tu contraseña.", "Correo requerido", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtCorreo.Focus()
-            Return
-        End If
 
         Try
             ' Validar que el correo exista antes de abrir la ventana

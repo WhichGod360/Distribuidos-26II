@@ -16,6 +16,14 @@ Public Class DetallePenalizacion
 
     ' Propiedades auxiliares traídas por JOIN
     Public Property TipoPenalizacion As String
+    Public Property DescripcionTipoPenalizacion As String
+    Public ReadOnly Property Motivo As String
+        Get
+            If Not String.IsNullOrWhiteSpace(DescripcionDetallePenalizacion) Then Return DescripcionDetallePenalizacion
+            If Not String.IsNullOrWhiteSpace(DescripcionTipoPenalizacion) Then Return DescripcionTipoPenalizacion
+            Return TipoPenalizacion
+        End Get
+    End Property
     Public Property MontoPenalizacion As Decimal
     Public Property NombreUsuario As String
     Public Property TituloLibro As String

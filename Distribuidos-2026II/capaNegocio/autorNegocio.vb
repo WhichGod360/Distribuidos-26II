@@ -1,4 +1,4 @@
-﻿Imports capaDatos
+Imports capaDatos
 
 Public Class autorNegocio
     Private ReadOnly dao As New autorDAO()
@@ -20,6 +20,7 @@ Public Class autorNegocio
         If dao.buscarPorNombre(nombre.Trim()) IsNot Nothing Then
             Throw New InvalidOperationException("Ya existe un autor con ese nombre.")
         End If
+        seguridadNegocio.ExigirPersonal()
         Return dao.insertar(nombre.Trim())
     End Function
 
@@ -30,13 +31,19 @@ Public Class autorNegocio
         If existente IsNot Nothing AndAlso existente.IdAutor <> idAutor Then
             Throw New InvalidOperationException("Ya existe un autor con ese nombre.")
         End If
+        seguridadNegocio.ExigirPersonal()
         Return dao.actualizar(idAutor, nombre.Trim())
     End Function
 
     Public Function eliminar(idAutor As Integer) As Boolean
         If idAutor <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idAutor))
-        Return dao.eliminar(idAutor)
+        seguridadNegocio.ExigirPersonal()
+        Return dao.eliminar(idAutor,AddressOf ValidarEliminacion)
     End Function
+
+    Private Shared Sub ValidarEliminacion(libros As Integer)
+        If libros > 0 Then Throw New InvalidOperationException("No se puede eliminar el autor porque está asociado a libros.")
+    End Sub
 
     Private Shared Sub ValidarNombre(nombre As String)
         If String.IsNullOrWhiteSpace(nombre) Then

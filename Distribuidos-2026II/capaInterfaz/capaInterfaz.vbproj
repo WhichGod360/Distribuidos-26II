@@ -44,6 +44,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="frmLector.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmUsuarios.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmUsuarios.Designer.vb"><DependentUpon>frmUsuarios.vb</DependentUpon></Compile>
+    <Compile Update="frmUsuarioDetalle.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmUsuarioDetalle.Designer.vb"><DependentUpon>frmUsuarioDetalle.vb</DependentUpon></Compile>
+    <Compile Update="frmLector.Designer.vb"><DependentUpon>frmLector.vb</DependentUpon></Compile>
+    <Compile Update="frmSolicitudes.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmSolicitudes.Designer.vb"><DependentUpon>frmSolicitudes.vb</DependentUpon></Compile>
+    <Compile Update="frmEntregaSolicitud.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmEntregaSolicitud.Designer.vb"><DependentUpon>frmEntregaSolicitud.vb</DependentUpon></Compile>
     <Compile Update="frmAgregarCategoria.vb"><SubType>Form</SubType></Compile>
     <Compile Update="frmAgregarCategoria.Designer.vb"><DependentUpon>frmAgregarCategoria.vb</DependentUpon></Compile>
     <EmbeddedResource Update="frmAgregarCategoria.resx"><DependentUpon>frmAgregarCategoria.vb</DependentUpon></EmbeddedResource>

@@ -23,7 +23,7 @@ Public Class frmBuscarLector
         Me.New()
         idBibliotecario = idUsuario
         nombreBibliotecario = nombreUsuario
-        puedeOperar = idUsuario > 0 AndAlso String.Equals(If(rol, "").Trim(), "Bibliotecario", StringComparison.OrdinalIgnoreCase)
+        puedeOperar = seguridadNegocio.PuedeOperar(idUsuario, rol)
         lblDescripcionVista.Text = "Estudiantes activos · Sesión: " & nombreUsuario & " · " & rol
     End Sub
 
@@ -107,7 +107,7 @@ Public Class frmBuscarLector
             If IsDisposed OrElse version <> versionHistorial Then Return
             tablaPrestamos.DataSource = prestamos
             tablaPrestamos.ClearSelection()
-            lblResumen.Text = prestamos.Count & " préstamo(s) del lector · Activos: " & prestamos.Where(Function(p) p.EstaActivo).Count() & " · Vencidos: " & prestamos.Where(Function(p) p.EstaVencido(Date.Today)).Count()
+            lblResumen.Text = prestamos.Count & " préstamo(s) del lector · Activos: " & prestamos.Where(Function(p) prestamoNegocio.PuedeDevolver(p)).Count() & " · Vencidos: " & prestamos.Where(Function(p) prestamoNegocio.EstaVencido(p, Date.Today)).Count()
         Catch ex As Exception
             If Not IsDisposed AndAlso version = versionHistorial Then lblResumen.Text = "No se pudo consultar el historial. " & ex.Message
         End Try
@@ -120,16 +120,16 @@ Public Class frmBuscarLector
 
     Private Sub SeleccionarPrestamo(sender As Object, e As EventArgs) Handles tablaPrestamos.SelectionChanged
         Dim prestamo = PrestamoSeleccionado()
-        btnDevolver.Enabled = puedeOperar AndAlso prestamo IsNot Nothing AndAlso prestamo.EstaActivo
+        btnDevolver.Enabled = puedeOperar AndAlso prestamoNegocio.PuedeDevolver(prestamo)
     End Sub
 
     Private Sub FormatearEstado(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles tablaPrestamos.CellFormatting
         If e.RowIndex < 0 OrElse tablaPrestamos.Columns(e.ColumnIndex).DataPropertyName <> "EstadoPrestamo" Then Return
         Dim prestamo = TryCast(tablaPrestamos.Rows(e.RowIndex).DataBoundItem, Prestamo)
         If prestamo Is Nothing Then Return
-        e.Value = prestamo.EstadoParaMostrar(Date.Today)
+        e.Value = prestamoNegocio.EstadoParaMostrar(prestamo, Date.Today)
         e.FormattingApplied = True
-        If prestamo.EstaVencido(Date.Today) Then e.CellStyle.ForeColor = Color.Firebrick
+        If prestamoNegocio.EstaVencido(prestamo, Date.Today) Then e.CellStyle.ForeColor = Color.Firebrick
     End Sub
 
     Private Sub VerPrestamos(sender As Object, e As EventArgs) Handles btnVerPrestamos.Click
@@ -150,7 +150,7 @@ Public Class frmBuscarLector
 
     Private Async Sub DevolverPrestamo(sender As Object, e As EventArgs) Handles btnDevolver.Click
         Dim prestamo = PrestamoSeleccionado()
-        If Not puedeOperar OrElse prestamo Is Nothing OrElse Not prestamo.EstaActivo Then Return
+        If Not puedeOperar OrElse Not prestamoNegocio.PuedeDevolver(prestamo) Then Return
         Using editor As New frmPrestamoDevolucion(prestamo, idBibliotecario, nombreBibliotecario)
             If MantenimientoUI.MostrarDialogo(editor, Me) = DialogResult.OK Then
                 RaiseEvent DatosCambiados()

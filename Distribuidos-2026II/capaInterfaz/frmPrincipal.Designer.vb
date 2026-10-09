@@ -29,10 +29,12 @@ Partial Class frmPrincipal
         Me.btnInicio = New System.Windows.Forms.Button()
         Me.btnBuscar = New System.Windows.Forms.Button()
         Me.btnPrestamos = New System.Windows.Forms.Button()
+        Me.btnSolicitudes = New System.Windows.Forms.Button()
         Me.btnLibros = New System.Windows.Forms.Button()
         Me.btnAutores = New System.Windows.Forms.Button()
         Me.btnCategorias = New System.Windows.Forms.Button()
         Me.btnPenalizaciones = New System.Windows.Forms.Button()
+        Me.btnUsuarios = New System.Windows.Forms.Button()
         Me.lblAyudaMenu = New System.Windows.Forms.Label()
         Me.btnSalir = New System.Windows.Forms.Button()
         Me.pnlMain = New System.Windows.Forms.Panel()
@@ -279,6 +281,19 @@ Partial Class frmPrincipal
         Me.btnPrestamos.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnPrestamos.Padding = New System.Windows.Forms.Padding(8, 0, 0, 0)
         Me.flpMenu.Controls.Add(Me.btnPrestamos)
+        Me.btnSolicitudes.Name = "btnSolicitudes"
+        Me.btnSolicitudes.Text = "Solicitudes y reservas"
+        Me.btnSolicitudes.Size = New System.Drawing.Size(170, 43)
+        Me.btnSolicitudes.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnSolicitudes.FlatAppearance.BorderSize = 0
+        Me.btnSolicitudes.BackColor = System.Drawing.Color.FromArgb(244, 246, 253)
+        Me.btnSolicitudes.ForeColor = System.Drawing.Color.FromArgb(72, 101, 244)
+        Me.btnSolicitudes.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
+        Me.btnSolicitudes.Margin = New System.Windows.Forms.Padding(0, 0, 0, 7)
+        Me.btnSolicitudes.Tag = "solicitudes"
+        Me.btnSolicitudes.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnSolicitudes.Padding = New System.Windows.Forms.Padding(8, 0, 0, 0)
+        Me.flpMenu.Controls.Add(Me.btnSolicitudes)
         Me.btnLibros.Name = "btnLibros"
         Me.btnLibros.Text = "Libros y ejemplares"
         Me.btnLibros.Size = New System.Drawing.Size(170, 43)
@@ -347,6 +362,20 @@ Partial Class frmPrincipal
         Me.btnPenalizaciones.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
         Me.btnPenalizaciones.Padding = New System.Windows.Forms.Padding(8, 0, 0, 0)
         Me.flpMenu.Controls.Add(Me.btnPenalizaciones)
+        Me.btnUsuarios.Name = "btnUsuarios"
+        Me.btnUsuarios.Text = "Gestión de usuarios"
+        Me.btnUsuarios.Size = New System.Drawing.Size(170, 43)
+        Me.btnUsuarios.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnUsuarios.FlatAppearance.BorderSize = 0
+        Me.btnUsuarios.BackColor = System.Drawing.Color.FromArgb(244, 246, 253)
+        Me.btnUsuarios.ForeColor = System.Drawing.Color.FromArgb(72, 101, 244)
+        Me.btnUsuarios.Font = New System.Drawing.Font("Segoe UI", 10.0!, System.Drawing.FontStyle.Bold)
+        Me.btnUsuarios.Margin = New System.Windows.Forms.Padding(0, 0, 0, 7)
+        Me.btnUsuarios.Tag = "usuarios"
+        Me.btnUsuarios.TextAlign = System.Drawing.ContentAlignment.MiddleLeft
+        Me.btnUsuarios.Padding = New System.Windows.Forms.Padding(8, 0, 0, 0)
+        Me.btnUsuarios.Visible = False
+        Me.flpMenu.Controls.Add(Me.btnUsuarios)
         Me.lblAyudaMenu.Name = "lblAyudaMenu"
         Me.lblAyudaMenu.Text = "Cada préstamo corresponde a una copia física."
         Me.lblAyudaMenu.ForeColor = System.Drawing.Color.FromArgb(105, 116, 140)
@@ -1080,6 +1109,7 @@ Partial Class frmPrincipal
     Friend WithEvents btnInicio As System.Windows.Forms.Button
     Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents btnPrestamos As System.Windows.Forms.Button
+    Friend WithEvents btnSolicitudes As System.Windows.Forms.Button
     Friend WithEvents btnLibros As System.Windows.Forms.Button
     Friend WithEvents btnAutores As System.Windows.Forms.Button
     Friend WithEvents btnCategorias As System.Windows.Forms.Button
@@ -1165,4 +1195,5 @@ Partial Class frmPrincipal
     Friend WithEvents lblNotaCategorias As System.Windows.Forms.Label
     Friend WithEvents lblEstadoCarga As System.Windows.Forms.Label
     Friend WithEvents lblFooter As System.Windows.Forms.Label
+    Friend WithEvents btnUsuarios As System.Windows.Forms.Button
 End Class

@@ -1,4 +1,4 @@
-﻿Imports capaNegocio
+Imports capaNegocio
 
 Public Class frmEditarCategoria
 
@@ -32,10 +32,6 @@ Public Class frmEditarCategoria
     End Sub
 
     Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
-        If String.IsNullOrWhiteSpace(txtNombre.Text) Then
-            MessageBox.Show("Ingrese el nombre de la categoría.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
-            Return
-        End If
         Dim nombre As String = txtNombre.Text
         Dim estado As Integer
         If chkEstado.Checked Then

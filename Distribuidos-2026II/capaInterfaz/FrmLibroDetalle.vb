@@ -1,4 +1,4 @@
-﻿Class FrmLibroDetalle
+Class FrmLibroDetalle
 
     Private _modificado As Boolean = False
     Private _idLibro As Integer
@@ -151,9 +151,7 @@
 
     Private Sub btnAddCategoria_Click(sender As Object, e As EventArgs) Handles btnAddCategoria.Click
         Try
-            Dim nombres = New capaNegocio.categoriaNegocio().listarCategoria().AsEnumerable().
-                Where(Function(f) f("estado").ToString() = "Activo").
-                Select(Function(f) f("nombre_categoria").ToString()).
+            Dim nombres = New capaNegocio.categoriaNegocio().listarActivas().
                 Where(Function(n) Not Categorias.Contains(n, StringComparer.OrdinalIgnoreCase)).ToList()
             SeleccionarRegistro("Seleccionar categoría", nombres, flpCategorias, btnAddCategoria)
         Catch ex As Exception
@@ -188,7 +186,6 @@
     End Sub
 
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
-        If Not ValidarCampos() Then Return
         If accionGuardar IsNot Nothing AndAlso Not accionGuardar(Me) Then Return
         _modificado = False
         DialogResult = DialogResult.OK
@@ -219,19 +216,6 @@
     ' =====================================================================
     '  AUXILIARES
     ' =====================================================================
-    Private Function ValidarCampos() As Boolean
-        Dim faltan As New List(Of String)
-        If Titulo = "" Then faltan.Add("Título")
-        If Editorial = "" Then faltan.Add("Editorial")
-        If Autores.Count = 0 Then faltan.Add("Autores")
-        If Categorias.Count = 0 Then faltan.Add("Categorías")
-        If cboPublico.SelectedIndex < 0 Then faltan.Add("Público objetivo")
-        If faltan.Count = 0 Then Return True
-
-        FrmConfirmacion.Mostrar(Me, TipoConfirmacion.Bloqueo, "Faltan datos obligatorios",
-                                "Completa: **" & String.Join(", ", faltan) & "**.", "Entendido")
-        Return False
-    End Function
 
     Private Function ObtenerChips(panel As FlowLayoutPanel) As List(Of String)
         Dim lista As New List(Of String)

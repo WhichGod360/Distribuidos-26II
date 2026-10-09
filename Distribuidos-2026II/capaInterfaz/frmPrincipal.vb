@@ -21,17 +21,26 @@ Public Class frmPrincipal
     End Sub
 
     Private Function EsAdministrador() As Boolean
-        Return IdUsuario > 0 AndAlso String.Equals(Rol, "Administrador", StringComparison.OrdinalIgnoreCase)
+        Return seguridadNegocio.PuedeGestionarUsuarios(IdUsuario, Rol)
     End Function
 
     Private Function PuedePrestar() As Boolean
-        Return IdUsuario > 0 AndAlso String.Equals(Rol, "Bibliotecario", StringComparison.OrdinalIgnoreCase)
+        Return seguridadNegocio.PuedeOperar(IdUsuario, Rol)
     End Function
 
     Private Async Sub CargarPrincipal(sender As Object, e As EventArgs) Handles MyBase.Load
         If ContextoDiseno.Activo(Me) Then Return
+        Try
+            seguridadNegocio.ExigirPersonal()
+            seguridadNegocio.ExigirSesion(IdUsuario)
+        Catch ex As UnauthorizedAccessException
+            MessageBox.Show(ex.Message, "Acceso", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+            Close()
+            Return
+        End Try
         lblNombre.Text = Usuario
         lblRol.Text = Rol & " · ID " & IdUsuario
+        btnUsuarios.Visible = EsAdministrador()
         lblTituloVista.Text = If(EsAdministrador(), "Resumen de administración", "Tu jornada en la biblioteca")
         lblDescripcionVista.Text = "Filtra los préstamos por su fecha de inicio. La disponibilidad corresponde al stock actual."
         vista_pnlBarras.Visible = False
@@ -39,7 +48,7 @@ Public Class frmPrincipal
         dtDesde.Value = New Date(Date.Today.Year, 1, 1)
         dtHasta.Value = Date.Today
         cboEst.SelectedIndex = 0
-        btnNuevoRapido.Text = If(EsAdministrador(), "Gestionar autores", "Nuevo préstamo")
+        btnNuevoRapido.Text = If(EsAdministrador(), "Gestionar usuarios", "Nuevo préstamo")
         btnDevolverRapido.Text = If(EsAdministrador(), "Gestionar categorías", "Registrar devolución")
         btnNuevoRapido.Enabled = EsAdministrador() OrElse PuedePrestar()
         btnDevolverRapido.Enabled = btnNuevoRapido.Enabled
@@ -142,12 +151,16 @@ Public Class frmPrincipal
         Await ActualizarDashboardAsync()
     End Sub
 
-    Private Sub Menu_Click(sender As Object, e As EventArgs) Handles btnInicio.Click, btnBuscar.Click, btnPrestamos.Click, btnLibros.Click, btnAutores.Click, btnCategorias.Click, btnPenalizaciones.Click
-        AbrirModulo(CStr(DirectCast(sender, Button).Tag))
+    Private Sub Menu_Click(sender As Object, e As EventArgs) Handles btnInicio.Click, btnBuscar.Click, btnPrestamos.Click, btnSolicitudes.Click, btnLibros.Click, btnAutores.Click, btnCategorias.Click, btnPenalizaciones.Click, btnUsuarios.Click
+        Try
+            AbrirModulo(CStr(DirectCast(sender, Button).Tag))
+        Catch ex As Exception
+            MessageBox.Show(ex.Message, "Acceso al módulo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
     End Sub
 
     Private Sub SeleccionarMenu(seleccion As Button)
-        For Each boton In {btnInicio, btnBuscar, btnPrestamos, btnLibros, btnAutores, btnCategorias, btnPenalizaciones}
+        For Each boton In {btnInicio, btnBuscar, btnPrestamos, btnSolicitudes, btnLibros, btnAutores, btnCategorias, btnPenalizaciones, btnUsuarios}
             boton.BackColor = If(boton Is seleccion, Utiles.MantenimientoUI.Primario, Color.FromArgb(244, 246, 253))
             boton.ForeColor = If(boton Is seleccion, Color.White, Utiles.MantenimientoUI.Texto)
         Next
@@ -155,7 +168,23 @@ Public Class frmPrincipal
 
     Public Sub AbrirModulo(clave As String)
         If ContextoDiseno.Activo(Me) Then Return
+        seguridadNegocio.ExigirPersonal()
         Select Case clave
+            Case "usuarios"
+                seguridadNegocio.ExigirAdministrador()
+                SeleccionarMenu(btnUsuarios)
+                If Not vistas.ContainsKey(clave) Then
+                    Dim formulario As New frmUsuarios()
+                    AddHandler formulario.DatosCambiados, AddressOf DatosCambiaron
+                    vistas.Add(clave, formulario)
+                End If
+            Case "solicitudes"
+                SeleccionarMenu(btnSolicitudes)
+                If Not vistas.ContainsKey(clave) Then
+                    Dim formulario As New frmSolicitudes()
+                    AddHandler formulario.DatosCambiados, AddressOf DatosCambiaron
+                    vistas.Add(clave, formulario)
+                End If
             Case "inicio"
                 MostrarInicio()
                 Return
@@ -207,6 +236,7 @@ Public Class frmPrincipal
     End Function
 
     Public Sub MostrarPrestamos(filtro As String, Optional idLector As Integer = 0, Optional idPrestamo As Integer = 0)
+        seguridadNegocio.ExigirPersonal()
         Dim formulario = VistaPrestamos()
         formulario.AplicarContexto(filtro, idLector, idPrestamo)
         MostrarVista(formulario)
@@ -270,7 +300,7 @@ Public Class frmPrincipal
 
     Private Sub NuevoRapido_Click(sender As Object, e As EventArgs) Handles btnNuevoRapido.Click
         If EsAdministrador() Then
-            AbrirModulo("autores")
+            AbrirModulo("usuarios")
         ElseIf PuedePrestar() Then
             MostrarPrestamos("Todos")
             VistaPrestamos().NuevoPrestamo()
@@ -370,6 +400,7 @@ Public Class frmPrincipal
     End Sub
 
     Private Sub Salir_Click(sender As Object, e As EventArgs) Handles btnSalir.Click
+        SesionUsuario.Cerrar()
         Application.Restart()
     End Sub
 

@@ -1,4 +1,4 @@
-﻿Imports System.Data
+Imports System.Data
 Imports capaDatos
 Imports capaDAO
 
@@ -10,6 +10,11 @@ Public Class categoriaNegocio
         Return dato.listarTabla()
     End Function
 
+    Public Function listarActivas() As List(Of String)
+        Return dato.listarTabla().AsEnumerable().Where(Function(f) f("estado").ToString() = "Activo").
+            Select(Function(f) f("nombre_categoria").ToString()).ToList()
+    End Function
+
     Public Function agregarCategoria(nombre As String, estado As Integer) As Boolean
         ValidarNombre(nombre)
         Dim tabla As DataTable = dato.listarTabla()
@@ -18,6 +23,7 @@ Public Class categoriaNegocio
                 Return False
             End If
         Next
+        seguridadNegocio.ExigirPersonal()
         Return dato.insertar(nombre.Trim(), estado)
     End Function
 
@@ -35,6 +41,7 @@ Public Class categoriaNegocio
                 Return False
             End If
         Next
+        seguridadNegocio.ExigirPersonal()
         Return dato.actualizar(id, nombre.Trim(), estado)
     End Function
 
@@ -44,6 +51,7 @@ Public Class categoriaNegocio
 
     Public Function desactivarCategoria(id As Integer) As Boolean
         If id <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(id))
+        seguridadNegocio.ExigirPersonal()
         Return dato.desactivar(id)
     End Function
 

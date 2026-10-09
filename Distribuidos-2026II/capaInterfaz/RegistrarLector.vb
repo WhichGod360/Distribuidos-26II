@@ -1,4 +1,4 @@
-﻿Imports capaDatos
+Imports capaDatos
 Imports capaNegocio
 
 Public Class RegistrarLector
@@ -7,6 +7,9 @@ Public Class RegistrarLector
     Private Sub RegistrarLector_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.CenterToScreen()
         txtDNI.MaxLength = 8
+        txtPregunta.MaxLength = 255
+        txtRpta.MaxLength = 200
+        txtRpta.UseSystemPasswordChar = True
         txtContraseña.UseSystemPasswordChar = True
         txtConfirmar.UseSystemPasswordChar = True
         cboSexo.DropDownStyle = ComboBoxStyle.DropDownList
@@ -27,9 +30,10 @@ Public Class RegistrarLector
     End Sub
 
     Private Sub ActualizarRequisitosVisuales(password As String)
-        lblCaracteres.ForeColor = If(password.Length >= 8, Color.ForestGreen, Color.Gray)
-        lblMayuscula.ForeColor = If(password.Any(AddressOf Char.IsUpper), Color.ForestGreen, Color.Gray)
-        lblNumero.ForeColor = If(password.Any(AddressOf Char.IsDigit), Color.ForestGreen, Color.Gray)
+        Dim requisitos = usuarioNegocio.EvaluarClave(password)
+        lblCaracteres.ForeColor = If(requisitos.LongitudValida, Color.ForestGreen, Color.Gray)
+        lblMayuscula.ForeColor = If(requisitos.TieneMayuscula, Color.ForestGreen, Color.Gray)
+        lblNumero.ForeColor = If(requisitos.TieneNumero, Color.ForestGreen, Color.Gray)
     End Sub
 
     Private Sub linkLogin_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles linkLogin.LinkClicked
@@ -41,21 +45,6 @@ Public Class RegistrarLector
     Private Sub btnRegistrarse_Click(sender As Object, e As EventArgs) Handles btnRegistrarse.Click
         Dim pass As String = txtContraseña.Text
         Dim confirmPass As String = txtConfirmar.Text
-
-        ' Resaltar en rojo requisitos incumplidos al intentar guardar
-        Dim tieneLongitud As Boolean = (pass.Length >= 8)
-        Dim tieneMayuscula As Boolean = pass.Any(AddressOf Char.IsUpper)
-        Dim tieneNumero As Boolean = pass.Any(AddressOf Char.IsDigit)
-
-        If Not tieneLongitud Then lblCaracteres.ForeColor = Color.Red
-        If Not tieneMayuscula Then lblMayuscula.ForeColor = Color.Red
-        If Not tieneNumero Then lblNumero.ForeColor = Color.Red
-
-        If Not (tieneLongitud AndAlso tieneMayuscula AndAlso tieneNumero) Then
-            MessageBox.Show("Asegúrese de cumplir con los requisitos mínimos de contraseña resaltados.", "Requisitos incompletos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            txtContraseña.Focus()
-            Return
-        End If
 
         Try
             Dim nuevoLector As New Usuario() With {

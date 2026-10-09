@@ -5,6 +5,9 @@ Imports Utiles
 Public Class frmPrestamoDetalle
 
     Private ReadOnly negocio As New prestamoNegocio()
+
+
+    Private cargandoCatalogo As Boolean
     Private ReadOnly libros As New libroNegocio()
     Private ReadOnly ejemplares As New ejemplarNegocio()
     Private ReadOnly idBibliotecario As Integer
@@ -21,6 +24,7 @@ Public Class frmPrestamoDetalle
                                       e.SuppressKeyPress = True
                                       BuscarLectores(sender, EventArgs.Empty)
                                   End Sub
+        AddHandler lector.SelectedIndexChanged, Sub() CargarLibros()
         AddHandler libro.SelectedIndexChanged, Sub() CargarEjemplares()
         AddHandler guardar.Click, AddressOf Registrar
         AddHandler inicio.ValueChanged, Sub() ActualizarLimite()
@@ -39,6 +43,7 @@ Public Class frmPrestamoDetalle
         Try
             inicio.Value = Date.Today
             inicio.MaxDate = Date.Today
+            inicio.Enabled = False
             ActualizarLimite()
             libro.DisplayMember = "TituloLibro"
             libro.ValueMember = "IdLibro"
@@ -62,7 +67,7 @@ Public Class frmPrestamoDetalle
 
     Private Sub ActualizarLimite()
         If ContextoDiseno.Activo(Me) Then Return
-        limite.Value = PoliticaPrestamo.FechaLimite(inicio.Value)
+        limite.Value = prestamoNegocio.FechaLimite(inicio.Value)
     End Sub
 
     Private Sub BuscarLectores(sender As Object, e As EventArgs)
@@ -86,15 +91,36 @@ Public Class frmPrestamoDetalle
         End Try
     End Sub
 
+    Private Sub CargarLibros()
+        If ContextoDiseno.Activo(Me) OrElse idBibliotecario <= 0 OrElse cargandoCatalogo Then Return
+        cargandoCatalogo = True
+        Try
+            Dim idLector = If(TypeOf lector.SelectedValue Is Integer, CInt(lector.SelectedValue), 0)
+            libro.DataSource = libros.listarDisponibles(idLector)
+            libro.SelectedIndex = -1
+
+            lblPlazo.Text = "Cinco días desde la entrega presencial"
+
+        Catch ex As Exception
+            MessageBox.Show("No se pudo cargar la disponibilidad: " & ex.Message, "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        Finally
+            cargandoCatalogo = False
+        End Try
+        CargarEjemplares()
+    End Sub
+
     Private Sub CargarEjemplares()
         If ContextoDiseno.Activo(Me) OrElse idBibliotecario <= 0 Then Return
         ejemplar.DataSource = Nothing
+
         Dim seleccionado = TryCast(libro.SelectedItem, Libro)
         If seleccionado Is Nothing Then Return
         Try
             ejemplar.DisplayMember = "IdEjemplar"
             ejemplar.ValueMember = "IdEjemplar"
-            ejemplar.DataSource = ejemplares.listarDisponiblesPorLibro(seleccionado.IdLibro)
+            Dim idLector = If(TypeOf lector.SelectedValue Is Integer, CInt(lector.SelectedValue), 0)
+            ejemplar.DataSource = ejemplares.listarDisponiblesPorLibro(seleccionado.IdLibro, idLector)
+            lblPlazo.Text = "Cinco días desde la entrega presencial"
             ejemplar.SelectedIndex = -1
         Catch ex As Exception
             MessageBox.Show("No se pudo consultar la disponibilidad: " & ex.Message, "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Error)
@@ -109,7 +135,8 @@ Public Class frmPrestamoDetalle
         End If
         guardar.Enabled = False
         Try
-            Dim id = negocio.registrar(CInt(lector.SelectedValue), idBibliotecario, CInt(ejemplar.SelectedValue), inicio.Value)
+            Dim id As Integer
+            id = negocio.registrar(CInt(lector.SelectedValue), idBibliotecario, CInt(ejemplar.SelectedValue), Date.Today)
             MessageBox.Show("Préstamo N.º " & id & " registrado.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
             DialogResult = DialogResult.OK
         Catch ex As Exception

@@ -21,18 +21,6 @@ Public Class Prestamo
     Public Property IdLibro As Integer
     Public Property TituloLibro As String
 
-    Public ReadOnly Property EstaActivo As Boolean
-        Get
-            Return Not FechaRetorno.HasValue AndAlso
-                String.Equals(If(EstadoPrestamo, "").Trim(), EstadoActivo, StringComparison.OrdinalIgnoreCase)
-        End Get
-    End Property
-
-    Public Function EstaVencido(fechaActual As Date) As Boolean
-        Return EstaActivo AndAlso FechaFin.Date < fechaActual.Date
-    End Function
-
-    Public Function EstadoParaMostrar(fechaActual As Date) As String
-        Return If(EstaVencido(fechaActual), "Vencido", EstadoPrestamo)
-    End Function
+    ' Estado calculado por Negocio para mostrarlo en las consultas.
+    Public Property EstaActivo As Boolean
 End Class
