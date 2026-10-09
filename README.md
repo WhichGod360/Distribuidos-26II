@@ -4,6 +4,12 @@ Aplicación de escritorio para gestionar el catálogo, las reservas, los présta
 
 El sistema permite que el lector solicite libros desde su propia interfaz y que el bibliotecario apruebe la solicitud antes de realizar la entrega presencial.
 
+## Diagrama de la base de datos
+
+Relaciones entre usuarios, libros, ejemplares, solicitudes, préstamos y penalizaciones.
+
+![Diagrama de la base de datos de la biblioteca](Distribuidos-2026II/Recursos/diagrama-base-datos.png)
+
 ## Usuarios y funciones
 
 | Rol | Funciones principales |
