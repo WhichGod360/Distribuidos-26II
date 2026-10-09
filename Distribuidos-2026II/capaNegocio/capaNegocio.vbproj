@@ -6,11 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Data.SqlClient" Version="4.9.1" />
+    <ProjectReference Include="..\capaDatos\capaDatos.vbproj" />
+    <ProjectReference Include="..\capaDAO\capaDAO.vbproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\capaDatos\capaDatos.vbproj" />
+    <Import Include="capaDAO" />
   </ItemGroup>
 
 </Project>

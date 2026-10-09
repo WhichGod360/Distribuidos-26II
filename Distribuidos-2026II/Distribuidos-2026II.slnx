@@ -1,5 +1,7 @@
 <Solution>
+  <Project Path="capaConexion/capaConexion.vbproj" />
   <Project Path="capaDatos/capaDatos.vbproj" />
+  <Project Path="capaDAO/capaDAO.vbproj" />
   <Project Path="capaNegocio/capaNegocio.vbproj" />
-  <Project Path="capaPresentacion/capaPresentacion.vbproj" />
+  <Project Path="capaInterfaz/capaInterfaz.vbproj" />
 </Solution>

@@ -1,35 +1,54 @@
 ﻿Imports System.Data
 Imports capaDatos
+Imports capaDAO
 
 Public Class categoriaNegocio
 
-    Private dato As New categoriaDato()
+    Private ReadOnly dato As New categoriaDAO()
 
     Public Function listarCategoria() As DataTable
-        Return dato.Listar()
+        Return dato.listarTabla()
     End Function
 
     Public Function agregarCategoria(nombre As String, estado As Integer) As Boolean
-        Dim tabla As DataTable = dato.Listar()
+        ValidarNombre(nombre)
+        Dim tabla As DataTable = dato.listarTabla()
         For Each fila As DataRow In tabla.Rows
-            If fila("nombre_categoria").ToString().ToLower() = nombre.ToLower() Then
+            If String.Equals(fila("nombre_categoria").ToString().Trim(), nombre.Trim(), StringComparison.OrdinalIgnoreCase) Then
                 Return False
             End If
         Next
-        dato.Insertar(nombre, estado)
-        Return True
+        Return dato.insertar(nombre.Trim(), estado)
     End Function
 
     Public Function obtenerCategoria(id As Integer) As DataTable
-        Return dato.ObtenerPorId(id)
+        Return dato.obtenerTablaPorId(id)
     End Function
 
     Public Function actualizarCategoria(id As Integer, nombre As String, estado As Integer) As Boolean
-        Return dato.Actualizar(id, nombre, estado)
+        If id <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(id))
+        ValidarNombre(nombre)
+        Dim tabla As DataTable = dato.listarTabla()
+        For Each fila As DataRow In tabla.Rows
+            If CInt(fila("id_categoria")) <> id AndAlso
+               String.Equals(fila("nombre_categoria").ToString().Trim(), nombre.Trim(), StringComparison.OrdinalIgnoreCase) Then
+                Return False
+            End If
+        Next
+        Return dato.actualizar(id, nombre.Trim(), estado)
     End Function
 
     Public Function buscarCategoria(nombre As String) As DataTable
-        Return dato.BuscarCategoria(nombre)
+        Return dato.buscarTabla(nombre)
     End Function
+
+    Public Function desactivarCategoria(id As Integer) As Boolean
+        If id <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(id))
+        Return dato.desactivar(id)
+    End Function
+
+    Private Shared Sub ValidarNombre(nombre As String)
+        If String.IsNullOrWhiteSpace(nombre) Then Throw New ArgumentException("El nombre de la categoría es obligatorio.")
+    End Sub
 
 End Class

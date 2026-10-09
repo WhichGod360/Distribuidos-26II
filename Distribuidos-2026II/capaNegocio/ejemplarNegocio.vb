@@ -14,4 +14,20 @@ Public Class ejemplarNegocio
     Public Function listarDisponiblesPorLibro(idLibro As Integer) As List(Of Ejemplar)
         Return dao.listarDisponiblesPorLibro(idLibro)
     End Function
+
+    Public Function listarPorLibro(idLibro As Integer) As Global.System.Data.DataTable
+        If idLibro <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idLibro))
+        Return dao.listarPorLibro(idLibro)
+    End Function
+
+    Public Function agregar(idLibro As Integer) As Boolean
+        If idLibro <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idLibro))
+        Return dao.agregar(idLibro)
+    End Function
+
+    Public Function cambiarEstado(idLibro As Integer, idEjemplar As Integer, activo As Boolean) As Boolean
+        If idLibro <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idLibro))
+        If idEjemplar <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idEjemplar))
+        Return dao.cambiarEstado(idLibro, idEjemplar, activo)
+    End Function
 End Class

@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <RootNamespace>capaDAO</RootNamespace>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\capaConexion\capaConexion.vbproj" />
+    <ProjectReference Include="..\capaDatos\capaDatos.vbproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="capaConexion" />
+    <Import Include="capaDatos" />
+  </ItemGroup>
+</Project>
