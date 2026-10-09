@@ -20,7 +20,7 @@ Public Class usuarioNegocio
 
         ' 3. Si no existe o las credenciales son incorrectas
         If usuarioLogueado Is Nothing Then
-            Throw New Exception("Correo o contraseña incorrectos, o la cuenta está inactiva.")
+            Throw New UnauthorizedAccessException("Correo o contraseña incorrectos, o la cuenta está inactiva.")
         End If
 
         Return usuarioLogueado
