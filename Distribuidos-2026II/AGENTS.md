@@ -45,4 +45,4 @@ Convenciones del historial sin verificar. Usa mensajes breves en imperativo: `Co
 
 ## Seguridad y configuración
 
-Configura `BIBLIOTECA_CONNECTION_STRING` antes de iniciar para reemplazar la conexión predeterminada `.\SQLEXPRESS` / `distribuidos-II`. No subas credenciales ni respuestas de seguridad en texto plano. Conserva los hashes de contraseñas y respuestas. Excluye `bin/`, `obj/`, `.vs/`, registros y archivos locales de bases de datos.
+La cadena de conexión a Somee se configura directamente en `capaConexion/Conexion.vb`, según lo acordado para este proyecto. Conserva los hashes de contraseñas y respuestas de seguridad. Excluye `bin/`, `obj/`, `.vs/`, registros y archivos locales de bases de datos.

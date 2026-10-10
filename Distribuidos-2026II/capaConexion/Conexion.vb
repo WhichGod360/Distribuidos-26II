@@ -1,4 +1,4 @@
-﻿Imports System.Data
+Imports System.Data
 Imports System.Data.SqlClient
 
 Public Class Conexion
@@ -10,15 +10,24 @@ Public Class Conexion
     Private _conexionTransaccional As SqlConnection = Nothing
 
     Private ReadOnly cadenaConexion As String
-    Private Const CadenaPredeterminada As String =
-        "Data Source=.\SQLEXPRESS;" &
-        "Initial Catalog=distribuidos-II;" &
-        "Integrated Security=SSPI;" &
+
+    Private Const CadenaSomee As String =
+        "workstation id=somee_distribuidos-II.mssql.somee.com;" &
+        "packet size=4096;" &
+        "user id=lope_SQLLogin_1;" &
+        "pwd=woxcl7vth3;" &
+        "data source=somee_distribuidos-II.mssql.somee.com;" &
+        "persist security info=False;" &
+        "initial catalog=somee_distribuidos-II;" &
         "TrustServerCertificate=True;"
+
     Private Sub New()
-        ' Configurar antes de iniciar la aplicación; por defecto se mantiene SQL Express local.
-        Dim configurada = Environment.GetEnvironmentVariable("BIBLIOTECA_CONNECTION_STRING")
-        cadenaConexion = If(String.IsNullOrWhiteSpace(configurada), CadenaPredeterminada, configurada)
+        ' Conexión activa: SQL Server remoto de Somee.
+        ' o comentas una o comentas otra según donde quieras conectarte.
+
+        ' cadenaConexion = CadenaSomee
+
+        cadenaConexion = "Data Source=.\SQLEXPRESS;Initial Catalog=distribuidos-II;Integrated Security=SSPI;TrustServerCertificate=True;"
     End Sub
 
     ' Cada operación concurrente debe ser dueña de su conexión y transacción.
