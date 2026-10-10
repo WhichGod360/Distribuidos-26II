@@ -8,7 +8,11 @@ El sistema permite que el lector solicite libros desde su propia interfaz y que 
 
 Relaciones entre usuarios, libros, ejemplares, solicitudes, préstamos y penalizaciones.
 
+<<<<<<< HEAD
 ![Diagrama de la base de datos de la biblioteca](./Recursos/diagrama-base-datos.png)
+=======
+![Diagrama de la base de datos de la biblioteca](Distribuidos-2026II/recursos/diagrama-base-datos.png)
+>>>>>>> 36b3fadaa4bc61a9498961a3a8b0098b64b09468
 
 ## Usuarios y funciones
 
