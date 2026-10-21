@@ -103,3 +103,11 @@ Los comandos restauran dependencias, compilan y abren el inicio de sesión. En V
 - Las contraseñas y respuestas de seguridad se guardan mediante hashes; la pregunta permanece visible.
 - Conserva los archivos `.vb`, `.Designer.vb` y `.resx` asociados a los formularios.
 - Consulta `AGENTS.md` para las pautas de contribución. No incluyas `bin/`, `obj/`, `.vs/` ni registros de compilación entre los cambios del proyecto.
+
+- SOMEE
+  - VER TABLAS DE LA BD:
+    SELECT TABLE_SCHEMA AS Esquema, TABLE_NAME AS Tabla
+    FROM INFORMATION_SCHEMA.TABLES
+    WHERE TABLE_TYPE = 'BASE TABLE'
+    ORDER BY TABLE_NAME;
+    <img width="510" height="482" alt="image" src="https://github.com/user-attachments/assets/14672b93-3ddf-48dd-b56b-d62fb69aba21" />
