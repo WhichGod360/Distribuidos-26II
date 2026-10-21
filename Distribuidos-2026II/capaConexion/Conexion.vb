@@ -25,9 +25,9 @@ Public Class Conexion
         ' Conexión activa: SQL Server remoto de Somee.
         ' o comentas una o comentas otra según donde quieras conectarte.
 
-        ' cadenaConexion = CadenaSomee
+        cadenaConexion = CadenaSomee
 
-        cadenaConexion = "Data Source=.\SQLEXPRESS;Initial Catalog=distribuidos-II;Integrated Security=SSPI;TrustServerCertificate=True;"
+        ' cadenaConexion = "Data Source=.\SQLEXPRESS;Initial Catalog=distribuidos-II;Integrated Security=SSPI;TrustServerCertificate=True;"
     End Sub
 
     ' Cada operación concurrente debe ser dueña de su conexión y transacción.

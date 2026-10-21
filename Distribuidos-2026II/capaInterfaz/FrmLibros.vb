@@ -6,6 +6,12 @@ Imports Utiles
 Public Class FrmLibros
     Implements IMantenimientoVista
 
+    ' --- API nativa para poner texto de ayuda (Placeholder) en txtBuscar ---
+    Private Const EM_SETCUEBANNER As Integer = &H1501
+    <DllImport("user32.dll", CharSet:=CharSet.Unicode)>
+    Private Shared Function SendMessage(hWnd As IntPtr, msg As Integer, wParam As Integer, lParam As String) As IntPtr
+    End Function
+
     Public Event SolicitarEjemplares(idLibro As Integer, titulo As String)
     Private ReadOnly negocioLibro As New libroNegocio()
     Private librosActuales As New List(Of Libro)()
@@ -14,7 +20,7 @@ Public Class FrmLibros
     Private vista As DataView
     Private Const TamPagina As Integer = 10
     Private paginaActual As Integer = 1
-    Private ReadOnly fuenteEstado As New Font("Segoe UI", 10.0F, FontStyle.Bold)
+    Private ReadOnly fuenteEstado As New Font("Segoe UI Semibold", 9.5F, FontStyle.Bold)
 
     Public Sub New()
         InitializeComponent()
@@ -26,22 +32,25 @@ Public Class FrmLibros
         colStock.DataPropertyName = "stock"
         colEstado.DataPropertyName = "estado"
 
-
-        colId.FillWeight = 10
-        colTitulo.FillWeight = 34
+        colId.FillWeight = 8
+        colTitulo.FillWeight = 36
         colEditorial.FillWeight = 20
         colAnio.FillWeight = 10
         colStock.FillWeight = 10
         colEstado.FillWeight = 16
+
         dtLibros.Columns.Add("id", GetType(Integer))
         dtLibros.Columns.Add("titulo", GetType(String))
         dtLibros.Columns.Add("editorial", GetType(String))
         dtLibros.Columns.Add("anio", GetType(Integer))
         dtLibros.Columns.Add("stock", GetType(Integer))
         dtLibros.Columns.Add("estado", GetType(String))
+
         cboEstado.SelectedIndex = 0
         cboOrden.SelectedIndex = 0
-        btnAgregar.Text = "Agregar libro"
+
+        ' Aplicamos la mejora visual moderna
+        AplicarEstilosModernos()
 
         AddHandler DataGridView1.CellFormatting, AddressOf dgvLibros_CellFormatting
         AddHandler DataGridView1.SelectionChanged, AddressOf SeleccionChanged
@@ -59,8 +68,100 @@ Public Class FrmLibros
                                         End Sub
     End Sub
 
+    ' =====================================================================
+    '  MEJORA VISUAL PARA PRESENTACIÓN
+    ' =====================================================================
+    Private Sub AplicarEstilosModernos()
+        Me.BackColor = Color.FromArgb(248, 250, 252) ' Fondo general gris azulado súper limpio
+
+        ' 1. Estilizar Botón Principal (Agregar)
+        btnAgregar.Text = "＋ Agregar libro"
+        btnAgregar.FlatStyle = FlatStyle.Flat
+        btnAgregar.FlatAppearance.BorderSize = 0
+        btnAgregar.BackColor = colorPrimario
+        btnAgregar.ForeColor = Color.White
+        btnAgregar.Font = New Font("Segoe UI", 9.5F, FontStyle.Bold)
+        btnAgregar.Cursor = Cursors.Hand
+
+        ' 2. Estilizar Botones de Acción Secundarios
+        btnEditar.Text = "✎ Editar"
+        EstilizarBotonSecundario(btnEditar, Color.FromArgb(51, 65, 85), Color.FromArgb(203, 213, 225))
+
+        btnEjemplares.Text = "📚 Ver ejemplares"
+        EstilizarBotonSecundario(btnEjemplares, Color.FromArgb(30, 64, 175), Color.FromArgb(191, 219, 254))
+
+        btnDesactivar.Text = "✕ Desactivar"
+        EstilizarBotonSecundario(btnDesactivar, Color.FromArgb(185, 28, 28), Color.FromArgb(254, 202, 202))
+
+        ' 3. Estilizar DataGridView (Estilo Tabla Web Moderna)
+        With DataGridView1
+            .BackgroundColor = Color.White
+            .BorderStyle = BorderStyle.None
+            .CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+            .GridColor = Color.FromArgb(226, 232, 240)
+            .RowHeadersVisible = False
+            .SelectionMode = DataGridViewSelectionMode.FullRowSelect
+            .MultiSelect = False
+            .AllowUserToResizeRows = False
+            .EnableHeadersVisualStyles = False
+
+            ' Estilo de Cabecera
+            .ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.None
+            .ColumnHeadersHeight = 44
+            .ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+            .ColumnHeadersDefaultCellStyle.BackColor = Color.FromArgb(241, 245, 249)
+            .ColumnHeadersDefaultCellStyle.ForeColor = Color.FromArgb(51, 65, 85)
+            .ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI Semibold", 9.5F, FontStyle.Bold)
+            .ColumnHeadersDefaultCellStyle.SelectionBackColor = Color.FromArgb(241, 245, 249)
+            .ColumnHeadersDefaultCellStyle.SelectionForeColor = Color.FromArgb(51, 65, 85)
+            .ColumnHeadersDefaultCellStyle.Padding = New Padding(8, 0, 0, 0)
+
+            ' Estilo de Filas
+            .RowTemplate.Height = 42
+            .DefaultCellStyle.BackColor = Color.White
+            .DefaultCellStyle.ForeColor = Color.FromArgb(30, 41, 59)
+            .DefaultCellStyle.Font = New Font("Segoe UI", 9.5F, FontStyle.Regular)
+            .DefaultCellStyle.SelectionBackColor = Color.FromArgb(224, 231, 255) ' Azul suave al seleccionar
+            .DefaultCellStyle.SelectionForeColor = Color.FromArgb(30, 58, 138)
+            .DefaultCellStyle.Padding = New Padding(8, 0, 0, 0)
+
+            ' Filas alternas (Efecto Cebra sutil)
+            .AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(248, 250, 252)
+        End With
+
+        ' Alineación de columnas numéricas y estado
+        colId.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        colAnio.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        colStock.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+        colEstado.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+
+        ' 4. Estilizar botones de paginación Anterior / Siguiente
+        For Each btnPag As Button In {btnPagPrev, btnPagNext}
+            btnPag.FlatStyle = FlatStyle.Flat
+            btnPag.BackColor = Color.White
+            btnPag.ForeColor = Color.FromArgb(51, 65, 85)
+            btnPag.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225)
+            btnPag.Cursor = Cursors.Hand
+        Next
+    End Sub
+
+    Private Sub EstilizarBotonSecundario(btn As Button, colorTexto As Color, colorBorde As Color)
+        btn.FlatStyle = FlatStyle.Flat
+        btn.FlatAppearance.BorderSize = 1
+        btn.FlatAppearance.BorderColor = colorBorde
+        btn.FlatAppearance.MouseOverBackColor = Color.FromArgb(241, 245, 249)
+        btn.BackColor = Color.White
+        btn.ForeColor = colorTexto
+        btn.Font = New Font("Segoe UI Semibold", 9.25F, FontStyle.Bold)
+        btn.Cursor = Cursors.Hand
+    End Sub
+
     Private Sub FrmLibros_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If ContextoDiseno.Activo(Me) Then Return
+        ' Poner texto guía en el buscador
+        If txtBuscar.IsHandleCreated Then
+            SendMessage(txtBuscar.Handle, EM_SETCUEBANNER, 1, "🔍 Buscar por título o editorial...")
+        End If
         ActualizarDatos()
     End Sub
 
@@ -147,8 +248,8 @@ Public Class FrmLibros
 
         DataGridView1.DataSource = pagina
         DataGridView1.ClearSelection()
-        lblRegistros.Text = If(total = 0, "Sin registros",
-                               "Mostrando " & (ini + 1) & "–" & (fin + 1) & " de " & total & " registros")
+        lblRegistros.Text = If(total = 0, "Sin registros para mostrar",
+                               "Mostrando " & (ini + 1) & "–" & (fin + 1) & " de " & total & " libros")
         ConstruirPaginacion(totalPaginas)
     End Sub
 
@@ -170,11 +271,15 @@ Public Class FrmLibros
             b.Margin = New Padding(3)
             b.Cursor = Cursors.Hand
             b.FlatStyle = FlatStyle.Flat
-            b.FlatAppearance.BorderColor = Color.FromArgb(200, 205, 220)
+            b.Font = New Font("Segoe UI Semibold", 9.0F, FontStyle.Bold)
             If p = paginaActual Then
                 b.BackColor = colorPrimario
                 b.ForeColor = Color.White
                 b.FlatAppearance.BorderColor = colorPrimario
+            Else
+                b.BackColor = Color.White
+                b.ForeColor = Color.FromArgb(51, 65, 85)
+                b.FlatAppearance.BorderColor = Color.FromArgb(203, 213, 225)
             End If
             AddHandler b.Click, AddressOf Pagina_Click
             flpNumeros.Controls.Add(b)
@@ -205,13 +310,32 @@ Public Class FrmLibros
     End Sub
 
     ' =====================================================================
-    '  GRILLA
+    '  GRILLA (ESTILO BADGE EN ESTADO Y STOCK)
     ' =====================================================================
     Private Sub dgvLibros_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
-        If e.RowIndex >= 0 AndAlso DataGridView1.Columns(e.ColumnIndex).Name = "colEstado" Then
+        If e.RowIndex < 0 Then Return
+
+        Dim nombreCol = DataGridView1.Columns(e.ColumnIndex).Name
+        If nombreCol = "colEstado" Then
             Dim activo = Convert.ToString(e.Value) = "Activo"
             e.CellStyle.Font = fuenteEstado
-            e.CellStyle.ForeColor = If(activo, Color.FromArgb(25, 35, 140), Color.FromArgb(90, 90, 100))
+            If activo Then
+                e.Value = "● Activo"
+                e.CellStyle.ForeColor = Color.FromArgb(21, 128, 61) ' Verde oscuro elegante
+                e.CellStyle.SelectionForeColor = Color.FromArgb(21, 128, 61)
+            Else
+                e.Value = "○ Inactivo"
+                e.CellStyle.ForeColor = Color.FromArgb(185, 28, 28) ' Rojo elegante
+                e.CellStyle.SelectionForeColor = Color.FromArgb(185, 28, 28)
+            End If
+        ElseIf nombreCol = "colStock" Then
+            Dim stock As Integer = 0
+            If e.Value IsNot Nothing AndAlso Integer.TryParse(e.Value.ToString(), stock) Then
+                If stock = 0 Then
+                    e.CellStyle.ForeColor = Color.FromArgb(185, 28, 28)
+                    e.CellStyle.Font = fuenteEstado
+                End If
+            End If
         End If
     End Sub
 
@@ -227,7 +351,6 @@ Public Class FrmLibros
     ' =====================================================================
     '  AGREGAR / EDITAR / ELIMINAR
     ' =====================================================================
-
     Private Sub btnAgregar_Click(sender As Object, e As EventArgs) Handles btnAgregar.Click
         Using editor As New FrmLibroDetalle()
             editor.ConfigurarGuardado(Function(f) GuardarLibro(f, 0))
@@ -285,6 +408,5 @@ Public Class FrmLibros
         If String.IsNullOrWhiteSpace(valor) Then Return Array.Empty(Of String)()
         Return valor.Split(New String() {", "}, StringSplitOptions.RemoveEmptyEntries)
     End Function
-
 
 End Class
