@@ -1,4 +1,4 @@
-Imports System.Data
+﻿Imports System.Data
 Imports System.Data.SqlClient
 Imports capaConexion
 Imports capaDatos
@@ -7,143 +7,152 @@ Public Class libroDAO
     ' Instancia única de tu clase de conexión
 
     Public Function listarDisponibles(Optional idLector As Integer = 0) As List(Of Libro)
-        Try
-            Dim lista As New List(Of Libro)()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                DisponibilidadReserva.ExigirEsquema(cn)
-                Dim query As String = "SELECT l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.estado_libro, l.publico_libro, " &
-                                      "(SELECT STRING_AGG(a.nombre_autor, ', ') FROM DetalleLibro dl INNER JOIN Autor a ON a.id_autor = dl.id_autor WHERE dl.id_libro = l.id_libro) AS autores, " &
-                                      "(SELECT STRING_AGG(c.nombre_categoria, ', ') FROM DetalleCategoria dc INNER JOIN Categoria c ON c.id_categoria = dc.id_categoria WHERE dc.id_libro = l.id_libro) AS categorias " &
-                                      "FROM Libro l " &
-                                      "INNER JOIN dbo.vw_DisponibilidadLibro d ON d.id_libro = l.id_libro " &
-                                      "WHERE l.estado_libro = 1 AND d.ejemplares_libres > 0 AND (d.disponibles > 0 OR EXISTS " &
-                                      "(SELECT 1 FROM SolicitudPrestamo s JOIN DetalleSolicitudPrestamo ds ON ds.id_solicitud=s.id_solicitud WHERE ds.id_libro=l.id_libro AND s.id_usuario=@lector AND " & DisponibilidadReserva.VigenteSql & ")) " &
-                                      "ORDER BY l.titulo_libro"
+        Return AuditoriaDAO.Consultar("Libro", "LISTADO", $"Listar libros disponibles | lector={idLector}",
+            Function()
+                Try
+                    Dim lista As New List(Of Libro)()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        DisponibilidadReserva.ExigirEsquema(cn)
+                        Dim query As String = "SELECT l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.estado_libro, l.publico_libro, " &
+                                              "(SELECT STRING_AGG(a.nombre_autor, ', ') FROM DetalleLibro dl INNER JOIN Autor a ON a.id_autor = dl.id_autor WHERE dl.id_libro = l.id_libro) AS autores, " &
+                                              "(SELECT STRING_AGG(c.nombre_categoria, ', ') FROM DetalleCategoria dc INNER JOIN Categoria c ON c.id_categoria = dc.id_categoria WHERE dc.id_libro = l.id_libro) AS categorias " &
+                                              "FROM Libro l " &
+                                              "INNER JOIN dbo.vw_DisponibilidadLibro d ON d.id_libro = l.id_libro " &
+                                              "WHERE l.estado_libro = 1 AND d.ejemplares_libres > 0 AND (d.disponibles > 0 OR EXISTS " &
+                                              "(SELECT 1 FROM SolicitudPrestamo s JOIN DetalleSolicitudPrestamo ds ON ds.id_solicitud=s.id_solicitud WHERE ds.id_libro=l.id_libro AND s.id_usuario=@lector AND " & DisponibilidadReserva.VigenteSql & ")) " &
+                                              "ORDER BY l.titulo_libro"
 
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
 
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            Dim objLibro As New Libro() With {
-                                .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
-                                .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro")),
-                                .EditorialLibro = If(dr.IsDBNull(dr.GetOrdinal("editorial_libro")), Nothing, dr.GetString(dr.GetOrdinal("editorial_libro"))),
-                                .StockTotal = dr.GetInt32(dr.GetOrdinal("stock_total")),
-                                .EstadoLibro = dr.GetBoolean(dr.GetOrdinal("estado_libro")),
-                                .PublicoLibro = If(dr.IsDBNull(dr.GetOrdinal("publico_libro")), Nothing, dr.GetString(dr.GetOrdinal("publico_libro"))),
-                                .Autor = If(dr.IsDBNull(dr.GetOrdinal("autores")), Nothing, dr.GetString(dr.GetOrdinal("autores"))),
-                                .Categoria = If(dr.IsDBNull(dr.GetOrdinal("categorias")), Nothing, dr.GetString(dr.GetOrdinal("categorias")))
-                            }
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    Dim objLibro As New Libro() With {
+                                        .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
+                                        .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro")),
+                                        .EditorialLibro = If(dr.IsDBNull(dr.GetOrdinal("editorial_libro")), Nothing, dr.GetString(dr.GetOrdinal("editorial_libro"))),
+                                        .StockTotal = dr.GetInt32(dr.GetOrdinal("stock_total")),
+                                        .EstadoLibro = dr.GetBoolean(dr.GetOrdinal("estado_libro")),
+                                        .PublicoLibro = If(dr.IsDBNull(dr.GetOrdinal("publico_libro")), Nothing, dr.GetString(dr.GetOrdinal("publico_libro"))),
+                                        .Autor = If(dr.IsDBNull(dr.GetOrdinal("autores")), Nothing, dr.GetString(dr.GetOrdinal("autores"))),
+                                        .Categoria = If(dr.IsDBNull(dr.GetOrdinal("categorias")), Nothing, dr.GetString(dr.GetOrdinal("categorias")))
+                                    }
 
-                            If Not dr.IsDBNull(dr.GetOrdinal("ano_publicacion")) Then
-                                objLibro.AnoPublicacion = dr.GetInt16(dr.GetOrdinal("ano_publicacion"))
-                            End If
+                                    If Not dr.IsDBNull(dr.GetOrdinal("ano_publicacion")) Then
+                                        objLibro.AnoPublicacion = dr.GetInt16(dr.GetOrdinal("ano_publicacion"))
+                                    End If
 
-                            lista.Add(objLibro)
-                        End While
+                                    lista.Add(objLibro)
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "libroDAO.listarDisponibles")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "libroDAO.listarDisponibles")
+                End Try
+            End Function)
     End Function
 
     Public Function buscar(titulo As String, autor As String, categoria As String) As List(Of Libro)
-        Try
-            Dim lista As New List(Of Libro)()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Dim query As String = "SELECT l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.estado_libro, l.publico_libro, " &
-                                    "STRING_AGG(a.nombre_autor, ', ') AS autores, " &
-                                    "STRING_AGG(c.nombre_categoria, ', ') AS categorias " &
-                                    "FROM Libro l " &
-                                    "INNER JOIN DetalleLibro dl ON l.id_libro = dl.id_libro " &
-                                    "INNER JOIN Autor a ON dl.id_autor = a.id_autor " &
-                                    "INNER JOIN DetalleCategoria dc ON l.id_libro = dc.id_libro " &
-                                    "INNER JOIN Categoria c ON dc.id_categoria = c.id_categoria " &
-                                    "WHERE l.estado_libro = 1 AND l.stock_total > 0 AND UPPER(l.titulo_libro) LIKE UPPER(@titulo) "
+        Return AuditoriaDAO.Consultar("Libro", "BUSQUEDA", "Buscar por título, autor o categoría",
+            Function()
+                Try
+                    Dim lista As New List(Of Libro)()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Dim query As String = "SELECT l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.estado_libro, l.publico_libro, " &
+                                            "STRING_AGG(a.nombre_autor, ', ') AS autores, " &
+                                            "STRING_AGG(c.nombre_categoria, ', ') AS categorias " &
+                                            "FROM Libro l " &
+                                            "INNER JOIN DetalleLibro dl ON l.id_libro = dl.id_libro " &
+                                            "INNER JOIN Autor a ON dl.id_autor = a.id_autor " &
+                                            "INNER JOIN DetalleCategoria dc ON l.id_libro = dc.id_libro " &
+                                            "INNER JOIN Categoria c ON dc.id_categoria = c.id_categoria " &
+                                            "WHERE l.estado_libro = 1 AND l.stock_total > 0 AND UPPER(l.titulo_libro) LIKE UPPER(@titulo) "
 
-                If autor <> "Todos" Then query &= " AND a.nombre_autor = @autor "
-                If categoria <> "Todas" Then query &= " AND c.nombre_categoria = @categoria "
+                        If autor <> "Todos" Then query &= " AND a.nombre_autor = @autor "
+                        If categoria <> "Todas" Then query &= " AND c.nombre_categoria = @categoria "
 
-                query &= "GROUP BY l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.estado_libro, l.publico_libro ORDER BY l.titulo_libro"
+                        query &= "GROUP BY l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.estado_libro, l.publico_libro ORDER BY l.titulo_libro"
 
-                Using cmd As New SqlCommand(query, cn)
+                        Using cmd As New SqlCommand(query, cn)
 
-                    cmd.Parameters.Add("@titulo", SqlDbType.VarChar, -1).Value = "%" & titulo & "%"
-                    If autor <> "Todos" Then cmd.Parameters.Add("@autor", SqlDbType.VarChar, -1).Value = autor
-                    If categoria <> "Todas" Then cmd.Parameters.Add("@categoria", SqlDbType.VarChar, -1).Value = categoria
+                            cmd.Parameters.Add("@titulo", SqlDbType.VarChar, -1).Value = "%" & titulo & "%"
+                            If autor <> "Todos" Then cmd.Parameters.Add("@autor", SqlDbType.VarChar, -1).Value = autor
+                            If categoria <> "Todas" Then cmd.Parameters.Add("@categoria", SqlDbType.VarChar, -1).Value = categoria
 
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            Dim objLibro As New Libro() With {
-                                .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
-                                .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro")),
-                                .EditorialLibro = If(dr.IsDBNull(dr.GetOrdinal("editorial_libro")), Nothing, dr.GetString(dr.GetOrdinal("editorial_libro"))),
-                                .StockTotal = dr.GetInt32(dr.GetOrdinal("stock_total")),
-                                .EstadoLibro = dr.GetBoolean(dr.GetOrdinal("estado_libro")),
-                                .PublicoLibro = If(dr.IsDBNull(dr.GetOrdinal("publico_libro")), Nothing, dr.GetString(dr.GetOrdinal("publico_libro"))),
-                                .Autor = If(dr.IsDBNull(dr.GetOrdinal("autores")), Nothing, dr.GetString(dr.GetOrdinal("autores"))),
-                                .Categoria = If(dr.IsDBNull(dr.GetOrdinal("categorias")), Nothing, dr.GetString(dr.GetOrdinal("categorias")))
-                            }
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    Dim objLibro As New Libro() With {
+                                        .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
+                                        .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro")),
+                                        .EditorialLibro = If(dr.IsDBNull(dr.GetOrdinal("editorial_libro")), Nothing, dr.GetString(dr.GetOrdinal("editorial_libro"))),
+                                        .StockTotal = dr.GetInt32(dr.GetOrdinal("stock_total")),
+                                        .EstadoLibro = dr.GetBoolean(dr.GetOrdinal("estado_libro")),
+                                        .PublicoLibro = If(dr.IsDBNull(dr.GetOrdinal("publico_libro")), Nothing, dr.GetString(dr.GetOrdinal("publico_libro"))),
+                                        .Autor = If(dr.IsDBNull(dr.GetOrdinal("autores")), Nothing, dr.GetString(dr.GetOrdinal("autores"))),
+                                        .Categoria = If(dr.IsDBNull(dr.GetOrdinal("categorias")), Nothing, dr.GetString(dr.GetOrdinal("categorias")))
+                                    }
 
-                            If Not dr.IsDBNull(dr.GetOrdinal("ano_publicacion")) Then
-                                objLibro.AnoPublicacion = dr.GetInt16(dr.GetOrdinal("ano_publicacion"))
-                            End If
+                                    If Not dr.IsDBNull(dr.GetOrdinal("ano_publicacion")) Then
+                                        objLibro.AnoPublicacion = dr.GetInt16(dr.GetOrdinal("ano_publicacion"))
+                                    End If
 
-                            lista.Add(objLibro)
-                        End While
+                                    lista.Add(objLibro)
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "libroDAO.buscar")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "libroDAO.buscar")
+                End Try
+            End Function)
     End Function
 
     Public Function listarTodos() As List(Of Libro)
-        Try
-            Dim lista As New List(Of Libro)()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Dim query As String = "SELECT l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.publico_libro, l.estado_libro, " &
-                                      "(SELECT STRING_AGG(a.nombre_autor, ', ') FROM DetalleLibro dl INNER JOIN Autor a ON dl.id_autor = a.id_autor WHERE dl.id_libro = l.id_libro) AS autores, " &
-                                      "(SELECT STRING_AGG(c.nombre_categoria, ', ') FROM DetalleCategoria dc INNER JOIN Categoria c ON dc.id_categoria = c.id_categoria WHERE dc.id_libro = l.id_libro) AS categorias " &
-                                      "FROM Libro l ORDER BY l.titulo_libro"
+        Return AuditoriaDAO.Consultar("Libro", "LISTADO", "Listar libros",
+            Function()
+                Try
+                    Dim lista As New List(Of Libro)()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Dim query As String = "SELECT l.id_libro, l.titulo_libro, l.editorial_libro, l.ano_publicacion, l.stock_total, l.publico_libro, l.estado_libro, " &
+                                              "(SELECT STRING_AGG(a.nombre_autor, ', ') FROM DetalleLibro dl INNER JOIN Autor a ON dl.id_autor = a.id_autor WHERE dl.id_libro = l.id_libro) AS autores, " &
+                                              "(SELECT STRING_AGG(c.nombre_categoria, ', ') FROM DetalleCategoria dc INNER JOIN Categoria c ON dc.id_categoria = c.id_categoria WHERE dc.id_libro = l.id_libro) AS categorias " &
+                                              "FROM Libro l ORDER BY l.titulo_libro"
 
-                Using cmd As New SqlCommand(query, cn)
+                        Using cmd As New SqlCommand(query, cn)
 
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            Dim objLibro As New Libro() With {
-                                .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
-                                .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro")),
-                                .EditorialLibro = If(dr.IsDBNull(dr.GetOrdinal("editorial_libro")), Nothing, dr.GetString(dr.GetOrdinal("editorial_libro"))),
-                                .StockTotal = dr.GetInt32(dr.GetOrdinal("stock_total")),
-                                .EstadoLibro = dr.GetBoolean(dr.GetOrdinal("estado_libro")),
-                                .PublicoLibro = If(dr.IsDBNull(dr.GetOrdinal("publico_libro")), Nothing, dr.GetString(dr.GetOrdinal("publico_libro"))),
-                                .Autor = If(dr.IsDBNull(dr.GetOrdinal("autores")), "", dr.GetString(dr.GetOrdinal("autores"))),
-                                .Categoria = If(dr.IsDBNull(dr.GetOrdinal("categorias")), "", dr.GetString(dr.GetOrdinal("categorias")))
-                            }
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    Dim objLibro As New Libro() With {
+                                        .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
+                                        .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro")),
+                                        .EditorialLibro = If(dr.IsDBNull(dr.GetOrdinal("editorial_libro")), Nothing, dr.GetString(dr.GetOrdinal("editorial_libro"))),
+                                        .StockTotal = dr.GetInt32(dr.GetOrdinal("stock_total")),
+                                        .EstadoLibro = dr.GetBoolean(dr.GetOrdinal("estado_libro")),
+                                        .PublicoLibro = If(dr.IsDBNull(dr.GetOrdinal("publico_libro")), Nothing, dr.GetString(dr.GetOrdinal("publico_libro"))),
+                                        .Autor = If(dr.IsDBNull(dr.GetOrdinal("autores")), "", dr.GetString(dr.GetOrdinal("autores"))),
+                                        .Categoria = If(dr.IsDBNull(dr.GetOrdinal("categorias")), "", dr.GetString(dr.GetOrdinal("categorias")))
+                                    }
 
-                            If Not dr.IsDBNull(dr.GetOrdinal("ano_publicacion")) Then
-                                objLibro.AnoPublicacion = dr.GetInt16(dr.GetOrdinal("ano_publicacion"))
-                            End If
+                                    If Not dr.IsDBNull(dr.GetOrdinal("ano_publicacion")) Then
+                                        objLibro.AnoPublicacion = dr.GetInt16(dr.GetOrdinal("ano_publicacion"))
+                                    End If
 
-                            lista.Add(objLibro)
-                        End While
+                                    lista.Add(objLibro)
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "libroDAO.listarTodos")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "libroDAO.listarTodos")
+                End Try
+            End Function)
     End Function
 
-    Public Function eliminarLibro(idLibro As Integer, reglas As IReglasLibro) As Boolean
+    Public Function eliminarLibro(idLibro As Integer, reglas As IReglasLibro, idOperador As Integer) As Boolean
         Try
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
                 Using tx As SqlTransaction = cn.BeginTransaction(IsolationLevel.Serializable)
@@ -153,6 +162,7 @@ Public Class libroDAO
                     Using cmd As New SqlCommand(query, cn, tx)
                         cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
                         Dim actualizado = cmd.ExecuteNonQuery() > 0
+                        If actualizado Then AuditoriaDAO.Registrar(cn, tx, idOperador, "Libro", "DELETE", $"ID={idLibro}; baja lógica: estado=Inactivo")
                         tx.Commit()
                         Return actualizado
                     End Using
@@ -165,7 +175,7 @@ Public Class libroDAO
 
     Public Function agregarLibroCompleto(titulo As String, editorial As String, anoPublicacion As Short, publico As String,
                                          estado As Boolean, idsAutores As IList(Of Integer), idsCategorias As IList(Of Integer),
-                                         cantidadEjemplares As Integer, reglas As IReglasLibro) As Boolean
+                                         cantidadEjemplares As Integer, reglas As IReglasLibro, idOperador As Integer) As Boolean
         Try
             Dim query As String
 
@@ -203,6 +213,8 @@ Public Class libroDAO
                         cmd.ExecuteNonQuery()
                     End Using
 
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "Libro", "INSERT",
+                        $"ID={idLibro}; título={titulo.Trim()}; editorial={editorial.Trim()}; año={anoPublicacion}; activo={estado}; ejemplares={cantidadEjemplares}")
                     tx.Commit()
                     Return True
                 End Using
@@ -214,7 +226,7 @@ Public Class libroDAO
 
     Public Function actualizarLibroCompleto(idLibro As Integer, titulo As String, editorial As String, anoPublicacion As Short,
                                             publico As String, estado As Boolean, idsAutores As IList(Of Integer),
-                                            idsCategorias As IList(Of Integer), reglas As IReglasLibro) As Boolean
+                                            idsCategorias As IList(Of Integer), reglas As IReglasLibro, idOperador As Integer) As Boolean
         Try
             Dim query As String
 
@@ -250,6 +262,8 @@ Public Class libroDAO
                         cmd.ExecuteNonQuery()
                     End Using
                     GuardarRelacionesLibro(cn, tx, idLibro, idsAutores, idsCategorias)
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "Libro", "UPDATE",
+                        $"ID={idLibro}; título={titulo.Trim()}; editorial={editorial.Trim()}; año={anoPublicacion}; activo={estado}")
                     tx.Commit()
                     Return True
                 End Using

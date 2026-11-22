@@ -334,8 +334,8 @@ Partial Class frmBuscarLector
         Me.colPrestamo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
         Me.tablaPrestamos.Columns.Add(Me.colPrestamo)
         Me.colEjemplar.Name = "IdEjemplar"
-        Me.colEjemplar.HeaderText = "Ejemplar"
-        Me.colEjemplar.DataPropertyName = "IdEjemplar"
+        Me.colEjemplar.HeaderText = "Ejemplares"
+        Me.colEjemplar.DataPropertyName = "Ejemplares"
         Me.colEjemplar.Width = 75
         Me.colEjemplar.FillWeight = 75
         Me.colEjemplar.ReadOnly = True

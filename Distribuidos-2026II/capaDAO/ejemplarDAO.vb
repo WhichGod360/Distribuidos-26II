@@ -11,96 +11,105 @@ Public Class ejemplarDAO
         "(p.fecha_retorno_prestamo IS NULL OR UPPER(LTRIM(RTRIM(p.estado_prestamo))) <> 'DEVUELTO')"
 
     Public Function obtenerDisponible(idLibro As Integer) As Ejemplar
-        Try
-            Dim objEjemplar As Ejemplar = Nothing
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Dim query As String = "SELECT TOP 1 e.id_ejemplar, e.estado_ejemplar, e.id_libro FROM Ejemplar e " &
-                                      "INNER JOIN Libro l ON l.id_libro = e.id_libro " &
-                                      "WHERE e.id_libro = @idLibro AND e.estado_ejemplar = 1 AND l.estado_libro = 1 " &
-                                      "AND EXISTS (SELECT 1 FROM dbo.vw_DisponibilidadLibro d WHERE d.id_libro=e.id_libro AND d.disponibles > 0) " &
-                                      "AND NOT EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") " &
-                                      "ORDER BY e.id_ejemplar"
+        Return AuditoriaDAO.Consultar("Ejemplar", "SELECT", $"Consultar disponibilidad | libro={idLibro}",
+            Function()
+                Try
+                    Dim objEjemplar As Ejemplar = Nothing
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Dim query As String = "SELECT TOP 1 e.id_ejemplar, e.estado_ejemplar, e.id_libro FROM Ejemplar e " &
+                                              "INNER JOIN Libro l ON l.id_libro = e.id_libro " &
+                                              "WHERE e.id_libro = @idLibro AND e.estado_ejemplar = 1 AND l.estado_libro = 1 " &
+                                              "AND EXISTS (SELECT 1 FROM dbo.vw_DisponibilidadLibro d WHERE d.id_libro=e.id_libro AND d.disponibles > 0) " &
+                                              "AND NOT EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") " &
+                                              "ORDER BY e.id_ejemplar"
 
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
 
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        If dr.Read() Then
-                            objEjemplar = New Ejemplar() With {
-                                .IdEjemplar = dr.GetInt32(dr.GetOrdinal("id_ejemplar")),
-                                .EstadoEjemplar = dr.GetBoolean(dr.GetOrdinal("estado_ejemplar")),
-                                .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro"))
-                            }
-                        End If
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                If dr.Read() Then
+                                    objEjemplar = New Ejemplar() With {
+                                        .IdEjemplar = dr.GetInt32(dr.GetOrdinal("id_ejemplar")),
+                                        .EstadoEjemplar = dr.GetBoolean(dr.GetOrdinal("estado_ejemplar")),
+                                        .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro"))
+                                    }
+                                End If
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
 
-            Return objEjemplar
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "ejemplarDAO.obtenerDisponible")
-        End Try
+                    Return objEjemplar
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "ejemplarDAO.obtenerDisponible")
+                End Try
+            End Function)
     End Function
 
     Public Function listarDisponiblesPorLibro(idLibro As Integer, Optional idLector As Integer = 0) As List(Of Ejemplar)
-        Try
-            Dim lista As New List(Of Ejemplar)()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                DisponibilidadReserva.ExigirEsquema(cn)
-                Dim query As String = "SELECT e.id_ejemplar, e.id_libro, e.estado_ejemplar FROM Ejemplar e " &
-                                      "INNER JOIN Libro l ON l.id_libro = e.id_libro " &
-                                      "WHERE e.id_libro = @idLibro AND e.estado_ejemplar = 1 AND l.estado_libro = 1 " &
-                                      "AND EXISTS (SELECT 1 FROM dbo.vw_DisponibilidadLibro d WHERE d.id_libro=e.id_libro AND " &
-                                      "(d.disponibles > 0 OR EXISTS (SELECT 1 FROM SolicitudPrestamo s JOIN DetalleSolicitudPrestamo ds ON ds.id_solicitud=s.id_solicitud WHERE ds.id_libro=e.id_libro AND s.id_usuario=@lector AND " & DisponibilidadReserva.VigenteSql & "))) " &
-                                      "AND NOT EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") " &
-                                      "ORDER BY e.id_ejemplar"
+        Return AuditoriaDAO.Consultar("Ejemplar", "LISTADO", $"Listar ejemplares disponibles | libro={idLibro}; lector={idLector}",
+            Function()
+                Try
+                    Dim lista As New List(Of Ejemplar)()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        DisponibilidadReserva.ExigirEsquema(cn)
+                        Dim query As String = "SELECT e.id_ejemplar, e.id_libro, e.estado_ejemplar FROM Ejemplar e " &
+                                              "INNER JOIN Libro l ON l.id_libro = e.id_libro " &
+                                              "WHERE e.id_libro = @idLibro AND e.estado_ejemplar = 1 AND l.estado_libro = 1 " &
+                                              "AND EXISTS (SELECT 1 FROM dbo.vw_DisponibilidadLibro d WHERE d.id_libro=e.id_libro AND " &
+                                              "(d.disponibles > 0 OR EXISTS (SELECT 1 FROM SolicitudPrestamo s JOIN DetalleSolicitudPrestamo ds ON ds.id_solicitud=s.id_solicitud WHERE ds.id_libro=e.id_libro AND s.id_usuario=@lector AND " & DisponibilidadReserva.VigenteSql & "))) " &
+                                              "AND NOT EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") " &
+                                              "ORDER BY e.id_ejemplar"
 
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
-                    cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
+                            cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
 
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            Dim objEjemplar As New Ejemplar() With {
-                                .IdEjemplar = dr.GetInt32(dr.GetOrdinal("id_ejemplar")),
-                                .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
-                                .EstadoEjemplar = dr.GetBoolean(dr.GetOrdinal("estado_ejemplar"))
-                            }
-                            lista.Add(objEjemplar)
-                        End While
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    Dim objEjemplar As New Ejemplar() With {
+                                        .IdEjemplar = dr.GetInt32(dr.GetOrdinal("id_ejemplar")),
+                                        .IdLibro = dr.GetInt32(dr.GetOrdinal("id_libro")),
+                                        .EstadoEjemplar = dr.GetBoolean(dr.GetOrdinal("estado_ejemplar"))
+                                    }
+                                    lista.Add(objEjemplar)
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
 
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "ejemplarDAO.listarDisponiblesPorLibro")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "ejemplarDAO.listarDisponiblesPorLibro")
+                End Try
+            End Function)
     End Function
 
     Public Function listarPorLibro(idLibro As Integer) As DataTable
-        Try
-            Dim tabla As New DataTable()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Dim query As String = "SELECT e.id_ejemplar, e.estado_ejemplar AS activo, " &
-                                    "CASE WHEN e.estado_ejemplar = 0 THEN 'Inactivo' " &
-                                    "WHEN EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") THEN 'Prestado' " &
-                                    "ELSE 'Disponible' END AS estado " &
-                                    "FROM Ejemplar e WHERE e.id_libro = @idLibro ORDER BY e.id_ejemplar"
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        LecturaDAO.CargarTabla(dr, tabla)
+        Return AuditoriaDAO.Consultar("Ejemplar", "LISTADO", $"Listar ejemplares | libro={idLibro}",
+            Function()
+                Try
+                    Dim tabla As New DataTable()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Dim query As String = "SELECT e.id_ejemplar, e.estado_ejemplar AS activo, " &
+                                            "CASE WHEN e.estado_ejemplar = 0 THEN 'Inactivo' " &
+                                            "WHEN EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") THEN 'Prestado' " &
+                                            "ELSE 'Disponible' END AS estado " &
+                                            "FROM Ejemplar e WHERE e.id_libro = @idLibro ORDER BY e.id_ejemplar"
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                LecturaDAO.CargarTabla(dr, tabla)
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return tabla
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "ejemplarDAO.listarPorLibro")
-        End Try
+                    Return tabla
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "ejemplarDAO.listarPorLibro")
+                End Try
+            End Function)
     End Function
 
-    Public Function agregar(idLibro As Integer, reglas As IReglasLibro) As Boolean
+    Public Function agregar(idLibro As Integer, reglas As IReglasLibro, idOperador As Integer) As Boolean
         Try
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
                 Using tx As SqlTransaction = cn.BeginTransaction(IsolationLevel.Serializable)
@@ -110,6 +119,7 @@ Public Class ejemplarDAO
                         cmd.Parameters.Add("@libro", SqlDbType.Int).Value = idLibro
                         cmd.ExecuteNonQuery()
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "Ejemplar", "INSERT", $"Agregar ejemplar | libro={idLibro}")
                     tx.Commit()
                     Return True
                 End Using
@@ -119,7 +129,7 @@ Public Class ejemplarDAO
         End Try
     End Function
 
-    Public Function cambiarEstado(idLibro As Integer, idEjemplar As Integer, activo As Boolean, reglas As IReglasLibro) As Boolean
+    Public Function cambiarEstado(idLibro As Integer, idEjemplar As Integer, activo As Boolean, reglas As IReglasLibro, idOperador As Integer) As Boolean
         Try
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
                 Using tx As SqlTransaction = cn.BeginTransaction(IsolationLevel.Serializable)
@@ -150,6 +160,7 @@ Public Class ejemplarDAO
                         cmd.Parameters.Add("@libro", SqlDbType.Int).Value = idLibro
                         cmd.ExecuteNonQuery()
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "Ejemplar", "UPDATE", $"Cambiar estado | ejemplar={idEjemplar}; activo={activo}")
                     tx.Commit()
                     Return True
                 End Using

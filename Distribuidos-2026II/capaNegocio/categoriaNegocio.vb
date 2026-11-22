@@ -5,13 +5,11 @@ Imports capaDAO
 Public Class categoriaNegocio
 
     Private ReadOnly dato As New categoriaDAO()
-    Private ReadOnly bitacora As New bitacoraNegocio()
 
     Public Function listarCategoria(Optional estado As String = "Todos") As DataTable
         Try
             Dim filtroEstado As Integer? = ConvertirEstado(estado)
-            Dim accion As String = If(filtroEstado.HasValue, "BUSQUEDA", "LISTADO")
-            Return dato.listarTabla(filtroEstado, bitacora.CrearContexto("Categoria", accion))
+            Return dato.listarTabla(filtroEstado)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -21,7 +19,7 @@ Public Class categoriaNegocio
 
     Public Function listarActivas() As List(Of String)
         Try
-            Return dato.listarTabla(1, bitacora.CrearContexto("Categoria", "BUSQUEDA")).AsEnumerable().
+            Return dato.listarTabla(1).AsEnumerable().
                 Select(Function(f) f("nombre_categoria").ToString()).ToList()
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
@@ -40,7 +38,7 @@ Public Class categoriaNegocio
                 End If
             Next
             Dim operador As Integer = seguridadNegocio.ExigirPersonal()
-            Return dato.insertar(nombre.Trim(), estado, bitacora.CrearContexto("Categoria", "INSERT", operador))
+            Return dato.insertar(nombre.Trim(), estado, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -50,7 +48,7 @@ Public Class categoriaNegocio
 
     Public Function obtenerCategoria(id As Integer) As DataTable
         Try
-            Return dato.obtenerTablaPorId(id, bitacora.CrearContexto("Categoria", "BUSQUEDA"))
+            Return dato.obtenerTablaPorId(id)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -70,7 +68,7 @@ Public Class categoriaNegocio
                 End If
             Next
             Dim operador As Integer = seguridadNegocio.ExigirPersonal()
-            Return dato.actualizar(id, nombre.Trim(), estado, bitacora.CrearContexto("Categoria", "UPDATE", operador))
+            Return dato.actualizar(id, nombre.Trim(), estado, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -80,7 +78,7 @@ Public Class categoriaNegocio
 
     Public Function buscarCategoria(nombre As String, Optional estado As String = "Todos") As DataTable
         Try
-            Return dato.buscarTabla(nombre, ConvertirEstado(estado), bitacora.CrearContexto("Categoria", "BUSQUEDA"))
+            Return dato.buscarTabla(nombre, ConvertirEstado(estado))
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -92,7 +90,7 @@ Public Class categoriaNegocio
         Try
             If id <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(id))
             Dim operador As Integer = seguridadNegocio.ExigirPersonal()
-            Return dato.desactivar(id, bitacora.CrearContexto("Categoria", "UPDATE", operador))
+            Return dato.desactivar(id, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception

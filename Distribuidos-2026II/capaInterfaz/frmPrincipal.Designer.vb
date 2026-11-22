@@ -39,6 +39,7 @@ Partial Class frmPrincipal
         btnAutores = New Button()
         btnCategorias = New Button()
         btnPenalizaciones = New Button()
+        btnCargosPagos = New Button()
         btnUsuarios = New Button()
         btnBitacora = New Button()
         lblAyudaMenu = New Label()
@@ -275,6 +276,7 @@ Partial Class frmPrincipal
         flpMenu.Controls.Add(btnAutores)
         flpMenu.Controls.Add(btnCategorias)
         flpMenu.Controls.Add(btnPenalizaciones)
+        flpMenu.Controls.Add(btnCargosPagos)
         flpMenu.Controls.Add(btnUsuarios)
         flpMenu.Controls.Add(btnBitacora)
         flpMenu.Controls.Add(lblAyudaMenu)
@@ -454,6 +456,24 @@ Partial Class frmPrincipal
         btnPenalizaciones.Text = "Penalizaciones"
         btnPenalizaciones.TextAlign = ContentAlignment.MiddleLeft
         btnPenalizaciones.UseVisualStyleBackColor = False
+        '
+        ' btnCargosPagos
+        '
+        btnCargosPagos.BackColor = Color.FromArgb(244, 246, 253)
+        btnCargosPagos.Cursor = Cursors.Hand
+        btnCargosPagos.FlatAppearance.BorderSize = 0
+        btnCargosPagos.FlatStyle = FlatStyle.Flat
+        btnCargosPagos.Font = New Font("Segoe UI Semibold", 10F)
+        btnCargosPagos.ForeColor = Color.FromArgb(59, 91, 115)
+        btnCargosPagos.Margin = New Padding(0, 0, 0, 7)
+        btnCargosPagos.Name = "btnCargosPagos"
+        btnCargosPagos.Padding = New Padding(8, 0, 0, 0)
+        btnCargosPagos.Size = New Size(170, 43)
+        btnCargosPagos.TabIndex = 9
+        btnCargosPagos.Tag = "cargos"
+        btnCargosPagos.Text = "Cargos y pagos"
+        btnCargosPagos.TextAlign = ContentAlignment.MiddleLeft
+        btnCargosPagos.UseVisualStyleBackColor = False
         ' 
         ' btnUsuarios
         ' 
@@ -467,7 +487,7 @@ Partial Class frmPrincipal
         btnUsuarios.Name = "btnUsuarios"
         btnUsuarios.Padding = New Padding(8, 0, 0, 0)
         btnUsuarios.Size = New Size(170, 43)
-        btnUsuarios.TabIndex = 9
+        btnUsuarios.TabIndex = 10
         btnUsuarios.Tag = "usuarios"
         btnUsuarios.Text = "Gestión de usuarios"
         btnUsuarios.TextAlign = ContentAlignment.MiddleLeft
@@ -1494,6 +1514,7 @@ Partial Class frmPrincipal
     Friend WithEvents btnAutores As System.Windows.Forms.Button
     Friend WithEvents btnCategorias As System.Windows.Forms.Button
     Friend WithEvents btnPenalizaciones As System.Windows.Forms.Button
+    Friend WithEvents btnCargosPagos As System.Windows.Forms.Button
     Friend WithEvents lblAyudaMenu As System.Windows.Forms.Label
     Friend WithEvents btnSalir As System.Windows.Forms.Button
     Friend WithEvents pnlMain As System.Windows.Forms.Panel

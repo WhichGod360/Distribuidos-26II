@@ -29,6 +29,18 @@ SET ANSI_NULLS ON;
 SET QUOTED_IDENTIFIER ON;
 GO
 
+-- Mismo formato de la tabla de bitácora que consumen las aplicaciones.
+CREATE TABLE dbo.bitacora_mantenimiento (
+    idMan INT NOT NULL CONSTRAINT PK_BitacoraMantenimiento PRIMARY KEY,
+    fechaMan DATE NOT NULL,
+    horaMan VARCHAR(10) NOT NULL,
+    idUsuario INT NOT NULL,
+    objeto VARCHAR(30) NOT NULL,
+    accion VARCHAR(15) NOT NULL,
+    cadenaMan VARCHAR(255) NULL
+);
+GO
+
 CREATE TABLE dbo.RolUsuario (
     id_rol_usuario INT IDENTITY(1,1) PRIMARY KEY,
     nombre_rol_usuario VARCHAR(50) NOT NULL UNIQUE,
@@ -111,6 +123,7 @@ CREATE TABLE dbo.Ejemplar (
 GO
 CREATE TABLE dbo.Prestamo (
     id_prestamo INT IDENTITY(1,1) PRIMARY KEY,
+    id_operacion UNIQUEIDENTIFIER NULL,
     fecha_inicio_prestamo DATE NOT NULL,
     fecha_fin_prestamo DATE NOT NULL,
     fecha_retorno_prestamo DATE NULL,
@@ -134,6 +147,7 @@ GO
 -- Una copia no puede tener dos préstamos abiertos. Una solicitud admite varios libros.
 CREATE UNIQUE INDEX UX_Prestamo_EjemplarAbierto ON dbo.Prestamo(id_ejemplar) WHERE fecha_retorno_prestamo IS NULL;
 CREATE INDEX IX_Prestamo_LectorCirculacion ON dbo.Prestamo(id_usuario,fecha_retorno_prestamo) INCLUDE(id_ejemplar,estado_prestamo);
+CREATE INDEX IX_Prestamo_Operacion ON dbo.Prestamo(id_operacion,id_prestamo) WHERE id_operacion IS NOT NULL;
 GO
 -- El plazo se valida en negocio para conservar préstamos históricos en bases existentes.
 -- Este script y todos los inserts nuevos usan cinco días.
@@ -424,7 +438,13 @@ VALUES('Daño menor confirmado y pagado. Cargo fijo de prueba.',
     (SELECT id_penalizacion FROM dbo.Penalizacion WHERE tipo_penalizacion='Daño menor'),1,'Pagada',15);
 GO
 COMMIT TRANSACTION;
-PRINT 'Base final creada con 13 tablas, catálogo por tramos y escenarios de demostración.';
+PRINT 'Base final creada con 14 tablas, catálogo por tramos y escenarios de demostración.';
 SET NOEXEC OFF;
 GO
 
+ALTER TABLE Autor
+ADD nacionalidad_autor VARCHAR(100) NULL,
+    fecha_nacimiento_autor DATE NULL,
+    fecha_fallecimiento_autor DATE NULL,
+    biografia_autor VARCHAR(MAX) NULL;
+GO

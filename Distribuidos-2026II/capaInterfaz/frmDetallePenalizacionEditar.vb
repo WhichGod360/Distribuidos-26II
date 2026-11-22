@@ -59,7 +59,8 @@ Public Class frmDetallePenalizacionEditar
             Dim estadoPago = If(CStr(cboPago.SelectedItem) = "Por revisar", DetallePenalizacion.PagoPorRevisar, CStr(cboPago.SelectedItem))
             Dim ok = If(detalle Is Nothing,
                 negocio.agregarDetalle(descripcion.Text.Trim(), CInt(sancion.SelectedValue), CInt(prestamo.SelectedValue), estadoPago),
-                negocio.actualizarDetalle(detalle.IdDetallePenalizacion, descripcion.Text.Trim(), CInt(sancion.SelectedValue), CInt(prestamo.SelectedValue), estadoPago))
+                negocio.actualizarDetalle(detalle.IdDetallePenalizacion, descripcion.Text.Trim(), CInt(sancion.SelectedValue), CInt(prestamo.SelectedValue),
+                    If(estadoPago = detalle.EstadoPago, Nothing, estadoPago)))
             If Not ok Then Throw New InvalidOperationException("No se pudo guardar el detalle.")
             DialogResult = DialogResult.OK
         Catch ex As Exception

@@ -6,7 +6,6 @@ Public Class usuarioNegocio
 
     ' Instancia del DAO para comunicarse con la base de datos
     Private ReadOnly usuarioDao As New usuarioDAO()
-    Private ReadOnly bitacora As New bitacoraNegocio()
     Private ReadOnly reglas As IReglasUsuario = New reglasUsuarioNegocio()
     Private Shared ReadOnly autorizaciones As New Dictionary(Of String, AutorizacionRecuperacion)()
 
@@ -32,7 +31,6 @@ Public Class usuarioNegocio
             SesionUsuario.Cerrar()
             PrepararSeguridad()
 
-            ' 1. Validaciones previas de formato y campos vacíos
             If String.IsNullOrWhiteSpace(email) Then
                 Throw New ArgumentException("Debe ingresar su correo electrónico.")
             End If
@@ -44,21 +42,26 @@ Public Class usuarioNegocio
             Dim usuarioLogueado As Usuario = usuarioDao.ObtenerCredenciales(email.Trim())
             If usuarioLogueado IsNot Nothing Then
                 Dim anterior = usuarioLogueado.Contrasena
-                If PasswordHasher.IsHash(anterior) Then
-                    If Not PasswordHasher.Verify(contrasena, anterior) Then usuarioLogueado = Nothing
-                ElseIf Not PasswordHasher.VerifyLegacy(contrasena, anterior) OrElse
-                    Not usuarioDao.MigrarContrasena(usuarioLogueado.IdUsuario, anterior, PasswordHasher.Hash(contrasena)) Then
+                Dim esHash = PasswordHasher.IsHash(anterior)
+                Dim valida = If(esHash, PasswordHasher.Verify(contrasena, anterior), PasswordHasher.VerifyLegacy(contrasena, anterior))
+                If Not valida Then
+                    usuarioLogueado = Nothing
+                ElseIf Not EstaActivo(usuarioLogueado) Then
+                    AuditoriaDAO.RegistrarEvento(usuarioLogueado.IdUsuario, "Acceso", "SELECT", "Inicio de sesión denegado | cuenta inactiva")
+                    Throw New InvalidOperationException(MensajeCuentaInactiva(usuarioLogueado))
+                ElseIf Not esHash AndAlso Not usuarioDao.MigrarContrasena(usuarioLogueado.IdUsuario, anterior, PasswordHasher.Hash(contrasena)) Then
                     usuarioLogueado = Nothing
                 End If
             End If
 
-            ' La interfaz presenta el aviso cuando las credenciales no son validas.
             If usuarioLogueado Is Nothing Then
+                AuditoriaDAO.RegistrarEvento(0, "Acceso", "SELECT", "Inicio de sesión denegado")
                 Return Nothing
             End If
 
             reglas.ValidarRol(usuarioLogueado.NombreRol)
             usuarioLogueado.Contrasena = Nothing
+            AuditoriaDAO.RegistrarEvento(usuarioLogueado.IdUsuario, "Acceso", "SELECT", "Inicio de sesión aceptado")
             SesionUsuario.Iniciar(usuarioLogueado)
             Return usuarioLogueado
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
@@ -101,7 +104,7 @@ Public Class usuarioNegocio
                 Throw New InvalidOperationException("La respuesta ingresada es incorrecta.")
             End If
 
-            Dim autorizacion As String = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
+            Dim autorizacion As String = Convert.ToBase64String(PasswordHasher.NewRandomBytes(32))
             SyncLock autorizaciones
                 For Each anterior In autorizaciones.Where(Function(a) a.Value.Vence <= Date.UtcNow OrElse
                     String.Equals(a.Value.Identidad.EmailUsuario, identidad.EmailUsuario, StringComparison.OrdinalIgnoreCase)).Select(Function(a) a.Key).ToArray()
@@ -233,12 +236,10 @@ Public Class usuarioNegocio
 
     Public Function ListarUsuarios(Optional texto As String = "", Optional idRol As Integer = 0, Optional estado As String = "Todos") As List(Of Usuario)
         Try
-            Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
+            seguridadNegocio.ExigirAdministrador()
             If Not {"Todos", "Activo", "Inactivo"}.Contains(estado) Then Throw New ArgumentException("Selecciona un estado válido.")
             If idRol < 0 Then Throw New ArgumentException("Selecciona un rol válido.")
-            Dim criterio As String = If(texto, "").Trim()
-            Dim accion As String = If(criterio.Length = 0 AndAlso idRol = 0 AndAlso estado = "Todos", "LISTADO", "BUSQUEDA")
-            Return usuarioDao.ListarUsuarios(criterio, idRol, estado, bitacora.CrearContexto("Usuario", accion, administrador))
+            Return usuarioDao.ListarUsuarios(If(texto, "").Trim(), idRol, estado)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -248,9 +249,9 @@ Public Class usuarioNegocio
 
     Public Function ObtenerUsuario(idUsuario As Integer) As Usuario
         Try
-            Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
+            seguridadNegocio.ExigirAdministrador()
             If idUsuario <= 0 Then Throw New ArgumentException("Selecciona un usuario.")
-            Dim usuario As Usuario = usuarioDao.ObtenerUsuario(idUsuario, bitacora.CrearContexto("Usuario", "BUSQUEDA", administrador))
+            Dim usuario As Usuario = usuarioDao.ObtenerUsuario(idUsuario)
             If usuario Is Nothing Then Throw New InvalidOperationException("El usuario ya no existe.")
             Return usuario
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
@@ -262,8 +263,8 @@ Public Class usuarioNegocio
 
     Public Function ListarRoles() As List(Of RolUsuario)
         Try
-            Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
-            Return usuarioDao.ListarRoles(bitacora.CrearContexto("Usuario", "LISTADO", administrador))
+            seguridadNegocio.ExigirAdministrador()
+            Return usuarioDao.ListarRoles()
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -278,8 +279,7 @@ Public Class usuarioNegocio
             ValidarAlta(usuario, confirmacionClave)
             PrepararSeguridad()
             Try
-                If Not usuarioDao.CrearUsuario(usuario, administrador, PasswordHasher.Hash(usuario.Contrasena), RespuestaSeguridadHasher.Hash(usuario.RptaSegura), reglas,
-                                              bitacora.CrearContexto("Usuario", "INSERT", administrador)) Then Throw New InvalidOperationException("No se pudo crear el usuario.")
+                If Not usuarioDao.CrearUsuario(usuario, administrador, PasswordHasher.Hash(usuario.Contrasena), RespuestaSeguridadHasher.Hash(usuario.RptaSegura), reglas) Then Throw New InvalidOperationException("No se pudo crear el usuario.")
             Catch ex As AccesoDatosException When ex.NumeroSql = 2601 OrElse ex.NumeroSql = 2627
                 Throw New ArgumentException("El correo o DNI ya está registrado.", ex)
             End Try
@@ -296,8 +296,7 @@ Public Class usuarioNegocio
             ValidarDatos(usuario, True)
             If usuario.IdUsuario <= 0 Then Throw New ArgumentException("Selecciona un usuario válido.")
             Try
-                If Not usuarioDao.ActualizarUsuario(usuario, administrador, reglas,
-                                                   bitacora.CrearContexto("Usuario", "UPDATE", administrador)) Then Throw New InvalidOperationException("No se pudo actualizar el usuario.")
+                If Not usuarioDao.ActualizarUsuario(usuario, administrador, reglas) Then Throw New InvalidOperationException("No se pudo actualizar el usuario.")
             Catch ex As AccesoDatosException When ex.NumeroSql = 2601 OrElse ex.NumeroSql = 2627
                 Throw New ArgumentException("El correo o DNI pertenece a otra cuenta.", ex)
             End Try
@@ -313,14 +312,59 @@ Public Class usuarioNegocio
             Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
             If idUsuario <= 0 Then Throw New ArgumentException("Selecciona un usuario.")
             If Not {"Activo", "Inactivo"}.Contains(estado) Then Throw New ArgumentException("Selecciona Activo o Inactivo.")
-            If Not usuarioDao.CambiarEstadoUsuario(idUsuario, estado, administrador, reglas,
-                                                  bitacora.CrearContexto("Usuario", "UPDATE", administrador)) Then Throw New InvalidOperationException("No se pudo cambiar el estado.")
+            If Not usuarioDao.CambiarEstadoUsuario(idUsuario, estado, administrador, reglas) Then Throw New InvalidOperationException("No se pudo cambiar el estado.")
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
             Throw New Exception("Ocurrió un error al cambiar el estado del usuario.", ex)
         End Try
     End Sub
+
+    Public Function ListarLectoresPendientes(Optional texto As String = "") As List(Of Usuario)
+        Try
+            seguridadNegocio.ExigirAdministrador()
+            Return usuarioDao.ListarLectoresPendientes(If(texto, "").Trim())
+        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
+            Throw
+        Catch ex As Exception
+            Throw New Exception("Ocurrió un error al listar los lectores pendientes.", ex)
+        End Try
+    End Function
+
+    Public Sub AprobarLector(idUsuario As Integer)
+        Try
+            Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
+            If idUsuario <= 0 Then Throw New ArgumentException("Selecciona un lector.")
+            If Not usuarioDao.AprobarLector(idUsuario, administrador, reglas) Then Throw New InvalidOperationException("El lector ya no está pendiente de aprobación. Actualiza la lista.")
+        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
+            Throw
+        Catch ex As Exception
+            Throw New Exception("Ocurrió un error al aprobar al lector.", ex)
+        End Try
+    End Sub
+
+    Public Sub RechazarLector(idUsuario As Integer)
+        Try
+            Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
+            If idUsuario <= 0 Then Throw New ArgumentException("Selecciona un lector.")
+            If Not usuarioDao.RechazarLector(idUsuario, administrador, reglas) Then Throw New InvalidOperationException("El lector ya no está pendiente de aprobación. Actualiza la lista.")
+        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
+            Throw
+        Catch ex As Exception
+            Throw New Exception("Ocurrió un error al rechazar al lector.", ex)
+        End Try
+    End Sub
+
+    Private Shared Function EstaActivo(usuario As Usuario) As Boolean
+        Return String.Equals(If(usuario.EstadoUsuario, "").Trim(), "Activo", StringComparison.OrdinalIgnoreCase)
+    End Function
+
+    Private Shared Function MensajeCuentaInactiva(usuario As Usuario) As String
+        If seguridadNegocio.EsRolLector(usuario.NombreRol) Then
+            Return "Tu cuenta está pendiente de aprobación. Un administrador debe activarla antes de que puedas ingresar. Vuelve a intentarlo más tarde."
+        End If
+        Return "Tu cuenta está inactiva. Comunícate con un administrador."
+    End Function
 
     Private Shared Sub ValidarDatos(usuario As Usuario, requiereRol As Boolean)
         If usuario Is Nothing Then Throw New ArgumentException("Completa los datos del usuario.")

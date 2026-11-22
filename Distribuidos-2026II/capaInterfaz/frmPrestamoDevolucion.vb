@@ -20,7 +20,7 @@ Public Class frmPrestamoDevolucion
         idBibliotecario = idUsuario
         txtBibliotecario.Text = nombreUsuario & " · ID " & idUsuario
         txtPrestamo.Text = "N.º " & prestamo.IdPrestamo & " · " & prestamo.NombreLector
-        txtEjemplar.Text = prestamo.TituloLibro & " · Ejemplar " & prestamo.IdEjemplar
+        txtEjemplar.Text = prestamo.TituloLibro & " · Ejemplares: " & prestamo.Ejemplares
         lblFechas.Text = "Inicio: " & prestamo.FechaInicio.ToString("dd/MM/yyyy") & " · Límite: " & prestamo.FechaFin.ToString("dd/MM/yyyy")
         retorno.MaxDate = Date.Today
         retorno.Value = Date.Today

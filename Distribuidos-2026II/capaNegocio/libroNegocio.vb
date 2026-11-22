@@ -1,4 +1,4 @@
-Imports System.Data
+﻿Imports System.Data
 Imports capaDatos
 
 Public Class libroNegocio
@@ -37,8 +37,8 @@ Public Class libroNegocio
 
     Public Function eliminarLibro(idLibro As Integer) As Boolean
         Try
-            seguridadNegocio.ExigirPersonal()
-            Return dao.eliminarLibro(idLibro, reglas)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.eliminarLibro(idLibro, reglas, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -77,8 +77,8 @@ Public Class libroNegocio
             If cantidadEjemplares < 0 OrElse cantidadEjemplares > 500 Then
                 Throw New ArgumentOutOfRangeException(NameOf(cantidadEjemplares), "La cantidad de ejemplares debe estar entre 0 y 500.")
             End If
-            seguridadNegocio.ExigirPersonal()
-            Return dao.agregarLibroCompleto(titulo, editorial, anoPublicacion, publico, estado, idsAutores, idsCategorias, cantidadEjemplares, reglas)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.agregarLibroCompleto(titulo, editorial, anoPublicacion, publico, estado, idsAutores, idsCategorias, cantidadEjemplares, reglas, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -92,8 +92,8 @@ Public Class libroNegocio
         Try
             If idLibro <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idLibro))
             ValidarLibro(titulo, editorial, idsAutores, idsCategorias)
-            seguridadNegocio.ExigirPersonal()
-            Return dao.actualizarLibroCompleto(idLibro, titulo, editorial, anoPublicacion, publico, estado, idsAutores, idsCategorias, reglas)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.actualizarLibroCompleto(idLibro, titulo, editorial, anoPublicacion, publico, estado, idsAutores, idsCategorias, reglas, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception

@@ -24,6 +24,14 @@ Public Class frmPrestamos
         MantenimientoUI.EstilizarBoton(btnRetorno)
         AddHandler btnEntrega.Click, AddressOf btnEntrega_Click
         AddHandler btnRetorno.Click, AddressOf btnRetorno_Click
+        tabla.AutoGenerateColumns = False
+        AgregarColumna(NameOf(Prestamo.IdPrestamo), "Préstamo", 70)
+        AgregarColumna(NameOf(Prestamo.NombreLector), "Lector", 150)
+        AgregarColumna(NameOf(Prestamo.TituloLibro), "Libros", 230)
+        AgregarColumna(NameOf(Prestamo.Ejemplares), "Ejemplares", 110)
+        AgregarColumna(NameOf(Prestamo.FechaFin), "Vence", 95, "dd/MM/yyyy")
+        AgregarColumna(NameOf(Prestamo.FechaRetorno), "Devuelto", 95, "dd/MM/yyyy")
+        AgregarColumna(NameOf(Prestamo.EstadoPrestamo), "Estado", 95)
         filtroEstado.SelectedIndex = 0
         btnNuevo.Enabled = False
     End Sub
@@ -34,7 +42,14 @@ Public Class frmPrestamos
         nombreBibliotecario = nombreUsuario
         puedeOperar = seguridadNegocio.PuedeOperar(idUsuario, rol)
         btnNuevo.Enabled = puedeOperar
-        lblDescripcionVista.Text = "Sesión: " & nombreUsuario & " · " & rol & " · Una fila por ejemplar físico"
+        lblDescripcionVista.Text = "Sesión: " & nombreUsuario & " · " & rol & " · Una fila por operación"
+    End Sub
+
+    Private Sub AgregarColumna(propiedad As String, titulo As String, ancho As Integer, Optional formato As String = "")
+        Dim columna As New DataGridViewTextBoxColumn With {
+            .Name = propiedad, .DataPropertyName = propiedad, .HeaderText = titulo, .Width = ancho}
+        columna.DefaultCellStyle.Format = formato
+        tabla.Columns.Add(columna)
     End Sub
 
     Public Sub AplicarContexto(filtro As String, Optional idLector As Integer = 0, Optional idPrestamo As Integer = 0)

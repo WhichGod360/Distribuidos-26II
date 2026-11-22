@@ -12,6 +12,10 @@ Public Class Prestamo
     Public Property IdUsuario As Integer
     Public Property IdBibliotecario As Integer
     Public Property IdEjemplar As Integer
+    Public Property IdOperacion As Guid?
+    Public Property CantidadEjemplares As Integer = 1
+    Public Property Ejemplares As String
+    Public Property IdsPrestamos As New List(Of Integer)
 
     ' Datos de consulta; no agregan columnas a Prestamo.
     Public Property NombreLector As String

@@ -55,8 +55,8 @@ Public Class autorNegocio
             If dao.buscarPorNombre(nombre.Trim()) IsNot Nothing Then
                 Throw New InvalidOperationException("Ya existe un autor con ese nombre.")
             End If
-            seguridadNegocio.ExigirPersonal()
-            Return dao.insertar(nombre.Trim(), nacionalidad, fechaNacimiento, fechaFallecimiento, biografia)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.insertar(nombre.Trim(), nacionalidad, fechaNacimiento, fechaFallecimiento, biografia, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -74,8 +74,8 @@ Public Class autorNegocio
             If existente IsNot Nothing AndAlso existente.IdAutor <> idAutor Then
                 Throw New InvalidOperationException("Ya existe un autor con ese nombre.")
             End If
-            seguridadNegocio.ExigirPersonal()
-            Return dao.actualizar(idAutor, nombre.Trim(), nacionalidad, fechaNacimiento, fechaFallecimiento, biografia)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.actualizar(idAutor, nombre.Trim(), nacionalidad, fechaNacimiento, fechaFallecimiento, biografia, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -86,8 +86,8 @@ Public Class autorNegocio
     Public Function eliminar(idAutor As Integer) As Boolean
         Try
             If idAutor <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idAutor))
-            seguridadNegocio.ExigirPersonal()
-            Return dao.eliminar(idAutor, AddressOf ValidarEliminacion)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.eliminar(idAutor, AddressOf ValidarEliminacion, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception

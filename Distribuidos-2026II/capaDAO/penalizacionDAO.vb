@@ -1,4 +1,4 @@
-Imports System.Data
+﻿Imports System.Data
 Imports System.Data.SqlClient
 Imports capaConexion
 Imports capaDatos
@@ -19,41 +19,47 @@ Public Class penalizacionDAO
     End Function
 
     Public Function buscar(texto As String, estado As Boolean?) As List(Of Penalizacion)
-        Try
-            Dim lista As New List(Of Penalizacion)
-            Dim query As String = "SELECT " & COLUMNAS & " FROM Penalizacion WHERE (tipo_penalizacion LIKE @texto OR descripcion_penalizacion LIKE @texto) AND (@estado IS NULL OR estado_penalizacion=@estado) ORDER BY dias_desde,tipo_penalizacion,id_penalizacion"
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@texto", SqlDbType.VarChar, -1).Value = "%" & If(texto, "").Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]") & "%"
-                    cmd.Parameters.Add("@estado", SqlDbType.Bit).Value = If(estado.HasValue, CObj(estado.Value), DBNull.Value)
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            lista.Add(Mapear(dr))
-                        End While
+        Return AuditoriaDAO.Consultar("Penalizacion", If(String.IsNullOrWhiteSpace(texto) AndAlso Not estado.HasValue, "LISTADO", "BUSQUEDA"), "Consultar tipos de penalización",
+            Function()
+                Try
+                    Dim lista As New List(Of Penalizacion)
+                    Dim query As String = "SELECT " & COLUMNAS & " FROM Penalizacion WHERE (tipo_penalizacion LIKE @texto OR descripcion_penalizacion LIKE @texto) AND (@estado IS NULL OR estado_penalizacion=@estado) ORDER BY dias_desde,tipo_penalizacion,id_penalizacion"
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@texto", SqlDbType.VarChar, -1).Value = "%" & If(texto, "").Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]") & "%"
+                            cmd.Parameters.Add("@estado", SqlDbType.Bit).Value = If(estado.HasValue, CObj(estado.Value), DBNull.Value)
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    lista.Add(Mapear(dr))
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "penalizacionDAO.buscar")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "penalizacionDAO.buscar")
+                End Try
+            End Function)
     End Function
 
     Public Function buscarPorId(id As Integer) As Penalizacion
-        Try
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Dim query As String = "SELECT " & COLUMNAS & " FROM Penalizacion WHERE id_penalizacion=@id"
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = id
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        If dr.Read() Then Return Mapear(dr)
+        Return AuditoriaDAO.Consultar("Penalizacion", "BUSQUEDA", $"Consultar tipo de penalización | ID={id}",
+            Function()
+                Try
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Dim query As String = "SELECT " & COLUMNAS & " FROM Penalizacion WHERE id_penalizacion=@id"
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = id
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                If dr.Read() Then Return Mapear(dr)
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return Nothing
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "penalizacionDAO.buscarPorId")
-        End Try
+                    Return Nothing
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "penalizacionDAO.buscarPorId")
+                End Try
+            End Function)
     End Function
 
     Public Function agregarPenalizacion(tipo As String, descripcion As String, monto As Decimal, estado As Boolean, idOperador As Integer, reglas As IReglasPenalizacion, Optional diasDesde As Integer? = Nothing) As Boolean
@@ -86,9 +92,10 @@ Public Class penalizacionDAO
                         End Using
                     End If
                     query = If(id = 0,
-                        "INSERT INTO Penalizacion(tipo_penalizacion,descripcion_penalizacion,monto_penalizacion,estado_penalizacion,dias_desde) VALUES(@tipo,@descripcion,@monto,@estado,@dias)",
+                        "INSERT INTO Penalizacion(tipo_penalizacion,descripcion_penalizacion,monto_penalizacion,estado_penalizacion,dias_desde) OUTPUT INSERTED.id_penalizacion VALUES(@tipo,@descripcion,@monto,@estado,@dias)",
                         "UPDATE Penalizacion SET tipo_penalizacion=@tipo,descripcion_penalizacion=@descripcion,monto_penalizacion=@monto,estado_penalizacion=@estado,dias_desde=@dias WHERE id_penalizacion=@id")
                     Dim resultado As Boolean
+                    Dim idGuardado = id
                     Using cmd As New SqlCommand(query, cn, tx)
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = id
                         cmd.Parameters.Add("@tipo", SqlDbType.VarChar, 30).Value = tipo.Trim()
@@ -96,8 +103,16 @@ Public Class penalizacionDAO
                         AgregarMonto(cmd, "@monto", monto)
                         cmd.Parameters.Add("@estado", SqlDbType.Bit).Value = estado
                         cmd.Parameters.Add("@dias", SqlDbType.Int).Value = If(dias.HasValue, CObj(dias.Value), DBNull.Value)
-                        resultado = cmd.ExecuteNonQuery() = 1
+                        If id = 0 Then
+                            idGuardado = CInt(cmd.ExecuteScalar())
+                            resultado = idGuardado > 0
+                        Else
+                            resultado = cmd.ExecuteNonQuery() = 1
+                        End If
                     End Using
+                    If resultado Then AuditoriaDAO.Registrar(cn, tx, idOperador, "Penalizacion",
+                        If(id = 0, "INSERT", "UPDATE"),
+                        $"ID={idGuardado}; tipo={tipo.Trim()}; monto={monto:F2}; activo={estado}; desde días={If(dias.HasValue, dias.Value.ToString(), "otro motivo")}")
                     tx.Commit()
                     Return resultado
                 End Using
@@ -117,6 +132,9 @@ Public Class penalizacionDAO
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = id
                         cmd.Parameters.Add("@estado", SqlDbType.Bit).Value = estado
                         Dim ok = cmd.ExecuteNonQuery() = 1
+                        If ok Then AuditoriaDAO.Registrar(cn, tx, idOperador, "Penalizacion",
+                            If(estado, "UPDATE", "DELETE"),
+                            $"ID={id}; {If(estado, "activación", "baja lógica")}; activo={estado}")
                         tx.Commit()
                         Return ok
                     End Using

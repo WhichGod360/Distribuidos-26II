@@ -10,6 +10,8 @@ Friend NotInheritable Class ErroresDAO
         Select Case ex.Number
             Case 2601, 2627
                 mensaje = "Ya existe un registro con esos datos. Revisa los valores que deben ser únicos."
+            Case 51006
+                mensaje = "El estado de este cargo se controla desde el historial de pagos. Revisa el reporte en Cargos y pagos."
             Case 547
                 mensaje = "No se puede guardar el cambio porque está relacionado con otros registros o incumple una validación de la base de datos."
             Case 1205, 1222

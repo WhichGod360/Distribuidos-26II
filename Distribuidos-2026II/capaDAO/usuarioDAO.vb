@@ -14,8 +14,7 @@ Public Class usuarioDAO
                 "       u.estado_usuario, u.contrasena, u.id_rol_usuario, r.nombre_rol_usuario " &
                 "FROM Usuario u " &
                 "INNER JOIN RolUsuario r ON u.id_rol_usuario = r.id_rol_usuario " &
-                "WHERE u.email_usuario = @email " &
-                "  AND UPPER(LTRIM(RTRIM(u.estado_usuario))) = 'ACTIVO'"
+                "WHERE u.email_usuario = @email"
 
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
                 Using cmd As New SqlCommand(query, cn)
@@ -36,7 +35,6 @@ Public Class usuarioDAO
                                 .Contrasena = dr("contrasena").ToString()
                             }
 
-                            ' Si la columna en BD es NULL, evitamos que rompa la conversión:
                             If Not IsDBNull(dr("fecha_nacimiento_usuario")) Then
                                 usuarioLogueado.FechaNacimientoUsuario = Convert.ToDateTime(dr("fecha_nacimiento_usuario"))
                             End If
@@ -59,11 +57,16 @@ Public Class usuarioDAO
         Try
             Dim query As String = "UPDATE Usuario SET contrasena = @hash WHERE id_usuario = @id AND CONVERT(varbinary(max), contrasena) = CONVERT(varbinary(max), @anterior) AND UPPER(LTRIM(RTRIM(estado_usuario))) = 'ACTIVO'"
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
-                    cmd.Parameters.Add("@hash", SqlDbType.VarChar, 255).Value = nuevoHash
-                    cmd.Parameters.Add("@anterior", SqlDbType.VarChar, 255).Value = anterior
-                    Return cmd.ExecuteNonQuery() = 1
+                Using tx As SqlTransaction = cn.BeginTransaction()
+                    Using cmd As New SqlCommand(query, cn, tx)
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
+                        cmd.Parameters.Add("@hash", SqlDbType.VarChar, 255).Value = nuevoHash
+                        cmd.Parameters.Add("@anterior", SqlDbType.VarChar, 255).Value = anterior
+                        If Not (cmd.ExecuteNonQuery() = 1) Then Return False
+                        AuditoriaDAO.Registrar(cn, tx, idUsuario, "Usuario", "UPDATE", "Actualizar formato de contraseña")
+                        tx.Commit()
+                        Return True
+                    End Using
                 End Using
             End Using
         Catch ex As SqlException
@@ -72,69 +75,78 @@ Public Class usuarioDAO
     End Function
 
     Public Function ExisteEmail(email As String) As Boolean
-        Try
-            Dim existe As Boolean = False
-            Dim query As String = "SELECT COUNT(1) FROM Usuario WHERE email_usuario = @email"
+        Return AuditoriaDAO.Consultar("Usuario", "SELECT", "Verificar disponibilidad de correo",
+            Function()
+                Try
+                    Dim existe As Boolean = False
+                    Dim query As String = "SELECT COUNT(1) FROM Usuario WHERE email_usuario = @email"
 
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
-                    Dim resultado As Object = cmd.ExecuteScalar()
-                    If resultado IsNot Nothing AndAlso Convert.ToInt32(resultado) > 0 Then
-                        existe = True
-                    End If
-                End Using
-            End Using
-            Return existe
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.ExisteEmail")
-        End Try
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
+                            Dim resultado As Object = cmd.ExecuteScalar()
+                            If resultado IsNot Nothing AndAlso Convert.ToInt32(resultado) > 0 Then
+                                existe = True
+                            End If
+                        End Using
+                    End Using
+                    Return existe
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ExisteEmail")
+                End Try
+            End Function)
     End Function
 
     ' Obtener la pregunta secreta según el email del usuario
     Public Function ObtenerPreguntaSeguridad(email As String) As String
-        Try
-            Dim pregunta As String = String.Empty
-            Dim query As String = "SELECT preguntasegura FROM Usuario WHERE email_usuario = @email AND UPPER(LTRIM(RTRIM(estado_usuario))) = 'ACTIVO'"
+        Return AuditoriaDAO.Consultar("Usuario", "SELECT", "Solicitar pregunta de recuperación",
+            Function()
+                Try
+                    Dim pregunta As String = String.Empty
+                    Dim query As String = "SELECT preguntasegura FROM Usuario WHERE email_usuario = @email AND UPPER(LTRIM(RTRIM(estado_usuario))) = 'ACTIVO'"
 
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
-                    Dim resultado As Object = cmd.ExecuteScalar()
-                    If resultado IsNot Nothing AndAlso Not IsDBNull(resultado) Then
-                        pregunta = resultado.ToString()
-                    End If
-                End Using
-            End Using
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
+                            Dim resultado As Object = cmd.ExecuteScalar()
+                            If resultado IsNot Nothing AndAlso Not IsDBNull(resultado) Then
+                                pregunta = resultado.ToString()
+                            End If
+                        End Using
+                    End Using
 
-            Return pregunta
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.ObtenerPreguntaSeguridad")
-        End Try
+                    Return pregunta
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ObtenerPreguntaSeguridad")
+                End Try
+            End Function)
     End Function
 
     ' La identidad verificada solo se usa en negocio; los hashes no se muestran en formularios.
     Public Function ObtenerIdentidadRecuperacion(email As String) As Usuario
-        Try
-            Dim identidad As Usuario = Nothing
-            Dim query As String = "SELECT id_usuario, email_usuario, rptasegura, contrasena FROM Usuario " &
-                "WHERE email_usuario = @email AND UPPER(LTRIM(RTRIM(estado_usuario))) = 'ACTIVO'"
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        If dr.Read() Then
-                            identidad = New Usuario With {.IdUsuario = CInt(dr("id_usuario")),
-                                .EmailUsuario = CStr(dr("email_usuario")), .RptaSegura = CStr(dr("rptasegura")),
-                                .Contrasena = CStr(dr("contrasena"))}
-                        End If
+        Return AuditoriaDAO.Consultar("Usuario", "SELECT", "Consultar identidad para recuperación",
+            Function()
+                Try
+                    Dim identidad As Usuario = Nothing
+                    Dim query As String = "SELECT id_usuario, email_usuario, rptasegura, contrasena FROM Usuario " &
+                        "WHERE email_usuario = @email AND UPPER(LTRIM(RTRIM(estado_usuario))) = 'ACTIVO'"
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                If dr.Read() Then
+                                    identidad = New Usuario With {.IdUsuario = CInt(dr("id_usuario")),
+                                        .EmailUsuario = CStr(dr("email_usuario")), .RptaSegura = CStr(dr("rptasegura")),
+                                        .Contrasena = CStr(dr("contrasena"))}
+                                End If
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return identidad
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.ObtenerIdentidadRecuperacion")
-        End Try
+                    Return identidad
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ObtenerIdentidadRecuperacion")
+                End Try
+            End Function)
     End Function
 
     ' Actualizar la contraseña en la base de datos
@@ -147,13 +159,18 @@ Public Class usuarioDAO
                 "AND UPPER(LTRIM(RTRIM(estado_usuario))) = 'ACTIVO'"
 
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@nuevaClave", SqlDbType.VarChar, 255).Value = nuevaClaveHash
-                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
-                    cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
-                    cmd.Parameters.Add("@respuesta", SqlDbType.VarChar, 255).Value = respuestaVerificada
-                    cmd.Parameters.Add("@anterior", SqlDbType.VarChar, 255).Value = contrasenaAnterior
-                    Return cmd.ExecuteNonQuery() = 1
+                Using tx As SqlTransaction = cn.BeginTransaction()
+                    Using cmd As New SqlCommand(query, cn, tx)
+                        cmd.Parameters.Add("@nuevaClave", SqlDbType.VarChar, 255).Value = nuevaClaveHash
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
+                        cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = email.Trim()
+                        cmd.Parameters.Add("@respuesta", SqlDbType.VarChar, 255).Value = respuestaVerificada
+                        cmd.Parameters.Add("@anterior", SqlDbType.VarChar, 255).Value = contrasenaAnterior
+                        If Not (cmd.ExecuteNonQuery() = 1) Then Return False
+                        AuditoriaDAO.Registrar(cn, tx, idUsuario, "Usuario", "UPDATE", "Restablecer contraseña")
+                        tx.Commit()
+                        Return True
+                    End Using
                 End Using
             End Using
         Catch ex As SqlException
@@ -163,62 +180,69 @@ Public Class usuarioDAO
 
     ' Valida si un DNI ya existe registrado
     Public Function ExisteDNI(dni As String) As Boolean
-        Try
-            Dim existe As Boolean = False
-            Dim query As String = "SELECT COUNT(1) FROM Usuario WHERE numero_dni_usuario = @dni"
+        Return AuditoriaDAO.Consultar("Usuario", "SELECT", "Verificar disponibilidad de DNI",
+            Function()
+                Try
+                    Dim existe As Boolean = False
+                    Dim query As String = "SELECT COUNT(1) FROM Usuario WHERE numero_dni_usuario = @dni"
 
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@dni", SqlDbType.VarChar, 8).Value = dni.Trim()
-                    Dim resultado As Object = cmd.ExecuteScalar()
-                    If resultado IsNot Nothing AndAlso Convert.ToInt32(resultado) > 0 Then
-                        existe = True
-                    End If
-                End Using
-            End Using
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@dni", SqlDbType.VarChar, 8).Value = dni.Trim()
+                            Dim resultado As Object = cmd.ExecuteScalar()
+                            If resultado IsNot Nothing AndAlso Convert.ToInt32(resultado) > 0 Then
+                                existe = True
+                            End If
+                        End Using
+                    End Using
 
-            Return existe
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.ExisteDNI")
-        End Try
+                    Return existe
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ExisteDNI")
+                End Try
+            End Function)
     End Function
 
-    ' El registro público crea únicamente cuentas de lector, nunca de personal.
     Public Function RegistrarLector(usuario As Usuario, claveHash As String, respuestaHash As String) As Boolean
         Try
             Dim query As String =
                 "INSERT INTO Usuario (email_usuario, nombre_usuario, ap_paterno, ap_materno, " &
                 "                     numero_dni_usuario, fecha_nacimiento_usuario, genero_usuario, " &
                 "                     estado_usuario, contrasena, id_rol_usuario, preguntasegura, rptasegura) " &
-                "VALUES (@email, @nombre, @apPaterno, @apMaterno, " &
+                "OUTPUT INSERTED.id_usuario VALUES (@email, @nombre, @apPaterno, @apMaterno, " &
                 "        @dni, @fechaNac, @genero, " &
-                "        'Activo', @clave, (SELECT MIN(id_rol_usuario) FROM RolUsuario WHERE UPPER(LTRIM(RTRIM(nombre_rol_usuario))) IN ('ESTUDIANTE','LECTOR')), @pregunta, @rpta)"
+                "        'Inactivo', @clave, (SELECT MIN(id_rol_usuario) FROM RolUsuario WHERE UPPER(LTRIM(RTRIM(nombre_rol_usuario))) IN ('ESTUDIANTE','LECTOR')), @pregunta, @rpta)"
 
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = usuario.EmailUsuario.Trim()
-                    cmd.Parameters.Add("@nombre", SqlDbType.VarChar, 100).Value = usuario.NombreUsuario.Trim()
-                    cmd.Parameters.Add("@apPaterno", SqlDbType.VarChar, 100).Value = usuario.ApPaterno.Trim()
-                    cmd.Parameters.Add("@apMaterno", SqlDbType.VarChar, 100).Value = usuario.ApMaterno.Trim()
-                    cmd.Parameters.Add("@dni", SqlDbType.VarChar, 8).Value = usuario.NumeroDniUsuario.Trim()
+                Using tx As SqlTransaction = cn.BeginTransaction()
+                    Using cmd As New SqlCommand(query, cn, tx)
+                        cmd.Parameters.Add("@email", SqlDbType.VarChar, 100).Value = usuario.EmailUsuario.Trim()
+                        cmd.Parameters.Add("@nombre", SqlDbType.VarChar, 100).Value = usuario.NombreUsuario.Trim()
+                        cmd.Parameters.Add("@apPaterno", SqlDbType.VarChar, 100).Value = usuario.ApPaterno.Trim()
+                        cmd.Parameters.Add("@apMaterno", SqlDbType.VarChar, 100).Value = usuario.ApMaterno.Trim()
+                        cmd.Parameters.Add("@dni", SqlDbType.VarChar, 8).Value = usuario.NumeroDniUsuario.Trim()
 
-                    If usuario.FechaNacimientoUsuario.HasValue Then
-                        cmd.Parameters.Add("@fechaNac", SqlDbType.Date).Value = usuario.FechaNacimientoUsuario.Value
-                    Else
-                        cmd.Parameters.Add("@fechaNac", SqlDbType.Date).Value = DBNull.Value
-                    End If
+                        If usuario.FechaNacimientoUsuario.HasValue Then
+                            cmd.Parameters.Add("@fechaNac", SqlDbType.Date).Value = usuario.FechaNacimientoUsuario.Value
+                        Else
+                            cmd.Parameters.Add("@fechaNac", SqlDbType.Date).Value = DBNull.Value
+                        End If
 
-                    If usuario.GeneroUsuario.HasValue Then
-                        cmd.Parameters.Add("@genero", SqlDbType.Bit).Value = usuario.GeneroUsuario.Value
-                    Else
-                        cmd.Parameters.Add("@genero", SqlDbType.Bit).Value = DBNull.Value
-                    End If
+                        If usuario.GeneroUsuario.HasValue Then
+                            cmd.Parameters.Add("@genero", SqlDbType.Bit).Value = usuario.GeneroUsuario.Value
+                        Else
+                            cmd.Parameters.Add("@genero", SqlDbType.Bit).Value = DBNull.Value
+                        End If
 
-                    cmd.Parameters.Add("@clave", SqlDbType.VarChar, 255).Value = claveHash
-                    cmd.Parameters.Add("@pregunta", SqlDbType.VarChar, 255).Value = usuario.PreguntaSegura.Trim()
-                    cmd.Parameters.Add("@rpta", SqlDbType.VarChar, 255).Value = respuestaHash
+                        cmd.Parameters.Add("@clave", SqlDbType.VarChar, 255).Value = claveHash
+                        cmd.Parameters.Add("@pregunta", SqlDbType.VarChar, 255).Value = usuario.PreguntaSegura.Trim()
+                        cmd.Parameters.Add("@rpta", SqlDbType.VarChar, 255).Value = respuestaHash
 
-                    Return cmd.ExecuteNonQuery() > 0
+                        Dim idNuevo = CInt(cmd.ExecuteScalar())
+                        AuditoriaDAO.Registrar(cn, tx, idNuevo, "Usuario", "INSERT", "Registrar lector pendiente de aprobación")
+                        tx.Commit()
+                        Return True
+                    End Using
                 End Using
             End Using
         Catch ex As SqlException
@@ -227,42 +251,50 @@ Public Class usuarioDAO
     End Function
 
     Public Function LeerRespuestasAnteriores() As List(Of KeyValuePair(Of Integer, String))
-        Try
-            Dim anteriores As New List(Of KeyValuePair(Of Integer, String))()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Dim query As String = "SELECT COL_LENGTH('dbo.Usuario', 'rptasegura') AS longitud"
-                Using cmd As New SqlCommand(query, cn)
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        If Not dr.Read() OrElse IsDBNull(dr("longitud")) OrElse CInt(dr("longitud")) < 255 Then
-                            Throw New InvalidOperationException("Ejecuta migraciones/004_respuesta_seguridad_hash.sql antes de abrir esta versión del sistema.")
-                        End If
+        Return AuditoriaDAO.Consultar("Usuario", "SELECT", "Verificar formato de respuestas de seguridad",
+            Function()
+                Try
+                    Dim anteriores As New List(Of KeyValuePair(Of Integer, String))()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Dim query As String = "SELECT COL_LENGTH('dbo.Usuario', 'rptasegura') AS longitud"
+                        Using cmd As New SqlCommand(query, cn)
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                If Not dr.Read() OrElse IsDBNull(dr("longitud")) OrElse CInt(dr("longitud")) < 255 Then
+                                    Throw New InvalidOperationException("Ejecuta migraciones/004_respuesta_seguridad_hash.sql antes de abrir esta versión del sistema.")
+                                End If
+                            End Using
+                        End Using
+                        query = "SELECT id_usuario, rptasegura FROM Usuario WHERE rptasegura COLLATE Latin1_General_100_BIN2 NOT LIKE 'PBKDF2-SHA256$%' ORDER BY id_usuario"
+                        Using cmd As New SqlCommand(query, cn)
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    Dim respuesta As String = CStr(dr("rptasegura"))
+                                    anteriores.Add(New KeyValuePair(Of Integer, String)(CInt(dr("id_usuario")), respuesta))
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-                query = "SELECT id_usuario, rptasegura FROM Usuario WHERE rptasegura COLLATE Latin1_General_100_BIN2 NOT LIKE 'PBKDF2-SHA256$%' ORDER BY id_usuario"
-                Using cmd As New SqlCommand(query, cn)
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            Dim respuesta As String = CStr(dr("rptasegura"))
-                            anteriores.Add(New KeyValuePair(Of Integer, String)(CInt(dr("id_usuario")), respuesta))
-                        End While
-                    End Using
-                End Using
-            End Using
-            Return anteriores
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.LeerRespuestasAnteriores")
-        End Try
+                    Return anteriores
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.LeerRespuestasAnteriores")
+                End Try
+            End Function)
     End Function
 
     Public Sub MigrarRespuesta(idUsuario As Integer, anterior As String, nuevoHash As String)
         Try
             Dim query As String = "UPDATE Usuario SET rptasegura=@hash WHERE id_usuario=@id AND CONVERT(varbinary(max),rptasegura)=CONVERT(varbinary(max),@anterior)"
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
-                    cmd.Parameters.Add("@hash", SqlDbType.VarChar, 255).Value = nuevoHash
-                    cmd.Parameters.Add("@anterior", SqlDbType.VarChar, 255).Value = anterior
-                    cmd.ExecuteNonQuery()
+                Using tx As SqlTransaction = cn.BeginTransaction()
+                    Using cmd As New SqlCommand(query, cn, tx)
+                        cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
+                        cmd.Parameters.Add("@hash", SqlDbType.VarChar, 255).Value = nuevoHash
+                        cmd.Parameters.Add("@anterior", SqlDbType.VarChar, 255).Value = anterior
+                        If cmd.ExecuteNonQuery() = 1 Then
+                            AuditoriaDAO.Registrar(cn, tx, SesionUsuario.IdUsuario, "Usuario", "UPDATE", $"Actualizar formato de respuesta | usuario={idUsuario}")
+                        End If
+                        tx.Commit()
+                    End Using
                 End Using
             End Using
         Catch ex As SqlException
@@ -271,77 +303,80 @@ Public Class usuarioDAO
     End Sub
 
     Public Function ListarUsuarios(texto As String, Optional idRol As Integer = 0,
-                                   Optional estado As String = "Todos",
-                                   Optional bitacora As IContextoBitacora = Nothing) As List(Of Usuario)
-        Try
-            Dim lista As New List(Of Usuario)()
-            Dim query As String = ConsultaUsuarios &
-                "WHERE (u.nombre_usuario + ' ' + u.ap_paterno + ' ' + u.ap_materno LIKE @texto " &
-                "OR u.email_usuario LIKE @texto OR u.numero_dni_usuario LIKE @texto) " &
-                "AND (@idRol = 0 OR u.id_rol_usuario = @idRol) " &
-                "AND (@estado = 'Todos' OR UPPER(LTRIM(RTRIM(u.estado_usuario))) = UPPER(@estado)) " &
-                "ORDER BY u.ap_paterno, u.ap_materno, u.nombre_usuario"
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@texto", SqlDbType.VarChar, -1).Value = "%" & texto.Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]") & "%"
-                    cmd.Parameters.Add("@idRol", SqlDbType.Int).Value = idRol
-                    cmd.Parameters.Add("@estado", SqlDbType.VarChar, 30).Value = estado
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            lista.Add(LeerUsuario(dr))
-                        End While
+                                   Optional estado As String = "Todos") As List(Of Usuario)
+        Return AuditoriaDAO.Consultar("Usuario", If(texto.Length = 0 AndAlso idRol = 0 AndAlso estado = "Todos", "LISTADO", "BUSQUEDA"), "Consultar usuarios por criterio, rol y estado",
+            Function()
+                Try
+                    Dim lista As New List(Of Usuario)()
+                    Dim query As String = ConsultaUsuarios &
+                        "WHERE (u.nombre_usuario + ' ' + u.ap_paterno + ' ' + u.ap_materno LIKE @texto " &
+                        "OR u.email_usuario LIKE @texto OR u.numero_dni_usuario LIKE @texto) " &
+                        "AND (@idRol = 0 OR u.id_rol_usuario = @idRol) " &
+                        "AND (@estado = 'Todos' OR UPPER(LTRIM(RTRIM(u.estado_usuario))) = UPPER(@estado)) " &
+                        "ORDER BY u.ap_paterno, u.ap_materno, u.nombre_usuario"
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@texto", SqlDbType.VarChar, -1).Value = "%" & texto.Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]") & "%"
+                            cmd.Parameters.Add("@idRol", SqlDbType.Int).Value = idRol
+                            cmd.Parameters.Add("@estado", SqlDbType.VarChar, 30).Value = estado
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    lista.Add(LeerUsuario(dr))
+                                End While
+                            End Using
+                        End Using
                     End Using
-                    BitacoraMantenimientoDAO.Registrar(cmd, bitacora)
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.ListarUsuarios")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ListarUsuarios")
+                End Try
+            End Function)
     End Function
 
-    Public Function ObtenerUsuario(idUsuario As Integer, Optional bitacora As IContextoBitacora = Nothing) As Usuario
-        Try
-            Dim usuario As Usuario = Nothing
-            Dim query As String = ConsultaUsuarios & "WHERE u.id_usuario = @id"
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        If dr.Read() Then usuario = LeerUsuario(dr)
+    Public Function ObtenerUsuario(idUsuario As Integer) As Usuario
+        Return AuditoriaDAO.Consultar("Usuario", "BUSQUEDA", $"Consultar usuario | ID={idUsuario}",
+            Function()
+                Try
+                    Dim query As String = ConsultaUsuarios & "WHERE u.id_usuario = @id"
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                If dr.Read() Then Return LeerUsuario(dr)
+                            End Using
+                        End Using
                     End Using
-                    BitacoraMantenimientoDAO.Registrar(cmd, bitacora)
-                End Using
-            End Using
-            Return usuario
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.ObtenerUsuario")
-        End Try
+                    Return Nothing
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ObtenerUsuario")
+                End Try
+            End Function)
     End Function
 
-    Public Function ListarRoles(Optional bitacora As IContextoBitacora = Nothing) As List(Of RolUsuario)
-        Try
-            Dim lista As New List(Of RolUsuario)()
-            Dim query As String = "SELECT id_rol_usuario, nombre_rol_usuario FROM RolUsuario " &
-                "WHERE UPPER(LTRIM(RTRIM(nombre_rol_usuario))) IN ('ADMINISTRADOR','BIBLIOTECARIO','ESTUDIANTE','LECTOR') ORDER BY nombre_rol_usuario"
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Using cmd As New SqlCommand(query, cn)
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            lista.Add(New RolUsuario With {.IdRolUsuario = CInt(dr("id_rol_usuario")), .NombreRolUsuario = CStr(dr("nombre_rol_usuario"))})
-                        End While
+    Public Function ListarRoles() As List(Of RolUsuario)
+        Return AuditoriaDAO.Consultar("Usuario", "LISTADO", "Listar roles",
+            Function()
+                Try
+                    Dim lista As New List(Of RolUsuario)()
+                    Dim query As String = "SELECT id_rol_usuario, nombre_rol_usuario FROM RolUsuario " &
+                        "WHERE UPPER(LTRIM(RTRIM(nombre_rol_usuario))) IN ('ADMINISTRADOR','BIBLIOTECARIO','ESTUDIANTE','LECTOR') ORDER BY nombre_rol_usuario"
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    lista.Add(New RolUsuario With {.IdRolUsuario = CInt(dr("id_rol_usuario")), .NombreRolUsuario = CStr(dr("nombre_rol_usuario"))})
+                                End While
+                            End Using
+                        End Using
                     End Using
-                    BitacoraMantenimientoDAO.Registrar(cmd, bitacora)
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "usuarioDAO.ListarRoles")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ListarRoles")
+                End Try
+            End Function)
     End Function
 
-    Public Function CrearUsuario(usuario As Usuario, idAdministrador As Integer, claveHash As String, respuestaHash As String, reglas As IReglasUsuario,
-                                 Optional bitacora As IContextoBitacora = Nothing) As Boolean
+    Public Function CrearUsuario(usuario As Usuario, idAdministrador As Integer, claveHash As String, respuestaHash As String, reglas As IReglasUsuario) As Boolean
         Try
             Dim query As String = "INSERT INTO Usuario (email_usuario,nombre_usuario,ap_paterno,ap_materno,numero_dni_usuario," &
                 "fecha_nacimiento_usuario,genero_usuario,estado_usuario,contrasena,id_rol_usuario,preguntasegura,rptasegura) " &
@@ -357,8 +392,8 @@ Public Class usuarioDAO
                         cmd.Parameters.Add("@pregunta", SqlDbType.VarChar, 255).Value = usuario.PreguntaSegura.Trim()
                         cmd.Parameters.Add("@respuesta", SqlDbType.VarChar, 255).Value = respuestaHash
                         If cmd.ExecuteNonQuery() <> 1 Then Return False
-                        BitacoraMantenimientoDAO.Registrar(cmd, bitacora)
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idAdministrador, "Usuario", "INSERT", "Crear usuario desde administración")
                     tx.Commit()
                     Return True
                 End Using
@@ -368,8 +403,7 @@ Public Class usuarioDAO
         End Try
     End Function
 
-    Public Function ActualizarUsuario(usuario As Usuario, idAdministrador As Integer, reglas As IReglasUsuario,
-                                      Optional bitacora As IContextoBitacora = Nothing) As Boolean
+    Public Function ActualizarUsuario(usuario As Usuario, idAdministrador As Integer, reglas As IReglasUsuario) As Boolean
         Try
             Dim query As String = "UPDATE Usuario SET email_usuario=@email,nombre_usuario=@nombre,ap_paterno=@paterno,ap_materno=@materno," &
                 "numero_dni_usuario=@dni,fecha_nacimiento_usuario=@fecha,genero_usuario=@genero,estado_usuario=@estado,id_rol_usuario=@rol WHERE id_usuario=@id"
@@ -382,8 +416,8 @@ Public Class usuarioDAO
                         AgregarDatosUsuario(cmd, usuario)
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = usuario.IdUsuario
                         If cmd.ExecuteNonQuery() <> 1 Then Return False
-                        BitacoraMantenimientoDAO.Registrar(cmd, bitacora)
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idAdministrador, "Usuario", "UPDATE", $"Actualizar cuenta | usuario={usuario.IdUsuario}")
                     tx.Commit()
                     Return True
                 End Using
@@ -393,8 +427,7 @@ Public Class usuarioDAO
         End Try
     End Function
 
-    Public Function CambiarEstadoUsuario(idUsuario As Integer, estado As String, idAdministrador As Integer, reglas As IReglasUsuario,
-                                         Optional bitacora As IContextoBitacora = Nothing) As Boolean
+    Public Function CambiarEstadoUsuario(idUsuario As Integer, estado As String, idAdministrador As Integer, reglas As IReglasUsuario) As Boolean
         Try
             Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
                 Using tx As SqlTransaction = cn.BeginTransaction(IsolationLevel.Serializable)
@@ -415,8 +448,8 @@ Public Class usuarioDAO
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = idUsuario
                         cmd.Parameters.Add("@estado", SqlDbType.VarChar, 30).Value = estado
                         If cmd.ExecuteNonQuery() <> 1 Then Return False
-                        BitacoraMantenimientoDAO.Registrar(cmd, bitacora)
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idAdministrador, "Usuario", "UPDATE", $"Cambiar estado de cuenta | usuario={idUsuario}; estado={estado}")
                     tx.Commit()
                     Return True
                 End Using
@@ -424,6 +457,72 @@ Public Class usuarioDAO
         Catch ex As SqlException
             Throw ErroresDAO.Traducir(ex, "usuarioDAO.CambiarEstadoUsuario")
         End Try
+    End Function
+
+    Private Const FiltroLectorPendiente As String = "UPPER(LTRIM(RTRIM(u.estado_usuario)))='INACTIVO' " &
+        "AND UPPER(LTRIM(RTRIM(r.nombre_rol_usuario))) IN ('ESTUDIANTE','LECTOR') " &
+        "AND NOT EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_usuario=u.id_usuario) " &
+        "AND NOT EXISTS (SELECT 1 FROM SolicitudPrestamo s WHERE s.id_usuario=u.id_usuario)"
+
+    Public Function ListarLectoresPendientes(texto As String) As List(Of Usuario)
+        Return AuditoriaDAO.Consultar("Usuario", If(texto.Length = 0, "LISTADO", "BUSQUEDA"), "Consultar lectores pendientes",
+            Function()
+                Try
+                    Dim lista As New List(Of Usuario)()
+                    Dim query As String = ConsultaUsuarios & "WHERE " & FiltroLectorPendiente & " " &
+                        "AND (u.nombre_usuario + ' ' + u.ap_paterno + ' ' + u.ap_materno LIKE @texto OR u.email_usuario LIKE @texto OR u.numero_dni_usuario LIKE @texto) " &
+                        "ORDER BY u.id_usuario"
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@texto", SqlDbType.VarChar, -1).Value = "%" & texto.Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]") & "%"
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    lista.Add(LeerUsuario(dr))
+                                End While
+                            End Using
+                        End Using
+                    End Using
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "usuarioDAO.ListarLectoresPendientes")
+                End Try
+            End Function)
+    End Function
+
+    Public Function AprobarLector(idLector As Integer, idAdministrador As Integer, reglas As IReglasUsuario) As Boolean
+        Try
+            Dim query As String = "UPDATE u SET estado_usuario='Activo' FROM Usuario u " &
+                "INNER JOIN RolUsuario r ON r.id_rol_usuario=u.id_rol_usuario WHERE u.id_usuario=@id AND " & FiltroLectorPendiente
+            Return ResolverLectorPendiente(query, idLector, idAdministrador, reglas, True)
+        Catch ex As SqlException
+            Throw ErroresDAO.Traducir(ex, "usuarioDAO.AprobarLector")
+        End Try
+    End Function
+
+    Public Function RechazarLector(idLector As Integer, idAdministrador As Integer, reglas As IReglasUsuario) As Boolean
+        Try
+            Dim query As String = "DELETE u FROM Usuario u " &
+                "INNER JOIN RolUsuario r ON r.id_rol_usuario=u.id_rol_usuario WHERE u.id_usuario=@id AND " & FiltroLectorPendiente
+            Return ResolverLectorPendiente(query, idLector, idAdministrador, reglas, False)
+        Catch ex As SqlException
+            Throw ErroresDAO.Traducir(ex, "usuarioDAO.RechazarLector")
+        End Try
+    End Function
+
+    Private Shared Function ResolverLectorPendiente(query As String, idLector As Integer, idAdministrador As Integer, reglas As IReglasUsuario, aprobar As Boolean) As Boolean
+        Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+            Using tx As SqlTransaction = cn.BeginTransaction(IsolationLevel.Serializable)
+                BloquearAdministracion(cn, tx)
+                reglas.ValidarAdministrador(DisponibilidadReserva.LeerUsuario(cn, tx, idAdministrador, True))
+                Using cmd As New SqlCommand(query, cn, tx)
+                    cmd.Parameters.Add("@id", SqlDbType.Int).Value = idLector
+                    If cmd.ExecuteNonQuery() <> 1 Then Return False
+                End Using
+                AuditoriaDAO.Registrar(cn, tx, idAdministrador, "Usuario", If(aprobar, "UPDATE", "DELETE"), $"{If(aprobar, "Aprobar", "Rechazar")} lector pendiente | usuario={idLector}")
+                tx.Commit()
+                Return True
+            End Using
+        End Using
     End Function
 
     Private Const ConsultaUsuarios As String = "SELECT u.id_usuario,u.email_usuario,u.nombre_usuario,u.ap_paterno,u.ap_materno," &

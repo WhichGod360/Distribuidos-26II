@@ -76,7 +76,7 @@ Public Class frmEntregaSolicitud
         Dim entregado = False
         Try
             Dim ids = Await Task.Run(Function() New solicitudPrestamoNegocio().entregar(solicitud.IdSolicitud, copias))
-            MessageBox.Show(ids.Count & " libro(s) entregado(s). Préstamos: " & String.Join(", ", ids) & ". El plazo comienza hoy.", "Entrega registrada", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Préstamo N.º " & ids(0) & " registrado con " & ids.Count & " ejemplar(es). El plazo comienza hoy.", "Entrega registrada", MessageBoxButtons.OK, MessageBoxIcon.Information)
             entregado = True
         Catch ex As Exception
             MessageBox.Show(ex.Message, "No se pudo entregar", MessageBoxButtons.OK, MessageBoxIcon.Warning)

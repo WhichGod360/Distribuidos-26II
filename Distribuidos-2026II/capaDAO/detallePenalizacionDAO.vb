@@ -48,75 +48,84 @@ Public Class detallePenalizacionDAO
 
     ' idPenalizacion = 0 devuelve los detalles de todas las sanciones
     Public Function listar(idPenalizacion As Integer, Optional idPrestamo As Integer = 0) As List(Of DetallePenalizacion)
-        Try
-            Dim lista As New List(Of DetallePenalizacion)()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                EsquemaPago.ExigirColumna(cn)
-                Dim query As String = SELECT_DETALLE &
-                    " WHERE (@idPen = 0 OR dp.id_penalizacion = @idPen) AND (@prestamo=0 OR dp.id_prestamo=@prestamo) ORDER BY dp.id_detalle_penalizacion DESC"
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@idPen", SqlDbType.Int).Value = idPenalizacion
-                    cmd.Parameters.Add("@prestamo", SqlDbType.Int).Value = idPrestamo
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            lista.Add(mapear(dr))
-                        End While
+        Return AuditoriaDAO.Consultar("DetallePenalizacion", "LISTADO", $"Listar cargos | tipo={idPenalizacion}; préstamo={idPrestamo}",
+            Function()
+                Try
+                    Dim lista As New List(Of DetallePenalizacion)()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        EsquemaPago.ExigirColumna(cn)
+                        Dim query As String = SELECT_DETALLE &
+                            " WHERE (@idPen = 0 OR dp.id_penalizacion = @idPen) AND (@prestamo=0 OR dp.id_prestamo=@prestamo) ORDER BY dp.id_detalle_penalizacion DESC"
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@idPen", SqlDbType.Int).Value = idPenalizacion
+                            cmd.Parameters.Add("@prestamo", SqlDbType.Int).Value = idPrestamo
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    lista.Add(mapear(dr))
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "detallePenalizacionDAO.listar")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "detallePenalizacionDAO.listar")
+                End Try
+            End Function)
     End Function
 
     Public Function ListarPorLector(idLector As Integer) As List(Of DetallePenalizacion)
-        Try
-            Dim lista As New List(Of DetallePenalizacion)()
-            Dim query As String = SELECT_DETALLE & " WHERE pr.id_usuario=@lector ORDER BY dp.id_detalle_penalizacion DESC"
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                EsquemaPago.ExigirColumna(cn)
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            lista.Add(mapear(dr))
-                        End While
+        Return AuditoriaDAO.Consultar("DetallePenalizacion", "SELECT", $"Consultar cargos | lector={idLector}",
+            Function()
+                Try
+                    Dim lista As New List(Of DetallePenalizacion)()
+                    Dim query As String = SELECT_DETALLE & " WHERE pr.id_usuario=@lector ORDER BY dp.id_detalle_penalizacion DESC"
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        EsquemaPago.ExigirColumna(cn)
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    lista.Add(mapear(dr))
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "detallePenalizacionDAO.ListarPorLector")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "detallePenalizacionDAO.ListarPorLector")
+                End Try
+            End Function)
     End Function
 
     Public Function listarPrestamos() As List(Of PrestamoResumen)
-        Try
-            Dim lista As New List(Of PrestamoResumen)()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                Dim query As String = "SELECT pr.id_prestamo, " & NOMBRE_USUARIO_SQL & ", l.titulo_libro " &
-                    "FROM Prestamo pr " &
-                    "INNER JOIN Usuario u ON u.id_usuario = pr.id_usuario " &
-                    "INNER JOIN Ejemplar e ON e.id_ejemplar = pr.id_ejemplar " &
-                    "INNER JOIN Libro l ON l.id_libro = e.id_libro " &
-                    "ORDER BY pr.id_prestamo DESC"
-                Using cmd As New SqlCommand(query, cn)
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            lista.Add(New PrestamoResumen() With {
-                                .IdPrestamo = dr.GetInt32(dr.GetOrdinal("id_prestamo")),
-                                .NombreUsuario = dr.GetString(dr.GetOrdinal("nombre_usuario")),
-                                .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro"))
-                            })
-                        End While
+        Return AuditoriaDAO.Consultar("DetallePenalizacion", "LISTADO", "Listar préstamos para penalizaciones",
+            Function()
+                Try
+                    Dim lista As New List(Of PrestamoResumen)()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        Dim query As String = "SELECT pr.id_prestamo, " & NOMBRE_USUARIO_SQL & ", l.titulo_libro " &
+                            "FROM Prestamo pr " &
+                            "INNER JOIN Usuario u ON u.id_usuario = pr.id_usuario " &
+                            "INNER JOIN Ejemplar e ON e.id_ejemplar = pr.id_ejemplar " &
+                            "INNER JOIN Libro l ON l.id_libro = e.id_libro " &
+                            "ORDER BY pr.id_prestamo DESC"
+                        Using cmd As New SqlCommand(query, cn)
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    lista.Add(New PrestamoResumen() With {
+                                        .IdPrestamo = dr.GetInt32(dr.GetOrdinal("id_prestamo")),
+                                        .NombreUsuario = dr.GetString(dr.GetOrdinal("nombre_usuario")),
+                                        .TituloLibro = dr.GetString(dr.GetOrdinal("titulo_libro"))
+                                    })
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "detallePenalizacionDAO.listarPrestamos")
-        End Try
+                    Return lista
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "detallePenalizacionDAO.listarPrestamos")
+                End Try
+            End Function)
     End Function
 
     Public Function agregarDetalle(descripcion As String, idPenalizacion As Integer, idPrestamo As Integer, idOperador As Integer, reglas As IReglasPenalizacion, Optional estadoPago As String = DetallePenalizacion.PagoPendiente) As Boolean
@@ -161,6 +170,7 @@ Public Class detallePenalizacionDAO
                         penalizacionDAO.AgregarMonto(cmd, "@monto", tipo.MontoPenalizacion)
                         cmd.ExecuteNonQuery()
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "DetallePenalizacion", "INSERT", $"Registrar cargo | préstamo={idPrestamo}; tipo={idPenalizacion}")
                     tx.Commit()
                     Return True
                 End Using
@@ -184,6 +194,7 @@ Public Class detallePenalizacionDAO
                         cmd.Parameters.Add("@prestamo", SqlDbType.Int).Value = idPrestamo
                         If cmd.ExecuteNonQuery() <> 1 Then Throw New InvalidOperationException("El cargo no existe o intentas cambiar su préstamo/tipo. Solo se editan el motivo y el pago.")
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "DetallePenalizacion", "UPDATE", $"Actualizar cargo | ID={idDetalle}; pago={estadoPago}")
                     tx.Commit()
                     Return True
                 End Using

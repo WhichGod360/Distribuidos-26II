@@ -19,17 +19,32 @@ Public Class Conexion
         "data source=somee_distribuidos-II.mssql.somee.com;" &
         "persist security info=False;" &
         "initial catalog=somee_distribuidos-II;" &
-        "TrustServerCertificate=True;" &
-        "language=spanish"
+        "TrustServerCertificate=True;"
 
     Private Sub New()
         ' Conexión activa: SQL Server remoto de Somee.
         ' o comentas una o comentas otra según donde quieras conectarte.
 
-        cadenaConexion = CadenaSomee
+        Dim configurada = Environment.GetEnvironmentVariable("BIBLIOTECA_CONNECTION_STRING")
+        If String.IsNullOrWhiteSpace(configurada) Then
+            Dim archivo = Environment.GetEnvironmentVariable("BIBLIOTECA_CONNECTION_FILE")
+            If Not String.IsNullOrWhiteSpace(archivo) AndAlso System.IO.File.Exists(archivo) Then
+                configurada = System.IO.File.ReadAllText(archivo).Trim()
+            End If
+        End If
+        cadenaConexion = If(String.IsNullOrWhiteSpace(configurada), CadenaSomee, configurada)
 
         ' cadenaConexion = "Data Source=.\SQLEXPRESS01;Initial Catalog=distribuidos-II;Integrated Security=SSPI;TrustServerCertificate=True;"
     End Sub
+
+    Public Function AdmitePagoDemo() As Boolean
+        If Environment.GetEnvironmentVariable("BIBLIOTECA_PAGO_DEMO") <> "1" Then Return False
+        Dim configuracion As New SqlConnectionStringBuilder(cadenaConexion)
+        Return configuracion.IntegratedSecurity AndAlso
+            String.Equals(configuracion.DataSource, "(localdb)\MSSQLLocalDB", StringComparison.OrdinalIgnoreCase) AndAlso
+            (String.Equals(configuracion.InitialCatalog, "LecturaePruebas", StringComparison.OrdinalIgnoreCase) OrElse
+             configuracion.InitialCatalog.StartsWith("LecturaePruebas_", StringComparison.OrdinalIgnoreCase))
+    End Function
 
     ' Cada operación concurrente debe ser dueña de su conexión y transacción.
     Public Function CrearConexionIndependiente() As SqlConnection

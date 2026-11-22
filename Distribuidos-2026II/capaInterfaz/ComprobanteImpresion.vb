@@ -1,4 +1,3 @@
-Imports System.Drawing.Printing
 Imports capaDatos
 
 ' Presentación e impresión nativas de WinForms. Los importes vienen de negocio.
@@ -73,56 +72,4 @@ Public Class ComprobanteImpresion
         End Using
     End Sub
 
-    Private Class VistaComprobante
-        Inherits Form
-
-        Private ReadOnly comprobante As ComprobanteBiblioteca
-        Private WithEvents documento As New PrintDocument()
-        Private WithEvents imprimir As New Button With {
-            .Text = "Elegir impresora e imprimir", .Dock = DockStyle.Top, .Height = 42}
-        Private posicion As Integer
-        Private pagina As Integer
-        Private lineas As List(Of String)
-
-        Public Sub New(datos As ComprobanteBiblioteca)
-            comprobante = datos
-            documento.DocumentName = "Biblioteca - " & comprobante.Referencia
-            documento.DefaultPageSettings.Margins = New Margins(60, 60, 60, 60)
-            Text = "Comprobante de " & comprobante.Tipo.ToLowerInvariant()
-            Size = New Size(950, 740)
-            StartPosition = FormStartPosition.CenterParent
-            Dim vista As New PrintPreviewControl With {.Dock = DockStyle.Fill, .Document = documento, .AutoZoom = True}
-            Controls.Add(vista)
-            Controls.Add(imprimir)
-        End Sub
-
-        Private Sub documento_BeginPrint(sender As Object, e As PrintEventArgs) Handles documento.BeginPrint
-            posicion = 0
-            pagina = 0
-            lineas = Texto(comprobante)
-        End Sub
-
-        Private Sub documento_PrintPage(sender As Object, e As PrintPageEventArgs) Handles documento.PrintPage
-            pagina += 1
-            e.HasMorePages = DibujarPagina(e.Graphics, e.MarginBounds, lineas, posicion, pagina)
-        End Sub
-
-        Private Sub imprimir_Click(sender As Object, e As EventArgs) Handles imprimir.Click
-            Try
-                Using dialogo As New PrintDialog With {.Document = documento, .UseEXDialog = True, .AllowSomePages = False}
-                    If dialogo.ShowDialog(Me) = DialogResult.OK Then documento.Print()
-                End Using
-            Catch ex As Exception
-                MessageBox.Show(ex.Message, "Impresión", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-            End Try
-        End Sub
-
-        Protected Overrides Sub Dispose(disposing As Boolean)
-            Try
-                MyBase.Dispose(disposing)
-            Finally
-                If disposing Then documento.Dispose()
-            End Try
-        End Sub
-    End Class
 End Class

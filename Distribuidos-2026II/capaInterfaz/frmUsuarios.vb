@@ -7,10 +7,22 @@ Public Class frmUsuarios
 
     Private ReadOnly negocio As New usuarioNegocio()
     Private cargando As Boolean
+    Private ReadOnly btnPendientes As New Button With {.Text = "Lectores pendientes", .Width = 178, .Height = 36}
+    Private ReadOnly btnAprobar As New Button With {.Text = "Aprobar", .Width = 100, .Height = 36}
+    Private ReadOnly btnRechazar As New Button With {.Text = "Rechazar", .Width = 105, .Height = 36}
+    Private mostrandoPendientes As Boolean
     Public Event DatosCambiados As EventHandler
 
     Public Sub New()
         InitializeComponent()
+        barraAcciones.Controls.AddRange({btnPendientes, btnAprobar, btnRechazar})
+        For Each boton In {btnPendientes, btnAprobar, btnRechazar}
+            MantenimientoUI.EstilizarBoton(boton)
+        Next
+        AddHandler btnPendientes.Click, AddressOf CambiarVista
+        AddHandler btnAprobar.Click, Sub() ResolverPendiente(True)
+        AddHandler btnRechazar.Click, Sub() ResolverPendiente(False)
+        ConfigurarVista()
     End Sub
 
     Private Sub Cargar(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -38,16 +50,52 @@ Public Class frmUsuarios
         Try
             Dim rol As Integer = If(cboRol.SelectedValue Is Nothing, 0, CInt(cboRol.SelectedValue))
             Dim estado As String = If(TryCast(cboEstado.SelectedItem, String), "Todos")
-            Dim lista As List(Of Usuario) = negocio.ListarUsuarios(txtBuscar.Text, rol, estado)
+            Dim lista = If(mostrandoPendientes, negocio.ListarLectoresPendientes(txtBuscar.Text), negocio.ListarUsuarios(txtBuscar.Text, rol, estado))
             tablaUsuarios.DataSource = lista
             tablaUsuarios.ClearSelection()
             lblResumen.Text = $"{lista.Count} usuario(s) · Solo el administrador puede crear cuentas y modificar roles o estados."
+            If mostrandoPendientes Then lblResumen.Text = $"{lista.Count} lector(es) pendientes de aprobación."
             ActualizarSeleccion()
         Catch ex As Exception
             tablaUsuarios.DataSource = Nothing
             ActualizarSeleccion()
             lblResumen.Text = "No se pudo actualizar el listado."
             MessageBox.Show(ex.Message, "Usuarios", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
+    End Sub
+
+    Private Sub CambiarVista(sender As Object, e As EventArgs)
+        mostrandoPendientes = Not mostrandoPendientes
+        ConfigurarVista()
+        ActualizarDatos()
+    End Sub
+
+    Private Sub ConfigurarVista()
+        btnPendientes.Text = If(mostrandoPendientes, "Volver a usuarios", "Lectores pendientes")
+        btnAgregar.Visible = Not mostrandoPendientes
+        btnEditar.Visible = Not mostrandoPendientes
+        btnEstado.Visible = Not mostrandoPendientes
+        cboRol.Enabled = Not mostrandoPendientes
+        cboEstado.Enabled = Not mostrandoPendientes
+        btnAprobar.Visible = mostrandoPendientes
+        btnRechazar.Visible = mostrandoPendientes
+    End Sub
+
+    Private Sub ResolverPendiente(aprobar As Boolean)
+        Dim usuario = Seleccionado()
+        If Not mostrandoPendientes OrElse usuario Is Nothing Then Return
+        If Not aprobar AndAlso MessageBox.Show($"¿Rechazar la solicitud de {usuario.NombreCompleto}? Su cuenta pendiente se eliminará.",
+                "Lectores pendientes", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) <> DialogResult.Yes Then Return
+        Try
+            If aprobar Then
+                negocio.AprobarLector(usuario.IdUsuario)
+            Else
+                negocio.RechazarLector(usuario.IdUsuario)
+            End If
+            ActualizarDatos()
+            RaiseEvent DatosCambiados(Me, EventArgs.Empty)
+        Catch ex As Exception
+            MessageBox.Show(ex.Message, "Lectores pendientes", MessageBoxButtons.OK, MessageBoxIcon.Warning)
         End Try
     End Sub
 
@@ -58,6 +106,8 @@ Public Class frmUsuarios
 
     Private Sub ActualizarSeleccion()
         Dim usuario As Usuario = Seleccionado()
+        btnAprobar.Enabled = mostrandoPendientes AndAlso usuario IsNot Nothing
+        btnRechazar.Enabled = mostrandoPendientes AndAlso usuario IsNot Nothing
         btnEditar.Enabled = usuario IsNot Nothing
         btnEstado.Enabled = usuario IsNot Nothing
         btnEstado.Text = If(usuario IsNot Nothing AndAlso String.Equals(usuario.EstadoUsuario.Trim(), "Activo", StringComparison.OrdinalIgnoreCase), "Desactivar", "Activar")
@@ -125,6 +175,6 @@ Public Class frmUsuarios
     End Sub
 
     Private Sub tablaUsuarios_CellDoubleClick(sender As Object, e As DataGridViewCellEventArgs) Handles tablaUsuarios.CellDoubleClick
-        If e.RowIndex >= 0 Then AbrirEditor(Seleccionado())
+        If e.RowIndex >= 0 AndAlso Not mostrandoPendientes Then AbrirEditor(Seleccionado())
     End Sub
 End Class

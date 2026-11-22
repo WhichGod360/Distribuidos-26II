@@ -45,8 +45,8 @@ Public Class ejemplarNegocio
     Public Function agregar(idLibro As Integer) As Boolean
         Try
             If idLibro <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idLibro))
-            seguridadNegocio.ExigirPersonal()
-            Return dao.agregar(idLibro, reglas)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.agregar(idLibro, reglas, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -58,8 +58,8 @@ Public Class ejemplarNegocio
         Try
             If idLibro <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idLibro))
             If idEjemplar <= 0 Then Throw New ArgumentOutOfRangeException(NameOf(idEjemplar))
-            seguridadNegocio.ExigirPersonal()
-            Return dao.cambiarEstado(idLibro, idEjemplar, activo, reglas)
+            Dim operador = seguridadNegocio.ExigirPersonal()
+            Return dao.cambiarEstado(idLibro, idEjemplar, activo, reglas, operador)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception

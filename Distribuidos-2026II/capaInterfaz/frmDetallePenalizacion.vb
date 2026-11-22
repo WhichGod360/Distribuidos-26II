@@ -18,7 +18,23 @@ Public Class frmDetallePenalizacion
 
     Public Sub New(idPenalizacion As Integer)
         InitializeComponent()
+        cboEstadoPago.DisplayMember = "Value"
+        cboEstadoPago.ValueMember = "Key"
+        cboEstadoPago.DataSource = New KeyValuePair(Of String, String)() {
+            New KeyValuePair(Of String, String)("", "Todos"),
+            New KeyValuePair(Of String, String)(DetallePenalizacion.PagoPendiente, "Pendiente"),
+            New KeyValuePair(Of String, String)(DetallePenalizacion.PagoPorRevisar, "Por revisar"),
+            New KeyValuePair(Of String, String)(DetallePenalizacion.PagoPagada, "Pagada")}
         idPenalizacionInicial = idPenalizacion
+        If idPenalizacionInicial = 0 Then
+            Text = "Cargos y pagos"
+            lblTituloVista.Text = Text
+            btnVolver.Visible = False
+        End If
+        MantenimientoUI.EstilizarBoton(btnRevisarYape)
+        MantenimientoUI.EstilizarBoton(btnActualizarCargos)
+        AddHandler btnRevisarYape.Click, AddressOf AbrirRevisionYape
+        AddHandler btnActualizarCargos.Click, Sub() ActualizarDatos()
         For Each columna As DataGridViewColumn In DataGridView1.Columns
             columna.MinimumWidth = If(columna.Name = "colDescripcion", 190, 100)
         Next
@@ -62,8 +78,10 @@ Public Class frmDetallePenalizacion
     Private Sub Filtrar()
         If cargando Then Return
         Dim texto = buscar.Text.Trim()
+        Dim estado = If(TryCast(cboEstadoPago.SelectedValue, String), "")
         DataGridView1.Rows.Clear()
         For Each d In listaActual
+            If estado.Length > 0 AndAlso d.EstadoPago <> estado Then Continue For
             If texto <> "" AndAlso (d.NombreUsuario & " " & d.TituloLibro & " " & d.DescripcionDetallePenalizacion & " " & d.IdPrestamo & " " & d.EstadoPagoTexto).IndexOf(texto, StringComparison.OrdinalIgnoreCase) < 0 Then Continue For
             DataGridView1.Rows.Add(d.IdDetallePenalizacion, d.TipoPenalizacion, "S/ " & d.MontoPenalizacion.ToString("N2"),
                 d.IdPrestamo, d.NombreUsuario, d.TituloLibro, d.FechaInicio.ToString("dd/MM/yyyy"), d.FechaFin.ToString("dd/MM/yyyy"),
@@ -82,6 +100,10 @@ Public Class frmDetallePenalizacion
 
     Private Sub cboFiltroSancion_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboFiltroSancion.SelectedIndexChanged
         ActualizarDatos()
+    End Sub
+
+    Private Sub cboEstadoPago_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cboEstadoPago.SelectedIndexChanged
+        Filtrar()
     End Sub
 
     Private Sub AbrirEditor(detalle As DetallePenalizacion)
@@ -106,6 +128,13 @@ Public Class frmDetallePenalizacion
 
     Private Sub btnEditar_Click(sender As Object, e As EventArgs) Handles btnEditar.Click
         AbrirEditor(Seleccionado())
+    End Sub
+
+    Private Sub AbrirRevisionYape(sender As Object, e As EventArgs)
+        Using revision As New frmPagosYape()
+            MantenimientoUI.MostrarDialogo(revision, Me)
+        End Using
+        ActualizarDatos()
     End Sub
 
     Private Sub btnVolver_Click(sender As Object, e As EventArgs) Handles btnVolver.Click

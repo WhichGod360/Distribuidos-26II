@@ -5,14 +5,16 @@ Public Class comprobanteNegocio
         Try
             seguridadNegocio.ExigirPersonal()
             If id <= 0 Then Throw New ArgumentException("Selecciona un préstamo.")
-            Dim prestamo = New prestamoDAO().listar("Todos", "", Date.Today, 0, id).FirstOrDefault()
-            If prestamo Is Nothing Then Throw New InvalidOperationException("El préstamo no existe.")
-            If devolucion AndAlso Not prestamo.FechaRetorno.HasValue Then Throw New InvalidOperationException("Confirma primero la devolución.")
+            Dim prestamos = New prestamoDAO().listar("Todos", "", Date.Today, 0, id, False)
+            If prestamos.Count = 0 Then Throw New InvalidOperationException("El préstamo no existe.")
+            If devolucion AndAlso prestamos.Any(Function(p) Not p.FechaRetorno.HasValue) Then Throw New InvalidOperationException("Confirma primero la devolución.")
+            Dim principal = prestamos.OrderBy(Function(p) p.IdPrestamo).First()
             Dim comprobante As New ComprobanteBiblioteca With {
-                .Tipo = If(devolucion, "Devolución", "Entrega"), .Referencia = "Préstamo N.º " & id,
-                .EmitidoPor = SesionUsuario.NombreCompleto, .Prestamos = New List(Of Prestamo) From {prestamo}}
-            If devolucion Then comprobante.Penalizaciones = New detallePenalizacionDAO().listar(0, id)
+                .Tipo = If(devolucion, "Devolución", "Entrega"), .Referencia = "Préstamo N.º " & principal.IdPrestamo,
+                .EmitidoPor = SesionUsuario.NombreCompleto, .Prestamos = prestamos}
+            If devolucion Then comprobante.Penalizaciones = New detallePenalizacionDAO().listar(0, principal.IdPrestamo)
             comprobante.TotalCargos = comprobante.Penalizaciones.Sum(Function(d) d.MontoPenalizacion)
+            AuditoriaDAO.RegistrarEvento(SesionUsuario.IdUsuario, "Comprobante", "SELECT", $"Consultar comprobante de {comprobante.Tipo} | préstamo={principal.IdPrestamo}")
             Return comprobante
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
@@ -30,9 +32,10 @@ Public Class comprobanteNegocio
             Dim prestamos As New List(Of Prestamo)
             Dim dao As New prestamoDAO
             For Each prestamo In ids
-                prestamos.AddRange(dao.listar("Todos", "", Date.Today, 0, prestamo))
+                prestamos.AddRange(dao.listar("Todos", "", Date.Today, 0, prestamo, False).Where(Function(p) p.IdPrestamo = prestamo))
             Next
             If prestamos.Count <> ids.Count OrElse prestamos.Any(Function(p) p.IdUsuario <> solicitud.IdUsuario) Then Throw New InvalidOperationException("La entrega está incompleta. Revisa sus préstamos.")
+            AuditoriaDAO.RegistrarEvento(SesionUsuario.IdUsuario, "Comprobante", "SELECT", $"Consultar comprobante de entrega | solicitud={id}")
             Return New ComprobanteBiblioteca With {.Tipo = "Entrega", .Referencia = "Solicitud N.º " & id,
                 .EmitidoPor = SesionUsuario.NombreCompleto, .Prestamos = prestamos}
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException

@@ -68,7 +68,7 @@ Public Class bitacoraDAO
                 "AND (@fechaHasta IS NULL OR fechaMan <= @fechaHasta) " &
                 "AND (@idUsuario IS NULL OR idUsuario = @idUsuario) " &
                 "AND (@objeto IS NULL OR objeto = @objeto) " &
-                "AND (@accion IS NULL OR accion = @accion) " &
+                "AND (@accion IS NULL OR accion = @accion OR accion = @accionAnterior) " &
                 "AND (@despuesDeId IS NULL OR idMan > @despuesDeId) " &
                 "ORDER BY idMan DESC"
 
@@ -84,6 +84,7 @@ Public Class bitacoraDAO
                         If(objeto Is Nothing, DBNull.Value, CObj(objeto))
                     cmd.Parameters.Add("@accion", SqlDbType.VarChar, 15).Value =
                         If(accion Is Nothing, DBNull.Value, CObj(accion))
+                    cmd.Parameters.Add("@accionAnterior", SqlDbType.VarChar, 15).Value = CObj(CodigoAnterior(accion))
                     cmd.Parameters.Add("@despuesDeId", SqlDbType.Int).Value =
                         If(despuesDeId.HasValue, CObj(despuesDeId.Value), DBNull.Value)
 
@@ -120,6 +121,21 @@ Public Class bitacoraDAO
         End Try
     End Function
 
+    Private Shared ReadOnly Acciones As String() = {"INSERT", "UPDATE", "DELETE", "SELECT", "BUSQUEDA", "LISTADO"}
+
+    Private Shared Function CodigoAnterior(accion As String) As String
+        Dim indice = Array.IndexOf(Acciones, accion)
+        Return If(indice < 0, "", (indice + 1).ToString(System.Globalization.CultureInfo.InvariantCulture))
+    End Function
+
+    Private Shared Function AccionVisible(accion As String) As String
+        Dim codigo As Integer
+        If Integer.TryParse(accion, codigo) AndAlso codigo >= 1 AndAlso codigo <= Acciones.Length Then
+            Return Acciones(codigo - 1)
+        End If
+        Return accion
+    End Function
+
     Private Shared Function Leer(dr As SqlDataReader) As Bitacora
         Return New Bitacora With {
             .IdMan = dr.GetInt32(dr.GetOrdinal("idMan")),
@@ -127,7 +143,7 @@ Public Class bitacoraDAO
             .HoraMan = dr.GetString(dr.GetOrdinal("horaMan")),
             .IdUsuario = dr.GetInt32(dr.GetOrdinal("idUsuario")),
             .Objeto = dr.GetString(dr.GetOrdinal("objeto")),
-            .Accion = dr.GetString(dr.GetOrdinal("accion")),
+            .Accion = AccionVisible(dr.GetString(dr.GetOrdinal("accion"))),
             .CadenaMan = If(dr.IsDBNull(dr.GetOrdinal("cadenaMan")), Nothing, dr.GetString(dr.GetOrdinal("cadenaMan")))
         }
     End Function

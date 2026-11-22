@@ -10,6 +10,7 @@ Public Class frmLector
     Private penalizaciones As New ResumenPenalizaciones()
     Private ReadOnly carrito As New List(Of Libro)()
     Private ReadOnly solicitudes As New solicitudPrestamoNegocio()
+    Private ReadOnly pagos As New pagoYapeNegocio()
     Private ocupado As Boolean
     Private datosDisponibles As Boolean
     Private actualizandoCatalogo As Boolean
@@ -32,6 +33,7 @@ Public Class frmLector
             tabla.DefaultCellStyle.WrapMode = DataGridViewTriState.True
             tabla.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells
         Next
+        cboPagoPenalizaciones.SelectedIndex = 0
     End Sub
 
     Private Async Sub Cargar(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -79,7 +81,7 @@ Public Class frmLector
                 .RecojoHasta = s.LimiteLocal.ToString("dd/MM/yyyy HH:mm"),
                 .AprobadaPor = s.NombreAprobador}).ToList()
             tablaPrestamos.DataSource = prestamos.Select(Function(p) New With {
-                .Prestamo = p.IdPrestamo, .Libro = p.TituloLibro, .Ejemplar = p.IdEjemplar,
+                .Prestamo = p.IdPrestamo, .Libro = p.TituloLibro, .Ejemplar = p.Ejemplares,
                 .Inicio = p.FechaInicio.ToString("dd/MM/yyyy"), .Vencimiento = p.FechaFin.ToString("dd/MM/yyyy"),
                 .Devolucion = If(p.FechaRetorno.HasValue, p.FechaRetorno.Value.ToString("dd/MM/yyyy"), "Pendiente"),
                 .Estado = prestamoNegocio.EstadoParaMostrar(p, Date.Today)}).ToList()
@@ -328,10 +330,13 @@ Public Class frmLector
         Dim estado As String = If(filtro = "Por revisar", DetallePenalizacion.PagoPorRevisar, filtro)
         Dim detalles = penalizaciones.Detalles.Where(Function(d) estado = "Todos" OrElse d.EstadoPago = estado).ToList()
         tablaPenalizaciones.DataSource = detalles.Select(Function(d) New With {
+            .IdDetalle = d.IdDetallePenalizacion,
             .Prestamo = d.IdPrestamo, .Libro = d.TituloLibro, .Tipo = d.TipoPenalizacion,
             .Motivo = d.Motivo, .Importe = d.MontoPenalizacion, .Estado = d.EstadoPagoTexto,
             .DiasRetraso = d.DiasRetraso}).ToList()
         If tablaPenalizaciones.Columns.Contains("Importe") Then
+            tablaPenalizaciones.Columns("IdDetalle").Visible = False
+            columnaVerPago.DisplayIndex = tablaPenalizaciones.Columns.Count - 1
             tablaPenalizaciones.Columns("Importe").DefaultCellStyle.Format = "'S/ '0.00"
             tablaPenalizaciones.Columns("Importe").FillWeight = 65
             tablaPenalizaciones.Columns("Motivo").FillWeight = 200
@@ -350,7 +355,25 @@ Public Class frmLector
         lblAvisoPenalizaciones.Text = "Total pendiente o por revisar: S/ " & penalizaciones.TotalPorRegularizar.ToString("0.00") & ". " &
             If(penalizaciones.Detalles.Count = 0, "No tienes penalizaciones registradas.",
             $"{detalles.Count} registro(s) en esta vista; totales de todas tus penalizaciones.") & vbCrLf &
-            If(penalizaciones.BloqueaPrestamos, "Tienes pagos pendientes o por revisar. Regularízalos en ventanilla para solicitar nuevos libros.", "Tus penalizaciones no bloquean nuevos préstamos.")
+            If(penalizaciones.BloqueaPrestamos, "Abre Ver pago para consultar el QR de Yape o revisar el estado de tu reporte.", "Tus penalizaciones no bloquean nuevos préstamos.")
+    End Sub
+
+    Private Async Sub tablaPenalizaciones_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles tablaPenalizaciones.CellContentClick
+        If ocupado OrElse e.RowIndex < 0 OrElse e.ColumnIndex <> columnaVerPago.Index Then Return
+        Dim id = CInt(tablaPenalizaciones.Rows(e.RowIndex).Cells("IdDetalle").Value)
+        Try
+            Dim cargo = pagos.CargoMio(id)
+            Dim historial As DataTable = Nothing
+            If Not pagoYapeNegocio.ModoDemoSolicitado() AndAlso pagos.Disponible() Then
+                historial = pagos.HistorialMio(id)
+            End If
+            Using pago As New frmPagarYape(id, cargo, historial)
+                If MantenimientoUI.MostrarDialogo(pago, Me) <> DialogResult.OK Then Return
+            End Using
+            Await ActualizarAsync()
+        Catch ex As Exception
+            MessageBox.Show(Me, ex.Message, "Pagar penalización", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End Try
     End Sub
 
     Private Async Sub btnActualizarAvisos_Click(sender As Object, e As EventArgs) Handles btnActualizarAvisos.Click

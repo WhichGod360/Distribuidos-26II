@@ -8,11 +8,7 @@ El sistema permite que el lector solicite libros desde su propia interfaz y que 
 
 Relaciones entre usuarios, libros, ejemplares, solicitudes, préstamos y penalizaciones.
 
-<<<<<<< HEAD
-![Diagrama de la base de datos de la biblioteca](./Recursos/diagrama-base-datos.png)
-=======
 ![Diagrama de la base de datos de la biblioteca](Distribuidos-2026II/recursos/diagrama-base-datos.png)
->>>>>>> 36b3fadaa4bc61a9498961a3a8b0098b64b09468
 
 ## Usuarios y funciones
 
@@ -20,7 +16,7 @@ Relaciones entre usuarios, libros, ejemplares, solicitudes, préstamos y penaliz
 | --- | --- |
 | Lector / Estudiante | Consultar el catálogo, formar un carrito, solicitar libros y consultar sus solicitudes, préstamos y penalizaciones. |
 | Bibliotecario | Aprobar o rechazar solicitudes, entregar ejemplares, registrar préstamos y devoluciones, y gestionar libros, autores, categorías, ejemplares y penalizaciones. |
-| Administrador | Realizar las funciones del bibliotecario y gestionar usuarios, roles y estados de las cuentas. |
+| Administrador | Realizar las funciones del bibliotecario, gestionar usuarios y aprobar o rechazar registros de lectores. |
 
 También se incluyen registro de lectores, recuperación de contraseña mediante pregunta de seguridad y comprobantes de las operaciones.
 
@@ -35,7 +31,7 @@ También se incluyen registro de lectores, recuperación de contraseña mediante
 | `capaInterfaz/` | Formularios de Windows Forms y presentación de resultados. |
 | `Utiles/` | Auxiliares visuales usados por los formularios; es necesaria para compilar. |
 | `Recursos/` | Imágenes y recursos gráficos. |
-| `sql/` | Script consolidado de la base de datos y datos de demostración. |
+| `bd_fdinal_biblioteca.sql` | Script consolidado para crear una base nueva con datos de demostración. |
 
 El flujo de llamadas es **Interfaz → Negocio → DAO → Conexión → SQL Server**. La capa Datos proporciona los modelos y contratos compartidos.
 
@@ -44,14 +40,14 @@ El flujo de llamadas es **Interfaz → Negocio → DAO → Conexión → SQL Ser
 ### Requisitos
 
 - Windows y SDK de **.NET 10**.
-- SQL Server; la conexión predeterminada utiliza SQL Server Express.
+- SQL Server; la conexión predeterminada apunta a Somee.
 - SQL Server Management Studio (SSMS) para preparar la base.
 - Visual Studio compatible con .NET 10, si se utiliza ese entorno.
 
 ### Preparar la base de datos
 
 1. Para una instalación nueva, crea una base **vacía** llamada `distribuidos-II` en la instancia `.\SQLEXPRESS`.
-2. Selecciona esa base en SSMS y ejecuta `sql/bd_fdinal_biblioteca.sql`.
+2. Selecciona esa base en SSMS y ejecuta `bd_fdinal_biblioteca.sql`.
 3. El archivo incluye el esquema y casos de demostración para lectores, personal, solicitudes, préstamos y penalizaciones.
 
 **El script consolidado crea una base nueva; no actualiza una existente.** Los datos y tarifas incluidos son ejemplos para trabajar con el proyecto.
@@ -80,8 +76,8 @@ Los comandos restauran dependencias, compilan y abren el inicio de sesión. En V
 2. Confirma el carrito para generar **una solicitud con varios libros**.
 3. El bibliotecario revisa la solicitud y la aprueba o rechaza.
 4. Si está aprobada y vigente, el lector acude a recoger los libros.
-5. El bibliotecario selecciona los ejemplares físicos y confirma la entrega completa. Se registra un préstamo por ejemplar.
-6. Al devolverlos, se cierra cada préstamo y se registra la penalización por retraso, si corresponde.
+5. El bibliotecario selecciona los ejemplares físicos y confirma la entrega completa. Se registra una operación de préstamo que agrupa sus ejemplares.
+6. Al devolverlos, se cierran todos los ejemplares de la operación juntos y se registra una sola mora, si corresponde.
 
 **Libro** representa el título del catálogo; **Ejemplar** representa una copia física. La solicitud se realiza por título y el préstamo se registra por copia.
 
@@ -102,7 +98,7 @@ Los comandos restauran dependencias, compilan y abren el inicio de sesión. En V
 - Conserva las transacciones de las operaciones que deben completarse juntas y las validaciones de disponibilidad dentro de ellas.
 - Las contraseñas y respuestas de seguridad se guardan mediante hashes; la pregunta permanece visible.
 - Conserva los archivos `.vb`, `.Designer.vb` y `.resx` asociados a los formularios.
-- Consulta `AGENTS.md` para las pautas de contribución. No incluyas `bin/`, `obj/`, `.vs/` ni registros de compilación entre los cambios del proyecto.
+- Deja fuera del historial de Git las carpetas generadas `bin/`, `obj/` y `.vs/`, así como los registros de compilación.
 
 - SOMEE
   - VER TABLAS DE LA BD:

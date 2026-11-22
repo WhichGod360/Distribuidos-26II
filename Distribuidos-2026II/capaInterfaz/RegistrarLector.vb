@@ -70,7 +70,7 @@ Public Class RegistrarLector
 
             negocioUsuario.RegistrarNuevoLector(nuevoLector, confirmPass)
 
-            MessageBox.Show("¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.", "Operación Completada", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            MessageBox.Show("Tu cuenta quedó pendiente. Podrás iniciar sesión cuando un administrador la apruebe.", "Operación Completada", MessageBoxButtons.OK, MessageBoxIcon.Information)
 
             Dim frmLogin As New Login()
             frmLogin.Show()

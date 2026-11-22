@@ -28,6 +28,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="..\..\..\Distribuidos--26II-web\appWEB Distribuidos\App_Data\YapeQr.png"
+                      Condition="Exists('..\..\..\Distribuidos--26II-web\appWEB Distribuidos\App_Data\YapeQr.png')"
+                      Link="Recursos\YapeQr.png" LogicalName="YapeQr.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="My Project\Resources.Designer.vb">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -75,6 +81,14 @@
     <Compile Update="FrmConfirmacion.Designer.vb"><DependentUpon>FrmConfirmacion.vb</DependentUpon></Compile>
     <EmbeddedResource Update="FrmConfirmacion.resx"><DependentUpon>FrmConfirmacion.vb</DependentUpon></EmbeddedResource>
     <Compile Update="frmDetallePenalizacion.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPagosYape.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPagosYape.Designer.vb"><DependentUpon>frmPagosYape.vb</DependentUpon></Compile>
+    <Compile Update="frmDecisionPagoYape.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmDecisionPagoYape.Designer.vb"><DependentUpon>frmDecisionPagoYape.vb</DependentUpon></Compile>
+    <Compile Update="frmPagarYape.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="frmPagarYape.Designer.vb"><DependentUpon>frmPagarYape.vb</DependentUpon></Compile>
+    <Compile Update="VistaComprobante.vb"><SubType>Form</SubType></Compile>
+    <Compile Update="VistaComprobante.Designer.vb"><DependentUpon>VistaComprobante.vb</DependentUpon></Compile>
     <Compile Update="frmDetallePenalizacion.Designer.vb"><DependentUpon>frmDetallePenalizacion.vb</DependentUpon></Compile>
     <EmbeddedResource Update="frmDetallePenalizacion.resx"><DependentUpon>frmDetallePenalizacion.vb</DependentUpon></EmbeddedResource>
     <Compile Update="frmDetallePenalizacionEditar.vb"><SubType>Form</SubType></Compile>
@@ -89,9 +103,6 @@
     <Compile Update="frmEjemplares.vb"><SubType>Form</SubType></Compile>
     <Compile Update="frmEjemplares.Designer.vb"><DependentUpon>frmEjemplares.vb</DependentUpon></Compile>
     <EmbeddedResource Update="frmEjemplares.resx"><DependentUpon>frmEjemplares.vb</DependentUpon></EmbeddedResource>
-    <Compile Update="frmLibro.vb"><SubType>Form</SubType></Compile>
-    <Compile Update="frmLibro.Designer.vb"><DependentUpon>frmLibro.vb</DependentUpon></Compile>
-    <EmbeddedResource Update="frmLibro.resx"><DependentUpon>frmLibro.vb</DependentUpon></EmbeddedResource>
     <Compile Update="FrmLibroDetalle.vb"><SubType>Form</SubType></Compile>
     <Compile Update="FrmLibroDetalle.Designer.vb"><DependentUpon>FrmLibroDetalle.vb</DependentUpon></Compile>
     <EmbeddedResource Update="FrmLibroDetalle.resx"><DependentUpon>FrmLibroDetalle.vb</DependentUpon></EmbeddedResource>

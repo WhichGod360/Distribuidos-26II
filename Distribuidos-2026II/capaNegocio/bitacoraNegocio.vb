@@ -1,74 +1,7 @@
-Imports System.Globalization
 Imports capaDatos
 
 Public Class bitacoraNegocio
     Private ReadOnly dao As New bitacoraDAO()
-
-    Public Function Registrar(objeto As String, accion As String, cadena As String) As Integer
-        Try
-            Dim registro As Bitacora = Preparar(objeto, accion, cadena)
-            Return dao.Registrar(registro)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
-        Catch ex As Exception
-            Throw New Exception("Ocurrió un error al registrar el movimiento en la bitácora.", ex)
-        End Try
-    End Function
-
-    ' Prepara el registro sin guardarlo, para poder compartir la transacción
-    ' del mantenimiento cuando se integre la bitácora con los demás módulos.
-    Public Function Preparar(objeto As String, accion As String, cadena As String) As Bitacora
-        Return PrepararRegistro(objeto, accion, cadena, SesionUsuario.IdUsuario)
-    End Function
-
-    Public Function CrearContexto(objeto As String, accion As String) As IContextoBitacora
-        Return CrearContexto(objeto, accion, SesionUsuario.IdUsuario)
-    End Function
-
-    Friend Function CrearContexto(objeto As String, accion As String, idUsuario As Integer) As IContextoBitacora
-        Return New ContextoBitacora(NormalizarObjeto(objeto, True), NormalizarAccion(accion, True), idUsuario)
-    End Function
-
-    Private Shared Function PrepararRegistro(objeto As String, accion As String, cadena As String, idUsuario As Integer) As Bitacora
-        Dim objetoMan As String = NormalizarObjeto(objeto, True)
-        Dim accionMan As String = NormalizarAccion(accion, True)
-        If idUsuario < 0 Then Throw New InvalidOperationException("El identificador del usuario de la sesión no es válido.")
-
-        Dim cadenaMan As String = cadena
-        If cadenaMan IsNot Nothing AndAlso cadenaMan.Length > 255 Then
-            cadenaMan = cadenaMan.Substring(0, 255)
-        End If
-
-        Dim instante As Date = Date.Now
-        Return New Bitacora With {
-            .FechaMan = instante.Date,
-            .HoraMan = instante.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
-            .IdUsuario = idUsuario,
-            .Objeto = objetoMan,
-            .Accion = accionMan,
-            .CadenaMan = cadenaMan
-        }
-    End Function
-
-    ' Conserva el actor que inició la operación, incluso si se cierra la sesión
-    ' mientras termina una tarea de guardado en segundo plano.
-    Private NotInheritable Class ContextoBitacora
-        Implements IContextoBitacora
-
-        Private ReadOnly objeto As String
-        Private ReadOnly accion As String
-        Private ReadOnly idUsuario As Integer
-
-        Public Sub New(objeto As String, accion As String, idUsuario As Integer)
-            Me.objeto = objeto
-            Me.accion = accion
-            Me.idUsuario = idUsuario
-        End Sub
-
-        Public Function Preparar(cadena As String) As Bitacora Implements IContextoBitacora.Preparar
-            Return PrepararRegistro(objeto, accion, cadena, idUsuario)
-        End Function
-    End Class
 
     Public Function Listar(Optional fechaDesde As Date? = Nothing,
                            Optional fechaHasta As Date? = Nothing,

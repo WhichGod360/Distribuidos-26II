@@ -31,7 +31,7 @@ Public Class prestamoNegocio
             seguridadNegocio.ExigirPersonal()
             Dim estados = {"Todos", "Activos", "Vencidos", "Devueltos"}
             If Not estados.Contains(filtro) Then Throw New ArgumentException("El filtro de préstamos no es válido.")
-            Return PrepararConsulta(dao.listar(filtro, If(texto, "").Trim(), Date.Today))
+            Return FiltrarConsulta(PrepararConsulta(dao.listar("Todos", "", Date.Today)), filtro, If(texto, "").Trim(), 0, 0, Date.Today)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
@@ -39,19 +39,31 @@ Public Class prestamoNegocio
         End Try
     End Function
 
-    Public Function registrar(idLector As Integer, idBibliotecario As Integer, idEjemplar As Integer,
+    Public Function registrar(idLector As Integer, idBibliotecario As Integer, idsEjemplares As IList(Of Integer),
                               fechaInicio As Date, fechaFin As Date) As Integer
         Try
             seguridadNegocio.ExigirAccesoLector(idLector)
             seguridadNegocio.ExigirOperador(idBibliotecario)
-            If idEjemplar <= 0 Then Throw New ArgumentException("Selecciona un ejemplar disponible.")
+            If idsEjemplares Is Nothing OrElse idsEjemplares.Count = 0 OrElse idsEjemplares.Count > PoliticaPrestamo.MaximoEjemplares OrElse
+                idsEjemplares.Any(Function(id) id <= 0) OrElse idsEjemplares.Distinct().Count() <> idsEjemplares.Count Then
+                Throw New ArgumentException("Selecciona entre uno y cinco ejemplares distintos.")
+            End If
             ValidarFechasPrestamo(fechaInicio, fechaFin, Date.Today)
-            Return dao.registrar(idLector, idBibliotecario, idEjemplar, fechaInicio.Date, fechaFin.Date, reglas)
+            Return dao.registrar(idLector, idBibliotecario, idsEjemplares, fechaInicio.Date, fechaFin.Date, reglas)
         Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
             Throw
         Catch ex As Exception
             Throw New Exception("Ocurrió un error al registrar los préstamos.", ex)
         End Try
+    End Function
+
+    Public Function registrar(idLector As Integer, idBibliotecario As Integer, idEjemplar As Integer,
+                              fechaInicio As Date, fechaFin As Date) As Integer
+        Return registrar(idLector, idBibliotecario, New List(Of Integer) From {idEjemplar}, fechaInicio, fechaFin)
+    End Function
+
+    Public Function registrar(idLector As Integer, idBibliotecario As Integer, idsEjemplares As IList(Of Integer), fechaInicio As Date) As Integer
+        Return registrar(idLector, idBibliotecario, idsEjemplares, fechaInicio, PoliticaPrestamo.FechaLimite(fechaInicio))
     End Function
 
     Public Function registrar(idLector As Integer, idBibliotecario As Integer, idEjemplar As Integer, fechaInicio As Date) As Integer
@@ -122,7 +134,7 @@ Public Class prestamoNegocio
                                            idLector As Integer, idPrestamo As Integer, hoy As Date) As List(Of Prestamo)
         Return prestamos.Where(Function(p)
                                    If idLector > 0 AndAlso p.IdUsuario <> idLector Then Return False
-                                   If idPrestamo > 0 AndAlso p.IdPrestamo <> idPrestamo Then Return False
+                                   If idPrestamo > 0 AndAlso p.IdPrestamo <> idPrestamo AndAlso Not p.IdsPrestamos.Contains(idPrestamo) Then Return False
                                    Select Case filtro
                                        Case "Activos"
                                            If Not PuedeDevolver(p) Then Return False
@@ -131,7 +143,7 @@ Public Class prestamoNegocio
                                        Case "Devueltos"
                                            If Not p.FechaRetorno.HasValue OrElse Not String.Equals(If(p.EstadoPrestamo, "").Trim(), Prestamo.EstadoDevuelto, StringComparison.OrdinalIgnoreCase) Then Return False
                                    End Select
-                                   Dim contenido = $"{p.IdPrestamo} {p.NombreLector} {p.DniLector} {p.CorreoLector} {p.IdEjemplar} {p.TituloLibro}"
+                                   Dim contenido = $"{p.IdPrestamo} {p.NombreLector} {p.DniLector} {p.CorreoLector} {p.Ejemplares} {p.TituloLibro}"
                                    Return contenido.IndexOf(If(texto, ""), StringComparison.OrdinalIgnoreCase) >= 0
                                End Function).ToList()
     End Function

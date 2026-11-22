@@ -83,7 +83,7 @@ Public NotInheritable Class reglasCirculacionNegocio
     End Function
 
     Public Sub ValidarConfirmacion(actual As DevolucionCalculada, confirmado As DevolucionCalculada) Implements IReglasCirculacion.ValidarConfirmacion
-        If confirmado Is Nothing OrElse confirmado.IdPrestamo <> actual.IdPrestamo OrElse confirmado.FechaRetorno <> actual.FechaRetorno OrElse
+        If confirmado Is Nothing OrElse confirmado.IdPrestamo <> actual.IdPrestamo OrElse confirmado.CantidadEjemplares <> actual.CantidadEjemplares OrElse confirmado.FechaRetorno <> actual.FechaRetorno OrElse
             confirmado.DiasRetraso <> actual.DiasRetraso OrElse Not Nullable.Equals(confirmado.IdPenalizacion, actual.IdPenalizacion) OrElse
             confirmado.Monto <> actual.Monto OrElse confirmado.YaRegistrada <> actual.YaRegistrada Then
             Throw New InvalidOperationException("La devolución o tarifa cambió. Actualiza el cálculo y vuelve a confirmarlo.")

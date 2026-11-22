@@ -166,7 +166,7 @@ Public Class frmPrincipal
         End Try
     End Sub
 
-    Private Sub Menu_Click(sender As Object, e As EventArgs) Handles btnInicio.Click, btnBuscar.Click, btnPrestamos.Click, btnSolicitudes.Click, btnLibros.Click, btnAutores.Click, btnCategorias.Click, btnPenalizaciones.Click, btnUsuarios.Click
+    Private Sub Menu_Click(sender As Object, e As EventArgs) Handles btnInicio.Click, btnBuscar.Click, btnPrestamos.Click, btnSolicitudes.Click, btnLibros.Click, btnAutores.Click, btnCategorias.Click, btnPenalizaciones.Click, btnCargosPagos.Click, btnUsuarios.Click
         Try
             AbrirModulo(CStr(DirectCast(sender, Button).Tag))
         Catch ex As Exception
@@ -175,7 +175,7 @@ Public Class frmPrincipal
     End Sub
 
     Private Sub SeleccionarMenu(seleccion As Button)
-        For Each boton In {btnInicio, btnBuscar, btnPrestamos, btnSolicitudes, btnLibros, btnAutores, btnCategorias, btnPenalizaciones, btnUsuarios, btnBitacora}
+        For Each boton In {btnInicio, btnBuscar, btnPrestamos, btnSolicitudes, btnLibros, btnAutores, btnCategorias, btnPenalizaciones, btnCargosPagos, btnUsuarios, btnBitacora}
             boton.BackColor = If(boton Is seleccion, Utiles.MantenimientoUI.Primario, Color.FromArgb(244, 246, 253))
             boton.ForeColor = If(boton Is seleccion, Color.White, Utiles.MantenimientoUI.Texto)
         Next
@@ -240,6 +240,9 @@ Public Class frmPrincipal
                     AddHandler formulario.SolicitarDetalles, AddressOf MostrarDetallesPenalizacion
                     vistas.Add(clave, formulario)
                 End If
+            Case "cargos"
+                SeleccionarMenu(btnCargosPagos)
+                If Not vistas.ContainsKey(clave) Then vistas.Add(clave, New frmDetallePenalizacion())
             Case Else
                 Throw New ArgumentException("Ruta de navegación no reconocida.", NameOf(clave))
         End Select

@@ -46,6 +46,7 @@ Public Class solicitudPrestamoDAO
                         End Using
                     Next
 
+                    AuditoriaDAO.Registrar(cn, tx, idLector, "SolicitudPrestamo", "INSERT", $"Registrar solicitud | ID={solicitud}; títulos={idsLibros.Count}")
                     tx.Commit()
                     Return solicitud
                 End Using
@@ -56,42 +57,45 @@ Public Class solicitudPrestamoDAO
     End Function
 
     Public Function listar(Optional idLector As Integer = 0) As List(Of SolicitudPrestamo)
-        Try
-            Dim resultado As New Dictionary(Of Integer, SolicitudPrestamo)()
-            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                DisponibilidadReserva.ExigirEsquema(cn)
-                Dim query As String = "SELECT s.*, u.nombre_usuario+' '+u.ap_paterno+' '+u.ap_materno AS lector, u.numero_dni_usuario, " &
-                    "a.nombre_usuario+' '+a.ap_paterno+' '+a.ap_materno AS aprobador, d.id_detalle_solicitud,d.id_libro,d.id_prestamo,l.titulo_libro, " &
-                    "CASE WHEN s.estado_solicitud IN ('Pendiente','Aprobada') AND s.fecha_limite_retiro<=SYSUTCDATETIME() THEN 'Vencida' ELSE s.estado_solicitud END AS estado_actual " &
-                    "FROM SolicitudPrestamo s JOIN Usuario u ON u.id_usuario=s.id_usuario LEFT JOIN Usuario a ON a.id_usuario=s.id_aprobador " &
-                    "JOIN DetalleSolicitudPrestamo d ON d.id_solicitud=s.id_solicitud JOIN Libro l ON l.id_libro=d.id_libro " &
-                    "WHERE (@lector=0 OR s.id_usuario=@lector) ORDER BY s.id_solicitud DESC,d.id_detalle_solicitud"
-                Using cmd As New SqlCommand(query, cn)
-                    cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
-                    Using dr As SqlDataReader = cmd.ExecuteReader()
-                        While dr.Read()
-                            Dim id = CInt(dr("id_solicitud"))
-                            If Not resultado.ContainsKey(id) Then
-                                resultado.Add(id, New SolicitudPrestamo With {
-                                    .IdSolicitud = id, .IdUsuario = CInt(dr("id_usuario")), .NombreLector = CStr(dr("lector")),
-                                    .DniLector = CStr(dr("numero_dni_usuario")), .FechaSolicitud = CDate(dr("fecha_solicitud")),
-                                    .FechaLimiteRetiro = CDate(dr("fecha_limite_retiro")), .EstadoSolicitud = CStr(dr("estado_solicitud")),
-                                    .EstadoActual = CStr(dr("estado_actual")), .NombreAprobador = If(IsDBNull(dr("aprobador")), "", CStr(dr("aprobador"))),
-                                    .FechaAprobacion = If(IsDBNull(dr("fecha_aprobacion")), CType(Nothing, Date?), CDate(dr("fecha_aprobacion"))),
-                                    .IdAprobador = If(IsDBNull(dr("id_aprobador")), CType(Nothing, Integer?), CInt(dr("id_aprobador"))),
-                                    .FechaCierre = If(IsDBNull(dr("fecha_cierre")), CType(Nothing, Date?), CDate(dr("fecha_cierre")))})
-                            End If
-                            resultado(id).Detalles.Add(New DetalleSolicitudPrestamo With {
-                                .IdDetalle = CInt(dr("id_detalle_solicitud")), .IdSolicitud = id, .IdLibro = CInt(dr("id_libro")),
-                                .TituloLibro = CStr(dr("titulo_libro")), .IdPrestamo = If(IsDBNull(dr("id_prestamo")), CType(Nothing, Integer?), CInt(dr("id_prestamo")))})
-                        End While
+        Return AuditoriaDAO.Consultar("SolicitudPrestamo", If(idLector > 0, "SELECT", "LISTADO"), $"Consultar solicitudes | lector={idLector}",
+            Function()
+                Try
+                    Dim resultado As New Dictionary(Of Integer, SolicitudPrestamo)()
+                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                        DisponibilidadReserva.ExigirEsquema(cn)
+                        Dim query As String = "SELECT s.*, u.nombre_usuario+' '+u.ap_paterno+' '+u.ap_materno AS lector, u.numero_dni_usuario, " &
+                            "a.nombre_usuario+' '+a.ap_paterno+' '+a.ap_materno AS aprobador, d.id_detalle_solicitud,d.id_libro,d.id_prestamo,l.titulo_libro, " &
+                            "CASE WHEN s.estado_solicitud IN ('Pendiente','Aprobada') AND s.fecha_limite_retiro<=SYSUTCDATETIME() THEN 'Vencida' ELSE s.estado_solicitud END AS estado_actual " &
+                            "FROM SolicitudPrestamo s JOIN Usuario u ON u.id_usuario=s.id_usuario LEFT JOIN Usuario a ON a.id_usuario=s.id_aprobador " &
+                            "JOIN DetalleSolicitudPrestamo d ON d.id_solicitud=s.id_solicitud JOIN Libro l ON l.id_libro=d.id_libro " &
+                            "WHERE (@lector=0 OR s.id_usuario=@lector) ORDER BY s.id_solicitud DESC,d.id_detalle_solicitud"
+                        Using cmd As New SqlCommand(query, cn)
+                            cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
+                            Using dr As SqlDataReader = cmd.ExecuteReader()
+                                While dr.Read()
+                                    Dim id = CInt(dr("id_solicitud"))
+                                    If Not resultado.ContainsKey(id) Then
+                                        resultado.Add(id, New SolicitudPrestamo With {
+                                            .IdSolicitud = id, .IdUsuario = CInt(dr("id_usuario")), .NombreLector = CStr(dr("lector")),
+                                            .DniLector = CStr(dr("numero_dni_usuario")), .FechaSolicitud = CDate(dr("fecha_solicitud")),
+                                            .FechaLimiteRetiro = CDate(dr("fecha_limite_retiro")), .EstadoSolicitud = CStr(dr("estado_solicitud")),
+                                            .EstadoActual = CStr(dr("estado_actual")), .NombreAprobador = If(IsDBNull(dr("aprobador")), "", CStr(dr("aprobador"))),
+                                            .FechaAprobacion = If(IsDBNull(dr("fecha_aprobacion")), CType(Nothing, Date?), CDate(dr("fecha_aprobacion"))),
+                                            .IdAprobador = If(IsDBNull(dr("id_aprobador")), CType(Nothing, Integer?), CInt(dr("id_aprobador"))),
+                                            .FechaCierre = If(IsDBNull(dr("fecha_cierre")), CType(Nothing, Date?), CDate(dr("fecha_cierre")))})
+                                    End If
+                                    resultado(id).Detalles.Add(New DetalleSolicitudPrestamo With {
+                                        .IdDetalle = CInt(dr("id_detalle_solicitud")), .IdSolicitud = id, .IdLibro = CInt(dr("id_libro")),
+                                        .TituloLibro = CStr(dr("titulo_libro")), .IdPrestamo = If(IsDBNull(dr("id_prestamo")), CType(Nothing, Integer?), CInt(dr("id_prestamo")))})
+                                End While
+                            End Using
+                        End Using
                     End Using
-                End Using
-            End Using
-            Return resultado.Values.ToList()
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.listar")
-        End Try
+                    Return resultado.Values.ToList()
+                Catch ex As SqlException
+                    Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.listar")
+                End Try
+            End Function)
     End Function
 
     Public Sub aprobar(idSolicitud As Integer, idOperador As Integer, reglas As IReglasCirculacion)
@@ -149,6 +153,7 @@ Public Class solicitudPrestamoDAO
                         cmd.Parameters.Add("@estado", SqlDbType.VarChar, 12).Value = estado
                         If cmd.ExecuteNonQuery() <> 1 Then Throw New InvalidOperationException("La solicitud cambió, ya está cerrada o venció. Actualiza la lista.")
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "SolicitudPrestamo", "UPDATE", $"Cambiar estado | solicitud={idSolicitud}; estado={estado}")
                     tx.Commit()
                 End Using
             End Using
@@ -188,6 +193,7 @@ Public Class solicitudPrestamoDAO
                     End Using
                     reglas.ValidarSolicitudParaEntrega(actual, ahora)
                     Dim prestamos As New List(Of Integer)()
+                    Dim operacion = Guid.NewGuid()
                     For Each libro In libros
                         Dim copia = seleccion(libro)
                         query = "SELECT e.estado_ejemplar,(SELECT COUNT(*) FROM Prestamo p WITH (UPDLOCK,HOLDLOCK) WHERE p.id_ejemplar=e.id_ejemplar AND " & ejemplarDAO.PrestamoOcupaEjemplarSql & ") AS abiertos FROM Ejemplar e WITH (UPDLOCK,HOLDLOCK) WHERE e.id_ejemplar=@copia AND e.id_libro=@libro"
@@ -204,7 +210,7 @@ Public Class solicitudPrestamoDAO
                             End Using
                         End Using
                         reglas.ValidarEjemplar(estadoEjemplar, abiertos)
-                        Dim prestamo = prestamoDAO.InsertarPrestamo(cn, tx, lector, idOperador, copia, inicio, limite)
+                        Dim prestamo = prestamoDAO.InsertarPrestamo(cn, tx, lector, idOperador, copia, inicio, limite, operacion)
                         query = "UPDATE DetalleSolicitudPrestamo SET id_prestamo=@prestamo WHERE id_solicitud=@solicitud AND id_libro=@libro AND id_prestamo IS NULL"
                         Using cmd As New SqlCommand(query, cn, tx)
                             cmd.Parameters.Add("@prestamo", SqlDbType.Int).Value = prestamo
@@ -219,6 +225,7 @@ Public Class solicitudPrestamoDAO
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = idSolicitud
                         If cmd.ExecuteNonQuery() <> 1 Then Throw New InvalidOperationException("La reserva venció durante la entrega. No se registró ningún préstamo.")
                     End Using
+                    AuditoriaDAO.Registrar(cn, tx, idOperador, "SolicitudPrestamo", "UPDATE", $"Entregar solicitud | ID={idSolicitud}; préstamo={prestamos(0)}; ejemplares={prestamos.Count}")
                     tx.Commit()
                     Return prestamos
                 End Using

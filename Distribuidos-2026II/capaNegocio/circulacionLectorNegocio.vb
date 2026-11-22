@@ -2,8 +2,8 @@ Imports capaDatos
 
 Public NotInheritable Class circulacionLectorNegocio
     Public Shared Function Evaluar(prestamos As IEnumerable(Of Prestamo), solicitudes As IEnumerable(Of SolicitudPrestamo), penalizaciones As ResumenPenalizaciones) As EstadoCirculacionLector
-        Dim pendientes = prestamos.Count(Function(p) Not p.FechaRetorno.HasValue OrElse
-            Not String.Equals(If(p.EstadoPrestamo, "").Trim(), Prestamo.EstadoDevuelto, StringComparison.OrdinalIgnoreCase))
+        Dim pendientes = prestamos.Where(Function(p) Not p.FechaRetorno.HasValue OrElse
+            Not String.Equals(If(p.EstadoPrestamo, "").Trim(), Prestamo.EstadoDevuelto, StringComparison.OrdinalIgnoreCase)).Sum(Function(p) p.CantidadEjemplares)
         Return New EstadoCirculacionLector With {.LibrosPendientes = pendientes,
             .CupoDisponible = Math.Max(0, PoliticaPrestamo.MaximoEjemplares - pendientes),
             .TieneSolicitudVigente = solicitudes.Any(Function(s) PuedeCancelar(s)),

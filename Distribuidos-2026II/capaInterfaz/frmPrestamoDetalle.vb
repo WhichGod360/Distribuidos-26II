@@ -6,6 +6,17 @@ Public Class frmPrestamoDetalle
 
     Private ReadOnly negocio As New prestamoNegocio()
 
+    Private Class CopiaSeleccionada
+        Public Property IdLibro As Integer
+        Public Property IdEjemplar As Integer
+        Public Property Texto As String
+    End Class
+
+    Private ReadOnly copias As New System.ComponentModel.BindingList(Of CopiaSeleccionada)()
+    Private ReadOnly listaCopias As New ListBox With {.Dock = DockStyle.Fill, .DisplayMember = NameOf(CopiaSeleccionada.Texto), .AccessibleName = "Ejemplares seleccionados"}
+    Private ReadOnly btnAgregarCopia As New Button With {.Text = "Agregar ejemplar", .Width = 145, .Height = 34}
+    Private ReadOnly btnQuitarCopia As New Button With {.Text = "Quitar seleccionado", .Width = 160, .Height = 34}
+
     Private cargandoCatalogo As Boolean
     Private ReadOnly libros As New libroNegocio()
     Private ReadOnly ejemplares As New ejemplarNegocio()
@@ -14,7 +25,10 @@ Public Class frmPrestamoDetalle
 
     Public Sub New()
         InitializeComponent()
-        If Not ContextoDiseno.Activo(Me) Then ActualizarLimite()
+        If Not ContextoDiseno.Activo(Me) Then
+            ConfigurarSeleccion()
+            ActualizarLimite()
+        End If
         guardar.Enabled = False
     End Sub
 
@@ -24,6 +38,38 @@ Public Class frmPrestamoDetalle
         lectorInicial = lectorElegido
         txtBibliotecario.Text = nombreUsuario & " · ID " & idUsuario
         guardar.Enabled = idUsuario > 0
+    End Sub
+
+    Private Sub ConfigurarSeleccion()
+        Dim botones As New FlowLayoutPanel With {.Dock = DockStyle.Top, .Height = 40, .WrapContents = False}
+        botones.Controls.AddRange({btnAgregarCopia, btnQuitarCopia})
+        MantenimientoUI.EstilizarBoton(btnAgregarCopia)
+        MantenimientoUI.EstilizarBoton(btnQuitarCopia)
+        listaCopias.DataSource = copias
+        Dim panel As New Panel With {.Dock = DockStyle.Fill, .Height = 110}
+        panel.Controls.Add(listaCopias)
+        panel.Controls.Add(botones)
+        camposEditor.RowStyles.Add(New RowStyle(SizeType.Absolute, 110))
+        camposEditor.RowCount += 1
+        camposEditor.Controls.Add(panel, 0, camposEditor.RowCount - 1)
+        AddHandler btnAgregarCopia.Click, AddressOf AgregarCopia
+        AddHandler btnQuitarCopia.Click, Sub()
+                                            If listaCopias.SelectedIndex >= 0 Then copias.RemoveAt(listaCopias.SelectedIndex)
+                                        End Sub
+    End Sub
+
+    Private Sub AgregarCopia(sender As Object, e As EventArgs)
+        Dim titulo = TryCast(libro.SelectedItem, Libro)
+        If Not TypeOf lector.SelectedValue Is Integer OrElse titulo Is Nothing OrElse Not TypeOf ejemplar.SelectedValue Is Integer Then
+            MessageBox.Show("Selecciona lector, libro y ejemplar.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        If copias.Count >= PoliticaPrestamo.MaximoEjemplares OrElse copias.Any(Function(copia) copia.IdLibro = titulo.IdLibro) Then
+            MessageBox.Show("Selecciona hasta cinco títulos distintos.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Return
+        End If
+        Dim idCopia = CInt(ejemplar.SelectedValue)
+        copias.Add(New CopiaSeleccionada With {.IdLibro = titulo.IdLibro, .IdEjemplar = idCopia, .Texto = $"{titulo.TituloLibro} · Ejemplar {idCopia}"})
     End Sub
 
     Private Sub Cargar(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -116,15 +162,16 @@ Public Class frmPrestamoDetalle
 
     Private Sub Registrar(sender As Object, e As EventArgs) Handles guardar.Click
         If Not guardar.Enabled Then Return
-        If lector.SelectedValue Is Nothing OrElse ejemplar.SelectedValue Is Nothing Then
+        If Not TypeOf lector.SelectedValue Is Integer OrElse (copias.Count = 0 AndAlso Not TypeOf ejemplar.SelectedValue Is Integer) Then
             MessageBox.Show("Selecciona un lector y un ejemplar disponible.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Warning)
             Return
         End If
         guardar.Enabled = False
         Try
-            Dim id As Integer
-            id = negocio.registrar(CInt(lector.SelectedValue), idBibliotecario, CInt(ejemplar.SelectedValue), Date.Today)
-            MessageBox.Show("Préstamo N.º " & id & " registrado.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
+            Dim ids = copias.Select(Function(copia) copia.IdEjemplar).ToList()
+            If ids.Count = 0 Then ids.Add(CInt(ejemplar.SelectedValue))
+            Dim id = negocio.registrar(CInt(lector.SelectedValue), idBibliotecario, ids, Date.Today)
+            MessageBox.Show($"Préstamo N.º {id} registrado con {ids.Count} ejemplar(es).", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)
             DialogResult = DialogResult.OK
         Catch ex As Exception
             MessageBox.Show(ex.Message, "No se pudo registrar el préstamo", MessageBoxButtons.OK, MessageBoxIcon.Warning)
@@ -142,6 +189,7 @@ Public Class frmPrestamoDetalle
 
     Private Sub lector_SelectedIndexChanged(sender As Object, e As EventArgs) Handles lector.SelectedIndexChanged
         If Not IsHandleCreated Then Return
+        copias.Clear()
         CargarLibros()
     End Sub
 

@@ -60,6 +60,7 @@ Partial Class frmLector
         btnCancelar = New Button()
         tablaPrestamos = New DataGridView()
         tablaPenalizaciones = New DataGridView()
+        columnaVerPago = New DataGridViewLinkColumn()
         resumenPenalizaciones = New TableLayoutPanel()
         lblTotalPenalizaciones = New Label()
         lblPendientePenalizaciones = New Label()
@@ -613,6 +614,7 @@ Partial Class frmLector
         tablaPenalizaciones.ColumnHeadersDefaultCellStyle = DataGridViewCellStyle11
         tablaPenalizaciones.ColumnHeadersHeight = 40
         tablaPenalizaciones.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing
+        tablaPenalizaciones.Columns.AddRange(New DataGridViewColumn() {columnaVerPago})
         DataGridViewCellStyle12.Alignment = DataGridViewContentAlignment.MiddleLeft
         DataGridViewCellStyle12.BackColor = Color.White
         DataGridViewCellStyle12.Font = New Font("Segoe UI", 10.0F)
@@ -634,6 +636,16 @@ Partial Class frmLector
         tablaPenalizaciones.SelectionMode = DataGridViewSelectionMode.FullRowSelect
         tablaPenalizaciones.Size = New Size(400, 200)
         tablaPenalizaciones.TabIndex = 0
+        '
+        ' columnaVerPago
+        '
+        columnaVerPago.Name = "VerPago"
+        columnaVerPago.HeaderText = "Detalle"
+        columnaVerPago.Text = "Ver pago"
+        columnaVerPago.UseColumnTextForLinkValue = True
+        columnaVerPago.TrackVisitedState = False
+        columnaVerPago.SortMode = DataGridViewColumnSortMode.NotSortable
+        columnaVerPago.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells
         ' 
         ' resumenPenalizaciones  (tarjetas de resumen)
         ' 
@@ -927,6 +939,7 @@ Partial Class frmLector
     Friend WithEvents btnCancelar As System.Windows.Forms.Button
     Friend WithEvents tablaPrestamos As System.Windows.Forms.DataGridView
     Friend WithEvents tablaPenalizaciones As System.Windows.Forms.DataGridView
+    Friend WithEvents columnaVerPago As System.Windows.Forms.DataGridViewLinkColumn
     Friend WithEvents resumenPenalizaciones As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents lblTotalPenalizaciones As System.Windows.Forms.Label
     Friend WithEvents lblPendientePenalizaciones As System.Windows.Forms.Label

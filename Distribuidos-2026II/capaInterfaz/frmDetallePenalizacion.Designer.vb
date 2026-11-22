@@ -29,10 +29,15 @@ Partial Class frmDetallePenalizacion
         Me.cboFiltroSancion = New System.Windows.Forms.ComboBox()
         Me.bloque_cboFiltroSancion = New System.Windows.Forms.Panel()
         Me.etiqueta_cboFiltroSancion = New System.Windows.Forms.Label()
+        Me.cboEstadoPago = New System.Windows.Forms.ComboBox()
+        Me.bloqueEstadoPago = New System.Windows.Forms.Panel()
+        Me.lblEstadoPago = New System.Windows.Forms.Label()
         Me.barraAcciones = New System.Windows.Forms.FlowLayoutPanel()
         Me.btnAgregar = New System.Windows.Forms.Button()
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnVolver = New System.Windows.Forms.Button()
+        Me.btnRevisarYape = New System.Windows.Forms.Button()
+        Me.btnActualizarCargos = New System.Windows.Forms.Button()
         Me.DataGridView1 = New System.Windows.Forms.DataGridView()
         Me.DataGridView1Cabecera = New System.Windows.Forms.DataGridViewCellStyle()
         Me.DataGridView1Celdas = New System.Windows.Forms.DataGridViewCellStyle()
@@ -58,6 +63,7 @@ Partial Class frmDetallePenalizacion
         Me.barraFiltros.SuspendLayout()
         Me.bloque_buscar.SuspendLayout()
         Me.bloque_cboFiltroSancion.SuspendLayout()
+        Me.bloqueEstadoPago.SuspendLayout()
         Me.barraAcciones.SuspendLayout()
         Me.SuspendLayout()
         Me.encabezado.Name = "encabezado"
@@ -145,6 +151,23 @@ Partial Class frmDetallePenalizacion
         Me.bloque_cboFiltroSancion.Controls.Add(Me.cboFiltroSancion)
         Me.bloque_cboFiltroSancion.Controls.Add(Me.etiqueta_cboFiltroSancion)
         Me.barraFiltros.Controls.Add(Me.bloque_cboFiltroSancion)
+        Me.cboEstadoPago.Name = "cboEstadoPago"
+        Me.cboEstadoPago.AccessibleName = "Estado de pago"
+        Me.cboEstadoPago.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboEstadoPago.Dock = System.Windows.Forms.DockStyle.Top
+        Me.cboEstadoPago.Height = 30
+        Me.bloqueEstadoPago.Name = "bloqueEstadoPago"
+        Me.bloqueEstadoPago.Size = New System.Drawing.Size(165, 58)
+        Me.bloqueEstadoPago.Margin = New System.Windows.Forms.Padding(0, 0, 12, 6)
+        Me.lblEstadoPago.Name = "lblEstadoPago"
+        Me.lblEstadoPago.Text = "Estado de pago"
+        Me.lblEstadoPago.ForeColor = System.Drawing.Color.FromArgb(47, 72, 92)
+        Me.lblEstadoPago.Dock = System.Windows.Forms.DockStyle.Top
+        Me.lblEstadoPago.Height = 24
+        Me.lblEstadoPago.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Regular)
+        Me.bloqueEstadoPago.Controls.Add(Me.cboEstadoPago)
+        Me.bloqueEstadoPago.Controls.Add(Me.lblEstadoPago)
+        Me.barraFiltros.Controls.Add(Me.bloqueEstadoPago)
         Me.barraAcciones.Name = "barraAcciones"
         Me.barraAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraAcciones.AutoSize = True
@@ -201,6 +224,20 @@ Partial Class frmDetallePenalizacion
         Me.btnVolver.UseVisualStyleBackColor = False
         Me.btnVolver.Enabled = True
         Me.barraAcciones.Controls.Add(Me.btnVolver)
+        Me.btnRevisarYape.Name = "btnRevisarYape"
+        Me.btnRevisarYape.Text = "Revisar pagos por Yape"
+        Me.btnRevisarYape.Size = New System.Drawing.Size(195, 38)
+        Me.btnRevisarYape.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnRevisarYape.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnRevisarYape.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.barraAcciones.Controls.Add(Me.btnRevisarYape)
+        Me.btnActualizarCargos.Name = "btnActualizarCargos"
+        Me.btnActualizarCargos.Text = "Actualizar"
+        Me.btnActualizarCargos.Size = New System.Drawing.Size(115, 38)
+        Me.btnActualizarCargos.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnActualizarCargos.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnActualizarCargos.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.barraAcciones.Controls.Add(Me.btnActualizarCargos)
         Me.DataGridView1.Name = "DataGridView1"
         Me.DataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.DataGridView1.ReadOnly = True
@@ -358,6 +395,7 @@ Partial Class frmDetallePenalizacion
         Me.barraAcciones.PerformLayout()
         Me.bloque_cboFiltroSancion.ResumeLayout(False)
         Me.bloque_cboFiltroSancion.PerformLayout()
+        Me.bloqueEstadoPago.ResumeLayout(False)
         Me.bloque_buscar.ResumeLayout(False)
         Me.bloque_buscar.PerformLayout()
         Me.barraFiltros.ResumeLayout(False)
@@ -384,10 +422,15 @@ Partial Class frmDetallePenalizacion
     Friend WithEvents cboFiltroSancion As System.Windows.Forms.ComboBox
     Friend WithEvents bloque_cboFiltroSancion As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_cboFiltroSancion As System.Windows.Forms.Label
+    Friend WithEvents cboEstadoPago As System.Windows.Forms.ComboBox
+    Friend WithEvents bloqueEstadoPago As System.Windows.Forms.Panel
+    Friend WithEvents lblEstadoPago As System.Windows.Forms.Label
     Friend WithEvents barraAcciones As System.Windows.Forms.FlowLayoutPanel
     Friend WithEvents btnAgregar As System.Windows.Forms.Button
     Friend WithEvents btnEditar As System.Windows.Forms.Button
     Friend WithEvents btnVolver As System.Windows.Forms.Button
+    Friend WithEvents btnRevisarYape As System.Windows.Forms.Button
+    Friend WithEvents btnActualizarCargos As System.Windows.Forms.Button
     Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
     Friend WithEvents DataGridView1Cabecera As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents DataGridView1Celdas As System.Windows.Forms.DataGridViewCellStyle
