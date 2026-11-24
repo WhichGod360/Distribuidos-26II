@@ -48,7 +48,9 @@ El flujo de llamadas es **Interfaz → Negocio → DAO → Conexión → SQL Ser
 
 1. Para una instalación nueva, crea una base **vacía** llamada `distribuidos-II` en la instancia `.\SQLEXPRESS`.
 2. Selecciona esa base en SSMS y ejecuta `bd_fdinal_biblioteca.sql`.
-3. El archivo incluye el esquema y casos de demostración para lectores, personal, solicitudes, préstamos y penalizaciones.
+3. Para habilitar los reportes de pago, ejecuta `MigracionPagoYape.sql` en esa misma base. También puedes aplicarlo sobre una instalación existente que ya tenga préstamos y cargos con importe y estado de pago.
+
+El escritorio incorpora el QR al compilar desde `Distribuidos--26II-web/appWEB Distribuidos/App_Data/YapeQr.png`, en la carpeta web que acompaña a este proyecto. Si falta la imagen, el lector puede consultar su historial y el formulario le indica que contacte con la biblioteca.
 
 **El script consolidado crea una base nueva; no actualiza una existente.** Los datos y tarifas incluidos son ejemplos para trabajar con el proyecto.
 
@@ -78,6 +80,7 @@ Los comandos restauran dependencias, compilan y abren el inicio de sesión. En V
 4. Si está aprobada y vigente, el lector acude a recoger los libros.
 5. El bibliotecario selecciona los ejemplares físicos y confirma la entrega completa. Se registra una operación de préstamo que agrupa sus ejemplares.
 6. Al devolverlos, se cierran todos los ejemplares de la operación juntos y se registra una sola mora, si corresponde.
+7. En **Mis penalizaciones → Ver pago**, el lector puede reportar un pago hecho por Yape y consultar su historial. En **Cargos y pagos → Revisar pagos por Yape**, el personal confirma el reporte o lo deniega indicando el motivo. El lector recibe la decisión en **Avisos**.
 
 **Libro** representa el título del catálogo; **Ejemplar** representa una copia física. La solicitud se realiza por título y el préstamo se registra por copia.
 
@@ -94,7 +97,7 @@ Los comandos restauran dependencias, compilan y abren el inicio de sesión. En V
 ## Pautas para trabajar en el proyecto
 
 - Mantén la arquitectura de cinco capas: los formularios llaman a Negocio y las consultas SQL permanecen en DAO.
-- Sigue el patrón de `usuarioDAO`: `query`, `cn`, `cmd`, `dr`, parámetros tipados, lectura con `Read()` y manejo de `SqlException`.
+- Sigue el patrón de `usuarioDAO`. Usa parámetros SQL tipados, lee con `Read()` y maneja los errores de acceso con un solo `Catch ex As Exception`. El formulario muestra el mensaje que recibe de Negocio.
 - Conserva las transacciones de las operaciones que deben completarse juntas y las validaciones de disponibilidad dentro de ellas.
 - Las contraseñas y respuestas de seguridad se guardan mediante hashes; la pregunta permanece visible.
 - Conserva los archivos `.vb`, `.Designer.vb` y `.resx` asociados a los formularios.

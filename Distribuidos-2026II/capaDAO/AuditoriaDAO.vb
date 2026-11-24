@@ -7,21 +7,36 @@ Public NotInheritable Class AuditoriaDAO
     End Sub
 
     Friend Shared Function Consultar(Of T)(objeto As String, accion As String, detalle As String, consulta As Func(Of T)) As T
-        Dim actor = SesionUsuario.IdUsuario
-        Dim resultado = consulta()
-        RegistrarEvento(actor, objeto, accion, detalle)
-        Return resultado
+        Try
+            Dim actor = SesionUsuario.IdUsuario
+            Dim resultado = consulta()
+            RegistrarEvento(actor, objeto, accion, detalle)
+            Return resultado
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "AuditoriaDAO.Consultar")
+        End Try
     End Function
 
     Public Shared Sub RegistrarEvento(idUsuario As Integer, objeto As String, accion As String, detalle As String)
-        Dim dao As New bitacoraDAO()
-        dao.Registrar(Preparar(idUsuario, objeto, accion, detalle))
+        Try
+            Dim dao As New bitacoraDAO()
+            dao.Registrar(Preparar(idUsuario, objeto, accion, detalle))
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "AuditoriaDAO.RegistrarEvento")
+        End Try
     End Sub
 
     Friend Shared Sub Registrar(cn As SqlConnection, tx As SqlTransaction, idUsuario As Integer,
                                objeto As String, accion As String, detalle As String)
-        Dim dao As New bitacoraDAO()
-        dao.Registrar(Preparar(idUsuario, objeto, accion, detalle), cn, tx)
+        Try
+            Dim dao As New bitacoraDAO()
+            dao.Registrar(Preparar(idUsuario, objeto, accion, detalle), cn, tx)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "AuditoriaDAO.Registrar")
+        End Try
     End Sub
 
     Private Shared Function Preparar(idUsuario As Integer, objeto As String, accion As String, detalle As String) As Bitacora

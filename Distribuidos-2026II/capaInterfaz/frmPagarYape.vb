@@ -65,7 +65,4 @@ Public Class frmPagarYape
         End Try
     End Sub
 
-    Private Sub imgQrYape_Click(sender As Object, e As EventArgs) Handles imgQrYape.Click
-
-    End Sub
 End Class

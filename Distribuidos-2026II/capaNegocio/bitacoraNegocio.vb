@@ -23,12 +23,11 @@ Public Class bitacoraNegocio
                 Throw New ArgumentException("El último ID de la bitácora no puede ser negativo.")
             End If
 
-            Dim objetoMan As String = NormalizarObjeto(objeto, False)
-            Dim accionMan As String = NormalizarAccion(accion, False)
+            Dim objetoMan As String = NormalizarObjeto(objeto)
+            Dim accionMan As String = NormalizarAccion(accion)
             Return dao.Listar(fechaDesde, fechaHasta, idUsuario, objetoMan, accionMan, despuesDeId)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar la bitácora.", ex)
         End Try
     End Function
@@ -38,16 +37,14 @@ Public Class bitacoraNegocio
             seguridadNegocio.ExigirAdministrador()
             If idMan <= 0 Then Throw New ArgumentException("El ID del movimiento debe ser un número positivo.")
             Return dao.ObtenerPorId(idMan)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar el movimiento de la bitácora.", ex)
         End Try
     End Function
 
-    Private Shared Function NormalizarObjeto(objeto As String, requerido As Boolean) As String
+    Private Shared Function NormalizarObjeto(objeto As String) As String
         If String.IsNullOrWhiteSpace(objeto) Then
-            If requerido Then Throw New ArgumentException("Indica el objeto o mantenimiento de la operación.")
             Return Nothing
         End If
 
@@ -56,9 +53,8 @@ Public Class bitacoraNegocio
         Return nombre
     End Function
 
-    Private Shared Function NormalizarAccion(accion As String, requerido As Boolean) As String
+    Private Shared Function NormalizarAccion(accion As String) As String
         If String.IsNullOrWhiteSpace(accion) Then
-            If requerido Then Throw New ArgumentException("Indica la acción realizada en el mantenimiento.")
             Return Nothing
         End If
 

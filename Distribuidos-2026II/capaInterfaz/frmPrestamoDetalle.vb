@@ -14,8 +14,8 @@ Public Class frmPrestamoDetalle
 
     Private ReadOnly copias As New System.ComponentModel.BindingList(Of CopiaSeleccionada)()
     Private ReadOnly listaCopias As New ListBox With {.Dock = DockStyle.Fill, .DisplayMember = NameOf(CopiaSeleccionada.Texto), .AccessibleName = "Ejemplares seleccionados"}
-    Private ReadOnly btnAgregarCopia As New Button With {.Text = "Agregar ejemplar", .Width = 145, .Height = 34}
-    Private ReadOnly btnQuitarCopia As New Button With {.Text = "Quitar seleccionado", .Width = 160, .Height = 34}
+    Private WithEvents btnAgregarCopia As New Button With {.Text = "Agregar ejemplar", .Width = 145, .Height = 34}
+    Private WithEvents btnQuitarCopia As New Button With {.Text = "Quitar seleccionado", .Width = 160, .Height = 34}
 
     Private cargandoCatalogo As Boolean
     Private ReadOnly libros As New libroNegocio()
@@ -52,13 +52,13 @@ Public Class frmPrestamoDetalle
         camposEditor.RowStyles.Add(New RowStyle(SizeType.Absolute, 110))
         camposEditor.RowCount += 1
         camposEditor.Controls.Add(panel, 0, camposEditor.RowCount - 1)
-        AddHandler btnAgregarCopia.Click, AddressOf AgregarCopia
-        AddHandler btnQuitarCopia.Click, Sub()
-                                            If listaCopias.SelectedIndex >= 0 Then copias.RemoveAt(listaCopias.SelectedIndex)
-                                        End Sub
     End Sub
 
-    Private Sub AgregarCopia(sender As Object, e As EventArgs)
+    Private Sub btnQuitarCopia_Click(sender As Object, e As EventArgs) Handles btnQuitarCopia.Click
+        If listaCopias.SelectedIndex >= 0 Then copias.RemoveAt(listaCopias.SelectedIndex)
+    End Sub
+
+    Private Sub btnAgregarCopia_Click(sender As Object, e As EventArgs) Handles btnAgregarCopia.Click
         Dim titulo = TryCast(libro.SelectedItem, Libro)
         If Not TypeOf lector.SelectedValue Is Integer OrElse titulo Is Nothing OrElse Not TypeOf ejemplar.SelectedValue Is Integer Then
             MessageBox.Show("Selecciona lector, libro y ejemplar.", "Préstamos", MessageBoxButtons.OK, MessageBoxIcon.Information)

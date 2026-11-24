@@ -5,6 +5,7 @@ Imports Utiles
 
 Public Class frmLector
     Private catalogo As New List(Of Libro)()
+    Private textoBuscado As String = ""
     Private reservas As New List(Of SolicitudPrestamo)()
     Private prestamos As New List(Of Prestamo)()
     Private penalizaciones As New ResumenPenalizaciones()
@@ -20,6 +21,7 @@ Public Class frmLector
 
     Public Sub New()
         InitializeComponent()
+        MantenimientoUI.EstilizarBoton(btnBuscar)
         If components Is Nothing Then components = New System.ComponentModel.Container()
         components.Add(actualizadorCatalogo)
         actualizadorCatalogo.Interval = 15000
@@ -59,17 +61,18 @@ Public Class frmLector
                 .Catalogo = New catalogoLectorNegocio().listar(), .Reservas = solicitudes.listarMias(),
                 .Prestamos = New prestamoNegocio().listarPorLector(SesionUsuario.IdUsuario),
                 .Penalizaciones = New detallePenalizacionNegocio().ConsultarMias(),
-                .Avisos = New avisoLectorNegocio().ConsultarMios()})
+                .DecisionesPago = avisoLectorNegocio.ConsultarDecisionesPago()})
             If IsDisposed OrElse cerrado Then Return
             catalogo = resultado.Catalogo
             reservas = resultado.Reservas
             prestamos = resultado.Prestamos
             penalizaciones = resultado.Penalizaciones
-            tablaAvisos.DataSource = resultado.Avisos
+            Dim avisos = avisoLectorNegocio.CrearAvisos(reservas, prestamos, penalizaciones, resultado.DecisionesPago)
+            tablaAvisos.DataSource = avisos
             tablaAvisos.Columns("Asunto").FillWeight = 30
             tablaAvisos.Columns("Detalle").FillWeight = 170
             tablaAvisos.ClearSelection()
-            tabAvisos.Text = "Avisos (" & resultado.Avisos.Count & ")"
+            tabAvisos.Text = "Avisos (" & avisos.Count & ")"
             datosDisponibles = True
             Dim categoriaAnterior = TryCast(cboCategoria.SelectedItem, String)
             Dim categorias = New List(Of String) From {"Todas las categorías"}
@@ -184,7 +187,7 @@ Public Class frmLector
             control.Dispose()
         Next
         panelCatalogo.Controls.Clear()
-        Dim texto = txtBuscar.Text.Trim()
+        Dim texto = textoBuscado
         Dim categoria = TryCast(cboCategoria.SelectedItem, String)
         Dim lista = catalogo.Where(Function(l) (l.TituloLibro & " " & l.Autor & " " & l.EditorialLibro).IndexOf(texto, StringComparison.OrdinalIgnoreCase) >= 0 AndAlso
             (categoria Is Nothing OrElse categoria = "Todas las categorías" OrElse l.Categoria.Split(","c).Any(Function(c) c.Trim() = categoria))).ToList()
@@ -393,8 +396,8 @@ Public Class frmLector
         MostrarPenalizaciones()
     End Sub
 
-    Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
-        If Not IsHandleCreated Then Return
+    Private Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
+        textoBuscado = txtBuscar.Text.Trim()
         MostrarCatalogo()
     End Sub
 

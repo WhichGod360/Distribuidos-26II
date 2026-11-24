@@ -6,7 +6,7 @@ Friend Class MoraDAO
     Friend Shared Function LeerTramos(cn As SqlConnection, tx As SqlTransaction) As List(Of Penalizacion)
         Try
             Dim lista As New List(Of Penalizacion)
-            Dim query As String = "SELECT * FROM Penalizacion WITH (HOLDLOCK) WHERE dias_desde IS NOT NULL"
+            Dim query As String = "SELECT id_penalizacion,tipo_penalizacion,descripcion_penalizacion,monto_penalizacion,estado_penalizacion,dias_desde FROM Penalizacion WITH (HOLDLOCK) WHERE dias_desde IS NOT NULL"
             Using cmd As New SqlCommand(query, cn, tx)
                 Using dr As SqlDataReader = cmd.ExecuteReader()
                     While dr.Read()
@@ -15,8 +15,9 @@ Friend Class MoraDAO
                 End Using
             End Using
             Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "MoraDAO.LeerTramos")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "MoraDAO.LeerTramos")
         End Try
     End Function
 
@@ -42,8 +43,9 @@ Friend Class MoraDAO
             End Using
             datos.Tramos = LeerTramos(cn, tx)
             Return datos
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "MoraDAO.LeerDevolucion")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "MoraDAO.LeerDevolucion")
         End Try
     End Function
 
@@ -57,8 +59,9 @@ Friend Class MoraDAO
                 penalizacionDAO.AgregarMonto(cmd, "@monto", calculo.Monto)
                 cmd.ExecuteNonQuery()
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "MoraDAO.Registrar")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "MoraDAO.Registrar")
         End Try
     End Sub
 End Class

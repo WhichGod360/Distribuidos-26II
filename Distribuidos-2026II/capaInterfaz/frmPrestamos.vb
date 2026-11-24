@@ -11,19 +11,19 @@ Public Class frmPrestamos
     Private ReadOnly nombreBibliotecario As String
     Private ReadOnly puedeOperar As Boolean
     Private datos As New List(Of Prestamo)()
+    Private textoBuscado As String = ""
     Private lectorContexto As Integer
     Private prestamoContexto As Integer
-    Private ReadOnly btnEntrega As New Button With {.Text = "Comprobante entrega", .Width = 195, .Height = 36}
-    Private ReadOnly btnRetorno As New Button With {.Text = "Comprobante devolución", .Width = 215, .Height = 36}
+    Private WithEvents btnEntrega As New Button With {.Text = "Comprobante entrega", .Width = 195, .Height = 36}
+    Private WithEvents btnRetorno As New Button With {.Text = "Comprobante devolución", .Width = 215, .Height = 36}
     Public Event DatosCambiados()
 
     Public Sub New()
         InitializeComponent()
+        MantenimientoUI.EstilizarBoton(btnBuscar)
         barraAcciones.Controls.AddRange({btnEntrega, btnRetorno})
         MantenimientoUI.EstilizarBoton(btnEntrega)
         MantenimientoUI.EstilizarBoton(btnRetorno)
-        AddHandler btnEntrega.Click, AddressOf btnEntrega_Click
-        AddHandler btnRetorno.Click, AddressOf btnRetorno_Click
         tabla.AutoGenerateColumns = False
         AgregarColumna(NameOf(Prestamo.IdPrestamo), "Préstamo", 70)
         AgregarColumna(NameOf(Prestamo.NombreLector), "Lector", 150)
@@ -55,6 +55,7 @@ Public Class frmPrestamos
     Public Sub AplicarContexto(filtro As String, Optional idLector As Integer = 0, Optional idPrestamo As Integer = 0)
         lectorContexto = idLector
         prestamoContexto = idPrestamo
+        textoBuscado = ""
         buscar.Clear()
         filtroEstado.SelectedItem = filtro
         Filtrar()
@@ -74,7 +75,7 @@ Public Class frmPrestamos
     End Sub
 
     Private Sub Filtrar()
-        Dim texto = buscar.Text.Trim()
+        Dim texto = textoBuscado
         Dim filtro = CStr(filtroEstado.SelectedItem)
         Dim hoy = Date.Today
         Dim filas = prestamoNegocio.FiltrarConsulta(datos, filtro, texto, lectorContexto, prestamoContexto, hoy)
@@ -141,11 +142,11 @@ Public Class frmPrestamos
         End Using
     End Sub
 
-    Private Sub btnEntrega_Click(sender As Object, e As EventArgs)
+    Private Sub btnEntrega_Click(sender As Object, e As EventArgs) Handles btnEntrega.Click
         VerComprobante(False)
     End Sub
 
-    Private Sub btnRetorno_Click(sender As Object, e As EventArgs)
+    Private Sub btnRetorno_Click(sender As Object, e As EventArgs) Handles btnRetorno.Click
         VerComprobante(True)
     End Sub
 
@@ -153,12 +154,12 @@ Public Class frmPrestamos
         ActualizarDatos()
     End Sub
 
-    Private Sub buscar_TextChanged(sender As Object, e As EventArgs) Handles buscar.TextChanged
-        If Not IsHandleCreated Then Return
+    Private Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
+        textoBuscado = buscar.Text.Trim()
         Filtrar()
     End Sub
 
-    Private Sub filtroEstado_SelectedIndexChanged2(sender As Object, e As EventArgs) Handles filtroEstado.SelectedIndexChanged
+    Private Sub filtroEstado_SelectedIndexChanged(sender As Object, e As EventArgs) Handles filtroEstado.SelectedIndexChanged
         If Not IsHandleCreated Then Return
         Filtrar()
     End Sub

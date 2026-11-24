@@ -21,6 +21,7 @@ Partial Class FrmCategoria
         Me.lblTituloVista = New System.Windows.Forms.Label()
         Me.lblDescripcionVista = New System.Windows.Forms.Label()
         Me.layoutVista = New System.Windows.Forms.TableLayoutPanel()
+        Me.btnBuscar = New System.Windows.Forms.Button()
         Me.barraFiltros = New System.Windows.Forms.FlowLayoutPanel()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.bloque_txtBuscar = New System.Windows.Forms.Panel()
@@ -29,8 +30,8 @@ Partial Class FrmCategoria
         Me.bloque_cboEstado = New System.Windows.Forms.Panel()
         Me.etiqueta_cboEstado = New System.Windows.Forms.Label()
         Me.barraAcciones = New System.Windows.Forms.FlowLayoutPanel()
-        Me.Button10 = New System.Windows.Forms.Button()
-        Me.Button11 = New System.Windows.Forms.Button()
+        Me.btnAgregar = New System.Windows.Forms.Button()
+        Me.btnEditar = New System.Windows.Forms.Button()
         Me.tbCategoria = New System.Windows.Forms.DataGridView()
         Me.tbCategoriaCabecera = New System.Windows.Forms.DataGridViewCellStyle()
         Me.tbCategoriaCeldas = New System.Windows.Forms.DataGridViewCellStyle()
@@ -135,45 +136,61 @@ Partial Class FrmCategoria
         Me.bloque_cboEstado.Controls.Add(Me.cboEstado)
         Me.bloque_cboEstado.Controls.Add(Me.etiqueta_cboEstado)
         Me.barraFiltros.Controls.Add(Me.bloque_cboEstado)
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.Size = New System.Drawing.Size(96, 32)
+        Me.btnBuscar.AutoSize = False
+        Me.btnBuscar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBuscar.FlatAppearance.BorderSize = 1
+        Me.btnBuscar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnBuscar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnBuscar.BackColor = System.Drawing.Color.White
+        Me.btnBuscar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnBuscar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(0, 20, 10, 6)
+        Me.btnBuscar.UseVisualStyleBackColor = False
+        Me.barraFiltros.Controls.Add(Me.btnBuscar)
         Me.barraAcciones.Name = "barraAcciones"
         Me.barraAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraAcciones.AutoSize = True
         Me.barraAcciones.WrapContents = True
         Me.barraAcciones.Margin = New System.Windows.Forms.Padding(0, 4, 0, 10)
-        Me.Button10.Name = "Button10"
-        Me.Button10.Text = "Agregar categoría"
-        Me.Button10.Size = New System.Drawing.Size(170, 38)
-        Me.Button10.AutoSize = False
-        Me.Button10.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button10.FlatAppearance.BorderSize = 0
-        Me.Button10.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(47, 72, 92)
-        Me.Button10.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(35, 56, 72)
-        Me.Button10.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(222, 226, 231)
-        Me.Button10.BackColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.Button10.ForeColor = System.Drawing.Color.White
-        Me.Button10.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
-        Me.Button10.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.Button10.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
-        Me.Button10.UseVisualStyleBackColor = False
-        Me.Button10.Enabled = True
-        Me.barraAcciones.Controls.Add(Me.Button10)
-        Me.Button11.Name = "Button11"
-        Me.Button11.Text = "Editar"
-        Me.Button11.Size = New System.Drawing.Size(170, 38)
-        Me.Button11.AutoSize = False
-        Me.Button11.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button11.FlatAppearance.BorderSize = 1
-        Me.Button11.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.Button11.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
-        Me.Button11.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
-        Me.Button11.BackColor = System.Drawing.Color.White
-        Me.Button11.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.Button11.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
-        Me.Button11.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.Button11.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
-        Me.Button11.UseVisualStyleBackColor = False
-        Me.Button11.Enabled = False
-        Me.barraAcciones.Controls.Add(Me.Button11)
+        Me.btnAgregar.Name = "btnAgregar"
+        Me.btnAgregar.Text = "Agregar categoría"
+        Me.btnAgregar.Size = New System.Drawing.Size(170, 38)
+        Me.btnAgregar.AutoSize = False
+        Me.btnAgregar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAgregar.FlatAppearance.BorderSize = 0
+        Me.btnAgregar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(47, 72, 92)
+        Me.btnAgregar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(35, 56, 72)
+        Me.btnAgregar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(222, 226, 231)
+        Me.btnAgregar.BackColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnAgregar.ForeColor = System.Drawing.Color.White
+        Me.btnAgregar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnAgregar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnAgregar.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnAgregar.UseVisualStyleBackColor = False
+        Me.btnAgregar.Enabled = True
+        Me.barraAcciones.Controls.Add(Me.btnAgregar)
+        Me.btnEditar.Name = "btnEditar"
+        Me.btnEditar.Text = "Editar"
+        Me.btnEditar.Size = New System.Drawing.Size(170, 38)
+        Me.btnEditar.AutoSize = False
+        Me.btnEditar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnEditar.FlatAppearance.BorderSize = 1
+        Me.btnEditar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnEditar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnEditar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnEditar.BackColor = System.Drawing.Color.White
+        Me.btnEditar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnEditar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnEditar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnEditar.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnEditar.UseVisualStyleBackColor = False
+        Me.btnEditar.Enabled = False
+        Me.barraAcciones.Controls.Add(Me.btnEditar)
         Me.tbCategoria.Name = "tbCategoria"
         Me.tbCategoria.Dock = System.Windows.Forms.DockStyle.Fill
         Me.tbCategoria.ReadOnly = True
@@ -271,6 +288,7 @@ Partial Class FrmCategoria
     Friend WithEvents lblTituloVista As System.Windows.Forms.Label
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents layoutVista As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
     Friend WithEvents txtBuscar As System.Windows.Forms.TextBox
     Friend WithEvents bloque_txtBuscar As System.Windows.Forms.Panel
@@ -279,8 +297,8 @@ Partial Class FrmCategoria
     Friend WithEvents bloque_cboEstado As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_cboEstado As System.Windows.Forms.Label
     Friend WithEvents barraAcciones As System.Windows.Forms.FlowLayoutPanel
-    Friend WithEvents Button10 As System.Windows.Forms.Button
-    Friend WithEvents Button11 As System.Windows.Forms.Button
+    Friend WithEvents btnAgregar As System.Windows.Forms.Button
+    Friend WithEvents btnEditar As System.Windows.Forms.Button
     Friend WithEvents tbCategoria As System.Windows.Forms.DataGridView
     Friend WithEvents tbCategoriaCabecera As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents tbCategoriaCeldas As System.Windows.Forms.DataGridViewCellStyle

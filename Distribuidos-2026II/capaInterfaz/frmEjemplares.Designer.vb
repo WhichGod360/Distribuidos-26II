@@ -21,11 +21,12 @@ Partial Class frmEjemplares
         Me.lblTituloVista = New System.Windows.Forms.Label()
         Me.lblDescripcionVista = New System.Windows.Forms.Label()
         Me.layoutVista = New System.Windows.Forms.TableLayoutPanel()
+        Me.btnBuscar = New System.Windows.Forms.Button()
         Me.barraFiltros = New System.Windows.Forms.FlowLayoutPanel()
-        Me.buscar = New System.Windows.Forms.TextBox()
+        Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.bloque_buscar = New System.Windows.Forms.Panel()
         Me.etiqueta_buscar = New System.Windows.Forms.Label()
-        Me.filtroEstado = New System.Windows.Forms.ComboBox()
+        Me.cboEstado = New System.Windows.Forms.ComboBox()
         Me.bloque_filtroEstado = New System.Windows.Forms.Panel()
         Me.etiqueta_filtroEstado = New System.Windows.Forms.Label()
         Me.barraAcciones = New System.Windows.Forms.FlowLayoutPanel()
@@ -99,8 +100,8 @@ Partial Class frmEjemplares
         Me.barraFiltros.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraFiltros.AutoSize = True
         Me.barraFiltros.WrapContents = True
-        Me.buscar.Name = "buscar"
-        Me.buscar.PlaceholderText = "Buscar..."
+        Me.txtBuscar.Name = "txtBuscar"
+        Me.txtBuscar.PlaceholderText = "ID o estado del ejemplar"
         Me.bloque_buscar.Name = "bloque_buscar"
         Me.bloque_buscar.Dock = System.Windows.Forms.DockStyle.None
         Me.bloque_buscar.Size = New System.Drawing.Size(320, 58)
@@ -112,14 +113,14 @@ Partial Class frmEjemplares
         Me.etiqueta_buscar.Dock = System.Windows.Forms.DockStyle.Top
         Me.etiqueta_buscar.Height = 24
         Me.etiqueta_buscar.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Regular)
-        Me.buscar.Dock = System.Windows.Forms.DockStyle.Top
-        Me.buscar.Height = 30
-        Me.bloque_buscar.Controls.Add(Me.buscar)
+        Me.txtBuscar.Dock = System.Windows.Forms.DockStyle.Top
+        Me.txtBuscar.Height = 30
+        Me.bloque_buscar.Controls.Add(Me.txtBuscar)
         Me.bloque_buscar.Controls.Add(Me.etiqueta_buscar)
         Me.barraFiltros.Controls.Add(Me.bloque_buscar)
-        Me.filtroEstado.Name = "filtroEstado"
-        Me.filtroEstado.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
-        Me.filtroEstado.Items.AddRange(New Object() {"Todos", "Disponible", "Prestado", "Inactivo"})
+        Me.cboEstado.Name = "cboEstado"
+        Me.cboEstado.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
+        Me.cboEstado.Items.AddRange(New Object() {"Todos", "Disponible", "Prestado", "Inactivo"})
         Me.bloque_filtroEstado.Name = "bloque_filtroEstado"
         Me.bloque_filtroEstado.Dock = System.Windows.Forms.DockStyle.None
         Me.bloque_filtroEstado.Size = New System.Drawing.Size(180, 58)
@@ -131,11 +132,27 @@ Partial Class frmEjemplares
         Me.etiqueta_filtroEstado.Dock = System.Windows.Forms.DockStyle.Top
         Me.etiqueta_filtroEstado.Height = 24
         Me.etiqueta_filtroEstado.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Regular)
-        Me.filtroEstado.Dock = System.Windows.Forms.DockStyle.Top
-        Me.filtroEstado.Height = 30
-        Me.bloque_filtroEstado.Controls.Add(Me.filtroEstado)
+        Me.cboEstado.Dock = System.Windows.Forms.DockStyle.Top
+        Me.cboEstado.Height = 30
+        Me.bloque_filtroEstado.Controls.Add(Me.cboEstado)
         Me.bloque_filtroEstado.Controls.Add(Me.etiqueta_filtroEstado)
         Me.barraFiltros.Controls.Add(Me.bloque_filtroEstado)
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.Size = New System.Drawing.Size(96, 32)
+        Me.btnBuscar.AutoSize = False
+        Me.btnBuscar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBuscar.FlatAppearance.BorderSize = 1
+        Me.btnBuscar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnBuscar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnBuscar.BackColor = System.Drawing.Color.White
+        Me.btnBuscar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnBuscar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(0, 20, 10, 6)
+        Me.btnBuscar.UseVisualStyleBackColor = False
+        Me.barraFiltros.Controls.Add(Me.btnBuscar)
         Me.barraAcciones.Name = "barraAcciones"
         Me.barraAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraAcciones.AutoSize = True
@@ -234,13 +251,14 @@ Partial Class frmEjemplares
         Me.colActivo.Width = 20
         Me.colActivo.FillWeight = 20
         Me.colActivo.ReadOnly = True
+        Me.colActivo.Visible = False
         Me.colActivo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
         Me.tabla.Columns.Add(Me.colActivo)
         Me.colEstadoEjemplar.Name = "estado"
         Me.colEstadoEjemplar.HeaderText = "Estado"
         Me.colEstadoEjemplar.DataPropertyName = "estado"
         Me.colEstadoEjemplar.Width = 50
-        Me.colEstadoEjemplar.FillWeight = 50
+        Me.colEstadoEjemplar.FillWeight = 70
         Me.colEstadoEjemplar.ReadOnly = True
         Me.colEstadoEjemplar.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
         Me.tabla.Columns.Add(Me.colEstadoEjemplar)
@@ -290,11 +308,12 @@ Partial Class frmEjemplares
     Friend WithEvents lblTituloVista As System.Windows.Forms.Label
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents layoutVista As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
-    Friend WithEvents buscar As System.Windows.Forms.TextBox
+    Friend WithEvents txtBuscar As System.Windows.Forms.TextBox
     Friend WithEvents bloque_buscar As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_buscar As System.Windows.Forms.Label
-    Friend WithEvents filtroEstado As System.Windows.Forms.ComboBox
+    Friend WithEvents cboEstado As System.Windows.Forms.ComboBox
     Friend WithEvents bloque_filtroEstado As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_filtroEstado As System.Windows.Forms.Label
     Friend WithEvents barraAcciones As System.Windows.Forms.FlowLayoutPanel

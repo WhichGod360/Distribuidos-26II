@@ -24,7 +24,7 @@ Public Class frmUsuarioDetalle
         End If
     End Sub
 
-    Private Sub Cargar(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Sub frmUsuarioDetalle_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If ContextoDiseno.Activo(Me) Then Return
         Try
             seguridadNegocio.ExigirAdministrador()
@@ -56,7 +56,7 @@ Public Class frmUsuarioDetalle
         End Try
     End Sub
 
-    Private Async Sub Guardar(sender As Object, e As EventArgs) Handles btnGuardar.Click
+    Private Async Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         If guardando Then Return
         Dim usuario As New Usuario With {.IdUsuario = idUsuario, .NombreUsuario = txtNombre.Text,
             .ApPaterno = txtPaterno.Text, .ApMaterno = txtMaterno.Text, .EmailUsuario = txtCorreo.Text,
@@ -91,11 +91,11 @@ Public Class frmUsuarioDetalle
         End Try
     End Sub
 
-    Private Sub Cerrando(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub frmUsuarioDetalle_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If guardando Then e.Cancel = True
     End Sub
 
-    Private Sub Cerrado(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
+    Private Sub frmUsuarioDetalle_FormClosed(sender As Object, e As FormClosedEventArgs) Handles MyBase.FormClosed
         txtClave.Clear()
         txtConfirmar.Clear()
         txtRespuesta.Clear()

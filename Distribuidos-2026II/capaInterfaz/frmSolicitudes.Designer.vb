@@ -26,6 +26,7 @@ Partial Class frmSolicitudes
         lblDescripcionVista = New Label()
         lblTituloVista = New Label()
         barraFiltros = New FlowLayoutPanel()
+        btnBuscar = New System.Windows.Forms.Button()
         txtBuscar = New TextBox()
         cboEstado = New ComboBox()
         barraAcciones = New FlowLayoutPanel()
@@ -106,6 +107,11 @@ Partial Class frmSolicitudes
         ' 
         barraFiltros.Controls.Add(txtBuscar)
         barraFiltros.Controls.Add(cboEstado)
+        btnBuscar.Name = "btnBuscar"
+        btnBuscar.Text = "Buscar"
+        btnBuscar.Size = New System.Drawing.Size(92, 32)
+        btnBuscar.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        barraFiltros.Controls.Add(btnBuscar)
         barraFiltros.Dock = DockStyle.Fill
         barraFiltros.Location = New Point(24, 88)
         barraFiltros.Margin = New Padding(0)
@@ -362,6 +368,7 @@ Partial Class frmSolicitudes
     Friend WithEvents lblTituloVista As System.Windows.Forms.Label
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents txtBuscar As System.Windows.Forms.TextBox
     Friend WithEvents cboEstado As System.Windows.Forms.ComboBox
     Friend WithEvents barraAcciones As System.Windows.Forms.FlowLayoutPanel

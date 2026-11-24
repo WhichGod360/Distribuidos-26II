@@ -2,8 +2,8 @@ Imports capaNegocio
 
 Public Class frmEditarCategoria
 
-    Private idCategoria As Integer
-    Private negocio As New categoriaNegocio()
+    Private ReadOnly idCategoria As Integer
+    Private ReadOnly negocio As New categoriaNegocio()
 
     Public Sub New()
         InitializeComponent()
@@ -12,7 +12,6 @@ Public Class frmEditarCategoria
     Public Sub New(id As Integer)
         Me.New()
         idCategoria = id
-        Button10.Text = "Guardar"
     End Sub
 
     Private Sub frmEditarCategoria_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -29,14 +28,9 @@ Public Class frmEditarCategoria
         End Try
     End Sub
 
-    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+    Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Dim nombre As String = txtNombre.Text
-        Dim estado As Integer
-        If chkEstado.Checked Then
-            estado = 1
-        Else
-            estado = 0
-        End If
+        Dim estado As Integer = If(chkEstado.Checked, 1, 0)
         Try
             If negocio.actualizarCategoria(idCategoria, nombre, estado) Then
                 DialogResult = DialogResult.OK

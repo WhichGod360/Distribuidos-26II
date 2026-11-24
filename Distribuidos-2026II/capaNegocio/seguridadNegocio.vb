@@ -25,37 +25,67 @@ Public NotInheritable Class seguridadNegocio
     End Sub
 
     Public Shared Function ExigirPersonal() As Integer
-        Return ExigirRoles("Administrador", "Bibliotecario")
+        Try
+            Return ExigirRoles("Administrador", "Bibliotecario")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudieron verificar los permisos de la cuenta.", ex)
+        End Try
     End Function
 
     Public Shared Function ExigirAdministrador() As Integer
-        Return ExigirRoles("Administrador")
+        Try
+            Return ExigirRoles("Administrador")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudieron verificar los permisos de la cuenta.", ex)
+        End Try
     End Function
 
     Public Shared Function ExigirLector() As Integer
-        Return ExigirRoles("Estudiante", "Lector")
+        Try
+            Return ExigirRoles("Estudiante", "Lector")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudieron verificar los permisos de la cuenta.", ex)
+        End Try
     End Function
 
     Private Shared Function ExigirRoles(ParamArray roles As String()) As Integer
-        Dim id = SesionUsuario.IdUsuario
-        If id <= 0 Then Throw New UnauthorizedAccessException("Inicia sesión para realizar esta operación.")
-        Dim rol = New seguridadDAO().ObtenerRolActivo(id)
-        If rol Is Nothing OrElse Not roles.Any(Function(r) String.Equals(r, rol.Trim(), StringComparison.OrdinalIgnoreCase)) Then
-            Throw New UnauthorizedAccessException("Tu cuenta no tiene permiso para realizar esta operación.")
-        End If
-        Return id
+        Try
+            Dim id = SesionUsuario.IdUsuario
+            If id <= 0 Then Throw New UnauthorizedAccessException("Inicia sesión para realizar esta operación.")
+            Dim rol = New seguridadDAO().ObtenerRolActivo(id)
+            If rol Is Nothing OrElse Not roles.Any(Function(r) String.Equals(r, rol.Trim(), StringComparison.OrdinalIgnoreCase)) Then
+                Throw New UnauthorizedAccessException("Tu cuenta no tiene permiso para realizar esta operación.")
+            End If
+            Return id
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudieron verificar los permisos de la cuenta.", ex)
+        End Try
     End Function
 
     Public Shared Sub ExigirAccesoLector(idLector As Integer)
-        If idLector <= 0 Then Throw New ArgumentException("Selecciona un lector.")
-        If PuedeOperar(SesionUsuario.IdUsuario, SesionUsuario.Rol) Then
-            ExigirPersonal()
-        ElseIf ExigirLector() <> idLector Then
-            Throw New UnauthorizedAccessException("Solo puedes consultar tus propios datos.")
-        End If
+        Try
+            If idLector <= 0 Then Throw New ArgumentException("Selecciona un lector.")
+            If PuedeOperar(SesionUsuario.IdUsuario, SesionUsuario.Rol) Then
+                ExigirPersonal()
+            ElseIf ExigirLector() <> idLector Then
+                Throw New UnauthorizedAccessException("Solo puedes consultar tus propios datos.")
+            End If
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudieron verificar los permisos de la cuenta.", ex)
+        End Try
     End Sub
 
     Public Shared Sub ExigirOperador(idOperador As Integer)
-        If ExigirPersonal() <> idOperador Then Throw New UnauthorizedAccessException("El operador debe ser la cuenta de la sesión actual.")
+        Try
+            If ExigirPersonal() <> idOperador Then Throw New UnauthorizedAccessException("El operador debe ser la cuenta de la sesión actual.")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudieron verificar los permisos de la cuenta.", ex)
+        End Try
     End Sub
 End Class

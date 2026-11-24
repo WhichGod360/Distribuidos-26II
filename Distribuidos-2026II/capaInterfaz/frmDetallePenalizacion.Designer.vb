@@ -23,6 +23,7 @@ Partial Class frmDetallePenalizacion
         Me.lblDescripcionVista = New System.Windows.Forms.Label()
         Me.layoutVista = New System.Windows.Forms.TableLayoutPanel()
         Me.barraFiltros = New System.Windows.Forms.FlowLayoutPanel()
+        Me.btnBuscar = New System.Windows.Forms.Button()
         Me.buscar = New System.Windows.Forms.TextBox()
         Me.bloque_buscar = New System.Windows.Forms.Panel()
         Me.etiqueta_buscar = New System.Windows.Forms.Label()
@@ -168,6 +169,11 @@ Partial Class frmDetallePenalizacion
         Me.bloqueEstadoPago.Controls.Add(Me.cboEstadoPago)
         Me.bloqueEstadoPago.Controls.Add(Me.lblEstadoPago)
         Me.barraFiltros.Controls.Add(Me.bloqueEstadoPago)
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.Size = New System.Drawing.Size(92, 32)
+        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(3, 16, 3, 3)
+        Me.barraFiltros.Controls.Add(Me.btnBuscar)
         Me.barraAcciones.Name = "barraAcciones"
         Me.barraAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraAcciones.AutoSize = True
@@ -416,6 +422,7 @@ Partial Class frmDetallePenalizacion
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents layoutVista As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents buscar As System.Windows.Forms.TextBox
     Friend WithEvents bloque_buscar As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_buscar As System.Windows.Forms.Label

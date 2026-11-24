@@ -11,9 +11,9 @@ Public Class ejemplarDAO
         "(p.fecha_retorno_prestamo IS NULL OR UPPER(LTRIM(RTRIM(p.estado_prestamo))) <> 'DEVUELTO')"
 
     Public Function obtenerDisponible(idLibro As Integer) As Ejemplar
-        Return AuditoriaDAO.Consultar("Ejemplar", "SELECT", $"Consultar disponibilidad | libro={idLibro}",
-            Function()
-                Try
+        Try
+            Return AuditoriaDAO.Consultar("Ejemplar", "SELECT", $"Consultar disponibilidad | libro={idLibro}",
+                Function()
                     Dim objEjemplar As Ejemplar = Nothing
                     Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
                         Dim query As String = "SELECT TOP 1 e.id_ejemplar, e.estado_ejemplar, e.id_libro FROM Ejemplar e " &
@@ -39,16 +39,17 @@ Public Class ejemplarDAO
                     End Using
 
                     Return objEjemplar
-                Catch ex As SqlException
-                    Throw ErroresDAO.Traducir(ex, "ejemplarDAO.obtenerDisponible")
-                End Try
-            End Function)
+                End Function)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "ejemplarDAO.obtenerDisponible")
+        End Try
     End Function
 
     Public Function listarDisponiblesPorLibro(idLibro As Integer, Optional idLector As Integer = 0) As List(Of Ejemplar)
-        Return AuditoriaDAO.Consultar("Ejemplar", "LISTADO", $"Listar ejemplares disponibles | libro={idLibro}; lector={idLector}",
-            Function()
-                Try
+        Try
+            Return AuditoriaDAO.Consultar("Ejemplar", "LISTADO", $"Listar ejemplares disponibles | libro={idLibro}; lector={idLector}",
+                Function()
                     Dim lista As New List(Of Ejemplar)()
                     Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
                         DisponibilidadReserva.ExigirEsquema(cn)
@@ -78,35 +79,34 @@ Public Class ejemplarDAO
                     End Using
 
                     Return lista
-                Catch ex As SqlException
-                    Throw ErroresDAO.Traducir(ex, "ejemplarDAO.listarDisponiblesPorLibro")
-                End Try
-            End Function)
+                End Function)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "ejemplarDAO.listarDisponiblesPorLibro")
+        End Try
     End Function
 
     Public Function listarPorLibro(idLibro As Integer) As DataTable
-        Return AuditoriaDAO.Consultar("Ejemplar", "LISTADO", $"Listar ejemplares | libro={idLibro}",
-            Function()
-                Try
-                    Dim tabla As New DataTable()
-                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                        Dim query As String = "SELECT e.id_ejemplar, e.estado_ejemplar AS activo, " &
-                                            "CASE WHEN e.estado_ejemplar = 0 THEN 'Inactivo' " &
-                                            "WHEN EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") THEN 'Prestado' " &
-                                            "ELSE 'Disponible' END AS estado " &
-                                            "FROM Ejemplar e WHERE e.id_libro = @idLibro ORDER BY e.id_ejemplar"
-                        Using cmd As New SqlCommand(query, cn)
-                            cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
-                            Using dr As SqlDataReader = cmd.ExecuteReader()
-                                LecturaDAO.CargarTabla(dr, tabla)
-                            End Using
-                        End Using
-                    End Using
-                    Return tabla
-                Catch ex As SqlException
-                    Throw ErroresDAO.Traducir(ex, "ejemplarDAO.listarPorLibro")
-                End Try
-            End Function)
+        Try
+            Dim actor = SesionUsuario.IdUsuario
+            Dim resultado As New DataTable()
+            Dim query As String = "SELECT e.id_ejemplar, e.estado_ejemplar AS activo, " &
+                                "CASE WHEN e.estado_ejemplar = 0 THEN 'Inactivo' " &
+                                "WHEN EXISTS (SELECT 1 FROM Prestamo p WHERE p.id_ejemplar = e.id_ejemplar AND " & PrestamoOcupaEjemplarSql & ") THEN 'Prestado' " &
+                                "ELSE 'Disponible' END AS estado " &
+                                "FROM Ejemplar e WHERE e.id_libro = @idLibro ORDER BY e.id_ejemplar"
+            Using cn = Conexion.ObtenerInstancia().CrearConexionIndependiente(), cmd As New SqlCommand(query, cn)
+                cmd.Parameters.Add("@idLibro", SqlDbType.Int).Value = idLibro
+                Using dr = cmd.ExecuteReader()
+                    LecturaDAO.CargarTabla(dr, resultado)
+                End Using
+            End Using
+            AuditoriaDAO.RegistrarEvento(actor, "Ejemplar", "LISTADO", $"Listar ejemplares | libro={idLibro}")
+            Return resultado
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "ejemplarDAO.listarPorLibro")
+        End Try
     End Function
 
     Public Function agregar(idLibro As Integer, reglas As IReglasLibro, idOperador As Integer) As Boolean
@@ -124,8 +124,9 @@ Public Class ejemplarDAO
                     Return True
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "ejemplarDAO.agregar")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "ejemplarDAO.agregar")
         End Try
     End Function
 
@@ -165,8 +166,9 @@ Public Class ejemplarDAO
                     Return True
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "ejemplarDAO.cambiarEstado")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "ejemplarDAO.cambiarEstado")
         End Try
     End Function
 End Class

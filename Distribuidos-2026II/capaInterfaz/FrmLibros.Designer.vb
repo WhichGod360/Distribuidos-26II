@@ -21,6 +21,7 @@ Partial Class FrmLibros
         Me.lblTituloVista = New System.Windows.Forms.Label()
         Me.lblDescripcionVista = New System.Windows.Forms.Label()
         Me.layoutVista = New System.Windows.Forms.TableLayoutPanel()
+        Me.btnBuscar = New System.Windows.Forms.Button()
         Me.barraFiltros = New System.Windows.Forms.FlowLayoutPanel()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.bloque_txtBuscar = New System.Windows.Forms.Panel()
@@ -36,7 +37,7 @@ Partial Class FrmLibros
         Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnDesactivar = New System.Windows.Forms.Button()
         Me.btnEjemplares = New System.Windows.Forms.Button()
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.tablaLibros = New System.Windows.Forms.DataGridView()
         Me.DataGridView1Cabecera = New System.Windows.Forms.DataGridViewCellStyle()
         Me.DataGridView1Celdas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.DataGridView1Alternas = New System.Windows.Forms.DataGridViewCellStyle()
@@ -53,7 +54,7 @@ Partial Class FrmLibros
         Me.btnPagNext = New System.Windows.Forms.Button()
         Me.pieListado = New System.Windows.Forms.Panel()
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.tablaLibros, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.encabezado.SuspendLayout()
         Me.textoEncabezado.SuspendLayout()
         Me.layoutVista.SuspendLayout()
@@ -116,7 +117,7 @@ Partial Class FrmLibros
         Me.barraFiltros.AutoSize = True
         Me.barraFiltros.WrapContents = True
         Me.txtBuscar.Name = "txtBuscar"
-        Me.txtBuscar.PlaceholderText = "Buscar..."
+        Me.txtBuscar.PlaceholderText = "Título o editorial"
         Me.bloque_txtBuscar.Name = "bloque_txtBuscar"
         Me.bloque_txtBuscar.Dock = System.Windows.Forms.DockStyle.None
         Me.bloque_txtBuscar.Size = New System.Drawing.Size(320, 58)
@@ -171,6 +172,22 @@ Partial Class FrmLibros
         Me.bloque_cboOrden.Controls.Add(Me.cboOrden)
         Me.bloque_cboOrden.Controls.Add(Me.etiqueta_cboOrden)
         Me.barraFiltros.Controls.Add(Me.bloque_cboOrden)
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.Size = New System.Drawing.Size(96, 32)
+        Me.btnBuscar.AutoSize = False
+        Me.btnBuscar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBuscar.FlatAppearance.BorderSize = 1
+        Me.btnBuscar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnBuscar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnBuscar.BackColor = System.Drawing.Color.White
+        Me.btnBuscar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnBuscar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(0, 20, 10, 6)
+        Me.btnBuscar.UseVisualStyleBackColor = False
+        Me.barraFiltros.Controls.Add(Me.btnBuscar)
         Me.barraAcciones.Name = "barraAcciones"
         Me.barraAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraAcciones.AutoSize = True
@@ -244,24 +261,24 @@ Partial Class FrmLibros
         Me.btnEjemplares.UseVisualStyleBackColor = False
         Me.btnEjemplares.Enabled = False
         Me.barraAcciones.Controls.Add(Me.btnEjemplares)
-        Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.DataGridView1.ReadOnly = True
-        Me.DataGridView1.AllowUserToAddRows = False
-        Me.DataGridView1.AllowUserToDeleteRows = False
-        Me.DataGridView1.MultiSelect = False
-        Me.DataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.DataGridView1.RowHeadersVisible = False
-        Me.DataGridView1.AutoGenerateColumns = False
-        Me.DataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        Me.DataGridView1.BackgroundColor = System.Drawing.Color.White
-        Me.DataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.DataGridView1.GridColor = System.Drawing.Color.FromArgb(232, 236, 240)
-        Me.DataGridView1.EnableHeadersVisualStyles = False
-        Me.DataGridView1.ColumnHeadersHeight = 40
-        Me.DataGridView1.RowTemplate.Height = 36
-        Me.DataGridView1.Margin = New System.Windows.Forms.Padding(0)
-        Me.DataGridView1.AccessibleName = "Tabla de resultados"
+        Me.tablaLibros.Name = "tablaLibros"
+        Me.tablaLibros.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tablaLibros.ReadOnly = True
+        Me.tablaLibros.AllowUserToAddRows = False
+        Me.tablaLibros.AllowUserToDeleteRows = False
+        Me.tablaLibros.MultiSelect = False
+        Me.tablaLibros.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.tablaLibros.RowHeadersVisible = False
+        Me.tablaLibros.AutoGenerateColumns = False
+        Me.tablaLibros.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.tablaLibros.BackgroundColor = System.Drawing.Color.White
+        Me.tablaLibros.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.tablaLibros.GridColor = System.Drawing.Color.FromArgb(232, 236, 240)
+        Me.tablaLibros.EnableHeadersVisualStyles = False
+        Me.tablaLibros.ColumnHeadersHeight = 40
+        Me.tablaLibros.RowTemplate.Height = 36
+        Me.tablaLibros.Margin = New System.Windows.Forms.Padding(0)
+        Me.tablaLibros.AccessibleName = "Tabla de resultados"
         Me.DataGridView1Cabecera.BackColor = System.Drawing.Color.FromArgb(226, 234, 240)
         Me.DataGridView1Cabecera.ForeColor = System.Drawing.Color.FromArgb(47, 72, 92)
         Me.DataGridView1Cabecera.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Regular)
@@ -269,57 +286,58 @@ Partial Class FrmLibros
         Me.DataGridView1Celdas.SelectionForeColor = System.Drawing.Color.FromArgb(47, 72, 92)
         Me.DataGridView1Celdas.NullValue = "—"
         Me.DataGridView1Alternas.BackColor = System.Drawing.Color.FromArgb(247, 249, 250)
-        Me.DataGridView1.ColumnHeadersDefaultCellStyle = Me.DataGridView1Cabecera
-        Me.DataGridView1.DefaultCellStyle = Me.DataGridView1Celdas
-        Me.DataGridView1.AlternatingRowsDefaultCellStyle = Me.DataGridView1Alternas
+        Me.tablaLibros.ColumnHeadersDefaultCellStyle = Me.DataGridView1Cabecera
+        Me.tablaLibros.DefaultCellStyle = Me.DataGridView1Celdas
+        Me.tablaLibros.AlternatingRowsDefaultCellStyle = Me.DataGridView1Alternas
         Me.colId.Name = "colId"
         Me.colId.HeaderText = "ID"
-        Me.colId.DataPropertyName = "id"
+        Me.colId.DataPropertyName = "IdLibro"
         Me.colId.Width = 10
         Me.colId.FillWeight = 10
         Me.colId.ReadOnly = True
         Me.colId.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colId)
+        Me.tablaLibros.Columns.Add(Me.colId)
         Me.colTitulo.Name = "colTitulo"
         Me.colTitulo.HeaderText = "Título"
-        Me.colTitulo.DataPropertyName = "titulo"
+        Me.colTitulo.DataPropertyName = "TituloLibro"
         Me.colTitulo.Width = 34
         Me.colTitulo.FillWeight = 34
         Me.colTitulo.ReadOnly = True
         Me.colTitulo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colTitulo)
+        Me.tablaLibros.Columns.Add(Me.colTitulo)
         Me.colEditorial.Name = "colEditorial"
         Me.colEditorial.HeaderText = "Editorial"
-        Me.colEditorial.DataPropertyName = "editorial"
+        Me.colEditorial.DataPropertyName = "EditorialLibro"
         Me.colEditorial.Width = 20
         Me.colEditorial.FillWeight = 20
         Me.colEditorial.ReadOnly = True
         Me.colEditorial.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colEditorial)
+        Me.tablaLibros.Columns.Add(Me.colEditorial)
         Me.colAnio.Name = "colAnio"
+        Me.colAnio.DefaultCellStyle.NullValue = "0"
         Me.colAnio.HeaderText = "Año"
-        Me.colAnio.DataPropertyName = "anio"
+        Me.colAnio.DataPropertyName = "AnoPublicacion"
         Me.colAnio.Width = 10
         Me.colAnio.FillWeight = 10
         Me.colAnio.ReadOnly = True
         Me.colAnio.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colAnio)
+        Me.tablaLibros.Columns.Add(Me.colAnio)
         Me.colStock.Name = "colStock"
         Me.colStock.HeaderText = "Ejemplares"
-        Me.colStock.DataPropertyName = "stock"
+        Me.colStock.DataPropertyName = "StockTotal"
         Me.colStock.Width = 10
         Me.colStock.FillWeight = 10
         Me.colStock.ReadOnly = True
         Me.colStock.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colStock)
+        Me.tablaLibros.Columns.Add(Me.colStock)
         Me.colEstado.Name = "colEstado"
         Me.colEstado.HeaderText = "Estado"
-        Me.colEstado.DataPropertyName = "estado"
+        Me.colEstado.DataPropertyName = "EstadoLibro"
         Me.colEstado.Width = 16
         Me.colEstado.FillWeight = 16
         Me.colEstado.ReadOnly = True
         Me.colEstado.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colEstado)
+        Me.tablaLibros.Columns.Add(Me.colEstado)
         Me.lblRegistros.Name = "lblRegistros"
         Me.lblRegistros.Text = "Sin datos cargados. Abre la pantalla para consultar."
         Me.lblRegistros.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120)
@@ -330,7 +348,7 @@ Partial Class FrmLibros
         Me.layoutVista.Controls.Add(Me.encabezado, 0, 0)
         Me.layoutVista.Controls.Add(Me.barraFiltros, 0, 1)
         Me.layoutVista.Controls.Add(Me.barraAcciones, 0, 2)
-        Me.layoutVista.Controls.Add(Me.DataGridView1, 0, 3)
+        Me.layoutVista.Controls.Add(Me.tablaLibros, 0, 3)
         Me.pnlPaginacion.Name = "pnlPaginacion"
         Me.pnlPaginacion.Dock = System.Windows.Forms.DockStyle.Right
         Me.pnlPaginacion.Width = 330
@@ -387,7 +405,7 @@ Partial Class FrmLibros
         Me.Name = "FrmLibros"
         Me.Text = "Libros"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.tablaLibros, System.ComponentModel.ISupportInitialize).EndInit()
         Me.pieListado.ResumeLayout(False)
         Me.pieListado.PerformLayout()
         Me.flpNumeros.ResumeLayout(False)
@@ -419,6 +437,7 @@ Partial Class FrmLibros
     Friend WithEvents lblTituloVista As System.Windows.Forms.Label
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents layoutVista As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
     Friend WithEvents txtBuscar As System.Windows.Forms.TextBox
     Friend WithEvents bloque_txtBuscar As System.Windows.Forms.Panel
@@ -434,7 +453,7 @@ Partial Class FrmLibros
     Friend WithEvents btnEditar As System.Windows.Forms.Button
     Friend WithEvents btnDesactivar As System.Windows.Forms.Button
     Friend WithEvents btnEjemplares As System.Windows.Forms.Button
-    Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaLibros As System.Windows.Forms.DataGridView
     Friend WithEvents DataGridView1Cabecera As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents DataGridView1Celdas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents DataGridView1Alternas As System.Windows.Forms.DataGridViewCellStyle

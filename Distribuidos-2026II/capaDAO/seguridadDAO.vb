@@ -15,8 +15,9 @@ Public Class seguridadDAO
                 End Using
             End Using
             Return Nothing
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "seguridadDAO.ObtenerRolActivo")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "seguridadDAO.ObtenerRolActivo")
         End Try
     End Function
 End Class

@@ -14,8 +14,9 @@ Friend NotInheritable Class DisponibilidadReserva
                     If dr.IsDBNull(0) OrElse dr.IsDBNull(1) Then Throw New InvalidOperationException("Falta la actualización 003 de carrito y aprobación. Aplícala antes de reservar o prestar.")
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "DisponibilidadReserva.ExigirEsquema")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "DisponibilidadReserva.ExigirEsquema")
         End Try
     End Sub
 
@@ -30,8 +31,9 @@ Friend NotInheritable Class DisponibilidadReserva
                 End Using
             End Using
             Return Nothing
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "DisponibilidadReserva.LeerUsuario")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "DisponibilidadReserva.LeerUsuario")
         End Try
     End Function
 
@@ -56,8 +58,9 @@ Friend NotInheritable Class DisponibilidadReserva
                 End Using
             End Using
             Return datos
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "DisponibilidadReserva.LeerLector")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "DisponibilidadReserva.LeerLector")
         End Try
     End Function
 
@@ -68,8 +71,9 @@ Friend NotInheritable Class DisponibilidadReserva
                 cmd.Parameters.Add("@libro", SqlDbType.Int).Value = idLibro
                 Return Convert.ToInt32(cmd.ExecuteScalar())
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "DisponibilidadReserva.Capacidad")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "DisponibilidadReserva.Capacidad")
         End Try
     End Function
 
@@ -81,8 +85,9 @@ Friend NotInheritable Class DisponibilidadReserva
                 Dim valor = cmd.ExecuteScalar()
                 Return If(valor Is Nothing, CType(Nothing, Boolean?), CBool(valor))
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "DisponibilidadReserva.BloquearLibro")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "DisponibilidadReserva.BloquearLibro")
         End Try
     End Function
 
@@ -103,8 +108,9 @@ Friend NotInheritable Class DisponibilidadReserva
                     reglas.ValidarCoberturaReserva(activo, libres, reservas)
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "DisponibilidadReserva.LeerCobertura")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "DisponibilidadReserva.LeerCobertura")
         End Try
     End Sub
 End Class

@@ -5,6 +5,12 @@ Friend NotInheritable Class ErroresDAO
     Private Sub New()
     End Sub
 
+    Friend Shared Function ParaMantenimiento(ex As Exception, operacion As String) As Exception
+        Dim errorSql = TryCast(ex, SqlException)
+        If errorSql IsNot Nothing Then Return Traducir(errorSql, operacion)
+        Return New AccesoDatosException("No se pudo completar la operación en la base de datos.", 0, operacion, ex)
+    End Function
+
     Friend Shared Function Traducir(ex As SqlException, operacion As String) As AccesoDatosException
         Dim mensaje As String
         Select Case ex.Number

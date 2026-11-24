@@ -42,6 +42,7 @@ Partial Class frmLector
         tabPenalizaciones = New TabPage()
         tabAvisos = New TabPage()
         barraCatalogo = New FlowLayoutPanel()
+        btnBuscar = New System.Windows.Forms.Button()
         txtBuscar = New TextBox()
         cboCategoria = New ComboBox()
         btnActualizar = New Button()
@@ -262,6 +263,11 @@ Partial Class frmLector
         ' 
         barraCatalogo.Controls.Add(txtBuscar)
         barraCatalogo.Controls.Add(cboCategoria)
+        btnBuscar.Name = "btnBuscar"
+        btnBuscar.Text = "Buscar"
+        btnBuscar.Size = New System.Drawing.Size(92, 32)
+        btnBuscar.Margin = New System.Windows.Forms.Padding(3, 3, 3, 3)
+        barraCatalogo.Controls.Add(btnBuscar)
         barraCatalogo.Controls.Add(btnActualizar)
         barraCatalogo.Dock = DockStyle.Top
         barraCatalogo.Location = New Point(12, 12)
@@ -921,6 +927,7 @@ Partial Class frmLector
     Friend WithEvents tabPenalizaciones As System.Windows.Forms.TabPage
     Friend WithEvents tabAvisos As System.Windows.Forms.TabPage
     Friend WithEvents barraCatalogo As System.Windows.Forms.FlowLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents txtBuscar As System.Windows.Forms.TextBox
     Friend WithEvents cboCategoria As System.Windows.Forms.ComboBox
     Friend WithEvents btnActualizar As System.Windows.Forms.Button

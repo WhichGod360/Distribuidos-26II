@@ -11,6 +11,7 @@ Public Class Conexion
 
     Private ReadOnly cadenaConexion As String
 
+#If Not NET472 Then
     Private Const CadenaSomee As String =
         "workstation id=somee_distribuidos-II.mssql.somee.com;" &
         "packet size=4096;" &
@@ -21,18 +22,27 @@ Public Class Conexion
         "initial catalog=somee_distribuidos-II;" &
         "TrustServerCertificate=True;"
 
-    Private Sub New()
-        ' Conexión activa: SQL Server remoto de Somee.
-        ' o comentas una o comentas otra según donde quieras conectarte.
+#End If
 
+    Private Sub New()
         Dim configurada = Environment.GetEnvironmentVariable("BIBLIOTECA_CONNECTION_STRING")
         If String.IsNullOrWhiteSpace(configurada) Then
             Dim archivo = Environment.GetEnvironmentVariable("BIBLIOTECA_CONNECTION_FILE")
+#If NET472 Then
+            If String.IsNullOrWhiteSpace(archivo) Then
+                archivo = IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "App_Data", "connection-string.txt")
+            End If
+#End If
             If Not String.IsNullOrWhiteSpace(archivo) AndAlso System.IO.File.Exists(archivo) Then
                 configurada = System.IO.File.ReadAllText(archivo).Trim()
             End If
         End If
+#If NET472 Then
+        If String.IsNullOrWhiteSpace(configurada) Then Throw New InvalidOperationException("Configura la conexión SQL del servidor.")
+        cadenaConexion = configurada
+#Else
         cadenaConexion = If(String.IsNullOrWhiteSpace(configurada), CadenaSomee, configurada)
+#End If
 
         ' cadenaConexion = "Data Source=.\SQLEXPRESS01;Initial Catalog=distribuidos-II;Integrated Security=SSPI;TrustServerCertificate=True;"
     End Sub
@@ -48,40 +58,42 @@ Public Class Conexion
 
     ' Cada operación concurrente debe ser dueña de su conexión y transacción.
     Public Function CrearConexionIndependiente() As SqlConnection
-        Dim cn As New SqlConnection(cadenaConexion)
+        Dim cn As SqlConnection = Nothing
         Try
+            cn = New SqlConnection(cadenaConexion)
             cn.Open()
             Return cn
-        Catch
-            cn.Dispose()
+        Catch ex As Exception
+            If cn IsNot Nothing Then cn.Dispose()
             Throw
         End Try
     End Function
 
     ' Acceso a la instancia única
     Public Shared Function ObtenerInstancia() As Conexion
-        If _instancia Is Nothing Then
-            SyncLock _bloqueo
-                If _instancia Is Nothing Then
-                    _instancia = New Conexion()
-                End If
-            End SyncLock
-        End If
-        Return _instancia
+        Try
+            If _instancia Is Nothing Then
+                SyncLock _bloqueo
+                    If _instancia Is Nothing Then
+                        _instancia = New Conexion()
+                    End If
+                End SyncLock
+            End If
+            Return _instancia
+        Catch ex As Exception
+            Throw New InvalidOperationException("No se pudo cargar la configuración de la conexión.", ex)
+        End Try
     End Function
 
     ''' Devuelve una conexión abierta lista para operar.
     ''' Si hay una transacción activa, devuelve la conexión de dicha transacción
     Public Function ObtenerConexion() As SqlConnection
-        If EnTransaccion Then
-            Return _conexionTransaccional
-        End If
-
-        Dim cn As New SqlConnection(cadenaConexion)
-        If cn.State <> ConnectionState.Open Then
-            cn.Open()
-        End If
-        Return cn
+        Try
+            If EnTransaccion Then Return _conexionTransaccional
+            Return CrearConexionIndependiente()
+        Catch ex As Exception
+            Throw New InvalidOperationException("No se pudo abrir la conexión a la base de datos.", ex)
+        End Try
     End Function
 
     Public ReadOnly Property EnTransaccion As Boolean
@@ -96,13 +108,16 @@ Public Class Conexion
         End Get
     End Property
     Public Sub IniciarTransaccion()
-        If EnTransaccion Then
-            Throw New InvalidOperationException("Ya existe una transacción en curso.")
-        End If
-
-        _conexionTransaccional = New SqlConnection(cadenaConexion)
-        _conexionTransaccional.Open()
-        _transaccionActiva = _conexionTransaccional.BeginTransaction()
+        If EnTransaccion Then Throw New InvalidOperationException("Ya existe una transacción en curso.")
+        Dim cn As SqlConnection = Nothing
+        Try
+            cn = CrearConexionIndependiente()
+            _transaccionActiva = cn.BeginTransaction()
+            _conexionTransaccional = cn
+        Catch ex As Exception
+            If cn IsNot Nothing Then cn.Dispose()
+            Throw
+        End Try
     End Sub
 
     Public Sub ConfirmarTransaccion()
@@ -112,6 +127,8 @@ Public Class Conexion
 
         Try
             _transaccionActiva.Commit()
+        Catch ex As Exception
+            Throw
         Finally
             LimpiarTransaccion()
         End Try
@@ -122,23 +139,24 @@ Public Class Conexion
 
         Try
             _transaccionActiva.Rollback()
+        Catch ex As Exception
+            Throw
         Finally
             LimpiarTransaccion()
         End Try
     End Sub
 
     Private Sub LimpiarTransaccion()
-        If _transaccionActiva IsNot Nothing Then
-            _transaccionActiva.Dispose()
-            _transaccionActiva = Nothing
-        End If
-
-        If _conexionTransaccional IsNot Nothing Then
-            If _conexionTransaccional.State = ConnectionState.Open Then
-                _conexionTransaccional.Close()
-            End If
-            _conexionTransaccional.Dispose()
-            _conexionTransaccional = Nothing
-        End If
+        Dim tx = _transaccionActiva
+        Dim cn = _conexionTransaccional
+        _transaccionActiva = Nothing
+        _conexionTransaccional = Nothing
+        Try
+            If tx IsNot Nothing Then tx.Dispose()
+        Catch ex As Exception
+            Throw
+        Finally
+            If cn IsNot Nothing Then cn.Dispose()
+        End Try
     End Sub
 End Class

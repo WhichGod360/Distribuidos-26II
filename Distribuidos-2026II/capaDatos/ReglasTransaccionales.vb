@@ -4,6 +4,7 @@ Public Interface IReglasCirculacion
     Sub ValidarLector(datos As DatosLectorPrestamo, cantidadNueva As Integer)
     Sub ValidarLibro(estado As Boolean?)
     Sub ValidarEjemplar(estado As Boolean?, prestamosAbiertos As Integer)
+    Sub ValidarTituloUnico(esNuevo As Boolean)
     Sub ValidarVentanilla(solicitudesVigentes As Integer, capacidad As Integer)
     Sub ValidarNuevaSolicitud(solicitudesVigentes As Integer)
     Sub ValidarDisponibilidad(capacidad As Integer)

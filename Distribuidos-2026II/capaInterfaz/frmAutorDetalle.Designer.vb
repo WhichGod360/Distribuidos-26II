@@ -25,7 +25,7 @@ Partial Class frmAutorDetalle
 
         ' Controles existentes
         bloque_nombre = New Panel()
-        nombre = New TextBox()
+        txtNombre = New TextBox()
         etiqueta_nombre = New Label()
 
         ' --- Nuevos controles declarados ---
@@ -46,8 +46,8 @@ Partial Class frmAutorDetalle
         etiqueta_biografia = New Label()
 
         accionesEditor = New FlowLayoutPanel()
-        guardar = New Button()
-        cancelar = New Button()
+        btnGuardar = New Button()
+        btnCancelar = New Button()
 
         encabezado.SuspendLayout()
         CType(imagenModulo, ISupportInitialize).BeginInit()
@@ -177,7 +177,7 @@ Partial Class frmAutorDetalle
         ' 
         ' bloque_nombre
         ' 
-        bloque_nombre.Controls.Add(nombre)
+        bloque_nombre.Controls.Add(txtNombre)
         bloque_nombre.Controls.Add(etiqueta_nombre)
         bloque_nombre.Dock = DockStyle.Fill
         bloque_nombre.Location = New Point(0, 0)
@@ -186,14 +186,14 @@ Partial Class frmAutorDetalle
         bloque_nombre.Size = New Size(594, 58)
         bloque_nombre.TabIndex = 0
         ' 
-        ' nombre
+        ' txtNombre
         ' 
-        nombre.Dock = DockStyle.Top
-        nombre.Location = New Point(0, 24)
-        nombre.MaxLength = 255
-        nombre.Name = "nombre"
-        nombre.Size = New Size(594, 30)
-        nombre.TabIndex = 0
+        txtNombre.Dock = DockStyle.Top
+        txtNombre.Location = New Point(0, 24)
+        txtNombre.MaxLength = 255
+        txtNombre.Name = "txtNombre"
+        txtNombre.Size = New Size(594, 30)
+        txtNombre.TabIndex = 0
         ' 
         ' etiqueta_nombre
         ' 
@@ -339,8 +339,8 @@ Partial Class frmAutorDetalle
         ' 
         ' accionesEditor
         ' 
-        accionesEditor.Controls.Add(guardar)
-        accionesEditor.Controls.Add(cancelar)
+        accionesEditor.Controls.Add(btnGuardar)
+        accionesEditor.Controls.Add(btnCancelar)
         accionesEditor.Dock = DockStyle.Fill
         accionesEditor.FlowDirection = FlowDirection.RightToLeft
         accionesEditor.Location = New Point(27, 493)
@@ -348,48 +348,48 @@ Partial Class frmAutorDetalle
         accionesEditor.Padding = New Padding(0, 12, 0, 0)
         accionesEditor.Size = New Size(606, 52)
         accionesEditor.TabIndex = 2
-        ' 
-        ' guardar
-        ' 
-        guardar.BackColor = Color.FromArgb(CByte(72), CByte(101), CByte(244))
-        guardar.Cursor = Cursors.Hand
-        guardar.FlatAppearance.BorderColor = Color.FromArgb(CByte(215), CByte(222), CByte(237))
-        guardar.FlatAppearance.BorderSize = 0
-        guardar.FlatStyle = FlatStyle.Flat
-        guardar.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
-        guardar.ForeColor = Color.White
-        guardar.Location = New Point(441, 12)
-        guardar.Margin = New Padding(0, 0, 10, 4)
-        guardar.Name = "guardar"
-        guardar.Size = New Size(155, 38)
-        guardar.TabIndex = 0
-        guardar.Text = "Guardar"
-        guardar.UseVisualStyleBackColor = False
-        ' 
-        ' cancelar
-        ' 
-        cancelar.BackColor = Color.White
-        cancelar.Cursor = Cursors.Hand
-        cancelar.DialogResult = DialogResult.Cancel
-        cancelar.FlatAppearance.BorderColor = Color.FromArgb(CByte(215), CByte(222), CByte(237))
-        cancelar.FlatStyle = FlatStyle.Flat
-        cancelar.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
-        cancelar.ForeColor = Color.FromArgb(CByte(72), CByte(101), CByte(244))
-        cancelar.Location = New Point(291, 12)
-        cancelar.Margin = New Padding(0, 0, 10, 4)
-        cancelar.Name = "cancelar"
-        cancelar.Size = New Size(140, 38)
-        cancelar.TabIndex = 1
-        cancelar.Text = "Cancelar"
-        cancelar.UseVisualStyleBackColor = False
+        '
+        ' btnGuardar
+        '
+        btnGuardar.BackColor = Color.FromArgb(CByte(72), CByte(101), CByte(244))
+        btnGuardar.Cursor = Cursors.Hand
+        btnGuardar.FlatAppearance.BorderColor = Color.FromArgb(CByte(215), CByte(222), CByte(237))
+        btnGuardar.FlatAppearance.BorderSize = 0
+        btnGuardar.FlatStyle = FlatStyle.Flat
+        btnGuardar.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        btnGuardar.ForeColor = Color.White
+        btnGuardar.Location = New Point(441, 12)
+        btnGuardar.Margin = New Padding(0, 0, 10, 4)
+        btnGuardar.Name = "btnGuardar"
+        btnGuardar.Size = New Size(155, 38)
+        btnGuardar.TabIndex = 0
+        btnGuardar.Text = "Guardar"
+        btnGuardar.UseVisualStyleBackColor = False
+        '
+        ' btnCancelar
+        '
+        btnCancelar.BackColor = Color.White
+        btnCancelar.Cursor = Cursors.Hand
+        btnCancelar.DialogResult = DialogResult.Cancel
+        btnCancelar.FlatAppearance.BorderColor = Color.FromArgb(CByte(215), CByte(222), CByte(237))
+        btnCancelar.FlatStyle = FlatStyle.Flat
+        btnCancelar.Font = New Font("Segoe UI", 10.0F, FontStyle.Bold)
+        btnCancelar.ForeColor = Color.FromArgb(CByte(72), CByte(101), CByte(244))
+        btnCancelar.Location = New Point(291, 12)
+        btnCancelar.Margin = New Padding(0, 0, 10, 4)
+        btnCancelar.Name = "btnCancelar"
+        btnCancelar.Size = New Size(140, 38)
+        btnCancelar.TabIndex = 1
+        btnCancelar.Text = "Cancelar"
+        btnCancelar.UseVisualStyleBackColor = False
         ' 
         ' frmAutorDetalle
         ' 
-        AcceptButton = guardar
+        AcceptButton = btnGuardar
         AutoScaleDimensions = New SizeF(120.0F, 120.0F)
         AutoScaleMode = AutoScaleMode.Dpi
         BackColor = Color.White
-        CancelButton = cancelar
+        CancelButton = btnCancelar
         ClientSize = New Size(660, 560)
         Controls.Add(layoutEditor)
         Font = New Font("Segoe UI", 10.0F)
@@ -431,7 +431,7 @@ Partial Class frmAutorDetalle
     Friend WithEvents camposEditor As System.Windows.Forms.TableLayoutPanel
 
     Friend WithEvents bloque_nombre As System.Windows.Forms.Panel
-    Friend WithEvents nombre As System.Windows.Forms.TextBox
+    Friend WithEvents txtNombre As System.Windows.Forms.TextBox
     Friend WithEvents etiqueta_nombre As System.Windows.Forms.Label
 
     Friend WithEvents bloque_nacionalidad As System.Windows.Forms.Panel
@@ -451,6 +451,6 @@ Partial Class frmAutorDetalle
     Friend WithEvents etiqueta_biografia As System.Windows.Forms.Label
 
     Friend WithEvents accionesEditor As System.Windows.Forms.FlowLayoutPanel
-    Friend WithEvents guardar As System.Windows.Forms.Button
-    Friend WithEvents cancelar As System.Windows.Forms.Button
+    Friend WithEvents btnGuardar As System.Windows.Forms.Button
+    Friend WithEvents btnCancelar As System.Windows.Forms.Button
 End Class

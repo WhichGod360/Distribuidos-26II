@@ -25,6 +25,7 @@ Partial Class frmPrestamos
         layoutVista = New TableLayoutPanel()
         barraFiltros = New FlowLayoutPanel()
         bloque_buscar = New Panel()
+        btnBuscar = New System.Windows.Forms.Button()
         buscar = New TextBox()
         etiqueta_buscar = New Label()
         bloque_filtroEstado = New Panel()
@@ -135,6 +136,11 @@ Partial Class frmPrestamos
         barraFiltros.AutoSize = True
         barraFiltros.Controls.Add(bloque_buscar)
         barraFiltros.Controls.Add(bloque_filtroEstado)
+        btnBuscar.Name = "btnBuscar"
+        btnBuscar.Text = "Buscar"
+        btnBuscar.Size = New System.Drawing.Size(92, 32)
+        btnBuscar.Margin = New System.Windows.Forms.Padding(3, 16, 3, 3)
+        barraFiltros.Controls.Add(btnBuscar)
         barraFiltros.Dock = DockStyle.Fill
         barraFiltros.Location = New Point(27, 105)
         barraFiltros.Name = "barraFiltros"
@@ -353,6 +359,7 @@ Partial Class frmPrestamos
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents layoutVista As System.Windows.Forms.TableLayoutPanel
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents buscar As System.Windows.Forms.TextBox
     Friend WithEvents bloque_buscar As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_buscar As System.Windows.Forms.Label

@@ -9,10 +9,12 @@ Public Class frmSolicitudes
     Public Event DatosCambiados()
     Private ReadOnly negocio As New solicitudPrestamoNegocio()
     Private datos As New List(Of SolicitudPrestamo)()
+    Private textoBuscado As String = ""
     Private ocupado As Boolean
 
     Public Sub New()
         InitializeComponent()
+        MantenimientoUI.EstilizarBoton(btnBuscar)
         cboEstado.SelectedIndex = 0
         For Each boton In {btnAprobar, btnEntregar, btnRechazar, btnActualizar, btnComprobante}
             MantenimientoUI.EstilizarBoton(boton, boton Is btnAprobar OrElse boton Is btnEntregar)
@@ -45,6 +47,7 @@ Public Class frmSolicitudes
 
     Private Sub Ocupacion(valor As Boolean)
         ocupado = valor
+        btnBuscar.Enabled = Not valor
         txtBuscar.Enabled = Not valor
         cboEstado.Enabled = Not valor
         tabla.Enabled = Not valor
@@ -55,7 +58,7 @@ Public Class frmSolicitudes
 
     Private Sub Filtrar()
         If ocupado Then Return
-        Dim texto = txtBuscar.Text.Trim()
+        Dim texto = textoBuscado
         Dim estado = CStr(cboEstado.SelectedItem)
         Dim lista = datos.Where(Function(s) (estado = "Todos" OrElse s.EstadoActual = estado) AndAlso
             (s.IdSolicitud & " " & s.NombreLector & " " & s.DniLector & " " & s.Libros).IndexOf(texto, StringComparison.OrdinalIgnoreCase) >= 0).ToList()
@@ -128,8 +131,8 @@ Public Class frmSolicitudes
         ActualizarDatos()
     End Sub
 
-    Private Sub txtBuscar_TextChanged(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
-        If Not IsHandleCreated Then Return
+    Private Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
+        textoBuscado = txtBuscar.Text.Trim()
         Filtrar()
     End Sub
 

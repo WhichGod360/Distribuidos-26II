@@ -37,7 +37,7 @@ Partial Class frmUsuarios
         btnAgregar = New Button()
         btnEditar = New Button()
         btnEstado = New Button()
-        btnActualizar = New Button()
+        btnBuscar = New Button()
         tablaUsuarios = New DataGridView()
         colIdUsuario = New DataGridViewTextBoxColumn()
         colNombreCompleto = New DataGridViewTextBoxColumn()
@@ -110,6 +110,7 @@ Partial Class frmUsuarios
         barraFiltros.Controls.Add(panelBuscar)
         barraFiltros.Controls.Add(panelRol)
         barraFiltros.Controls.Add(panelEstado)
+        barraFiltros.Controls.Add(btnBuscar)
         barraFiltros.Dock = DockStyle.Fill
         barraFiltros.Margin = New Padding(0, 0, 0, 10)
         barraFiltros.Name = "barraFiltros"
@@ -198,7 +199,6 @@ Partial Class frmUsuarios
         barraAcciones.Controls.Add(btnAgregar)
         barraAcciones.Controls.Add(btnEditar)
         barraAcciones.Controls.Add(btnEstado)
-        barraAcciones.Controls.Add(btnActualizar)
         barraAcciones.Dock = DockStyle.Fill
         barraAcciones.Margin = New Padding(0, 0, 0, 12)
         barraAcciones.Name = "barraAcciones"
@@ -257,22 +257,22 @@ Partial Class frmUsuarios
         btnEstado.Text = "Activar / desactivar"
         btnEstado.UseVisualStyleBackColor = False
         '
-        ' btnActualizar
+        ' btnBuscar
         '
-        btnActualizar.BackColor = Color.White
-        btnActualizar.Cursor = Cursors.Hand
-        btnActualizar.FlatAppearance.BorderColor = Color.FromArgb(59, 91, 115)
-        btnActualizar.FlatAppearance.MouseDownBackColor = Color.FromArgb(225, 232, 238)
-        btnActualizar.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 244, 247)
-        btnActualizar.FlatStyle = FlatStyle.Flat
-        btnActualizar.Font = New Font("Segoe UI Semibold", 10.0F)
-        btnActualizar.ForeColor = Color.FromArgb(59, 91, 115)
-        btnActualizar.Margin = New Padding(0, 0, 10, 4)
-        btnActualizar.Name = "btnActualizar"
-        btnActualizar.Size = New Size(110, 36)
-        btnActualizar.TabIndex = 3
-        btnActualizar.Text = "Actualizar"
-        btnActualizar.UseVisualStyleBackColor = False
+        btnBuscar.BackColor = Color.White
+        btnBuscar.Cursor = Cursors.Hand
+        btnBuscar.FlatAppearance.BorderColor = Color.FromArgb(59, 91, 115)
+        btnBuscar.FlatAppearance.MouseDownBackColor = Color.FromArgb(225, 232, 238)
+        btnBuscar.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 244, 247)
+        btnBuscar.FlatStyle = FlatStyle.Flat
+        btnBuscar.Font = New Font("Segoe UI Semibold", 10.0F)
+        btnBuscar.ForeColor = Color.FromArgb(59, 91, 115)
+        btnBuscar.Margin = New Padding(0, 20, 10, 6)
+        btnBuscar.Name = "btnBuscar"
+        btnBuscar.Size = New Size(110, 36)
+        btnBuscar.TabIndex = 3
+        btnBuscar.Text = "Buscar"
+        btnBuscar.UseVisualStyleBackColor = False
         '
         ' estiloEncabezado
         '
@@ -419,7 +419,7 @@ Partial Class frmUsuarios
     Friend WithEvents btnAgregar As Button
     Friend WithEvents btnEditar As Button
     Friend WithEvents btnEstado As Button
-    Friend WithEvents btnActualizar As Button
+    Friend WithEvents btnBuscar As Button
     Friend WithEvents tablaUsuarios As DataGridView
     Friend WithEvents colIdUsuario As DataGridViewTextBoxColumn
     Friend WithEvents colNombreCompleto As DataGridViewTextBoxColumn

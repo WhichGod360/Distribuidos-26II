@@ -14,19 +14,19 @@ Public Class bitacoraDAO
                     Return idMan
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "bitacoraDAO.Registrar")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "bitacoraDAO.Registrar")
         End Try
     End Function
 
     ' Permite guardar el movimiento dentro de la transacción del mantenimiento.
     ' La conexión y la transacción pertenecen al método que llama.
     Friend Function Registrar(registro As Bitacora, cn As SqlConnection, tx As SqlTransaction) As Integer
-        If registro Is Nothing Then Throw New ArgumentNullException(NameOf(registro))
-        If cn Is Nothing Then Throw New ArgumentNullException(NameOf(cn))
-        If tx Is Nothing Then Throw New ArgumentNullException(NameOf(tx))
-
         Try
+            If registro Is Nothing Then Throw New ArgumentNullException(NameOf(registro))
+            If cn Is Nothing Then Throw New ArgumentNullException(NameOf(cn))
+            If tx Is Nothing Then Throw New ArgumentNullException(NameOf(tx))
             ' El bloqueo se mantiene hasta confirmar o revertir la transacción.
             ' Así la asignación del ID también funciona con la tabla vacía.
             Dim query As String =
@@ -48,8 +48,9 @@ Public Class bitacoraDAO
                     If(registro.CadenaMan Is Nothing, DBNull.Value, CObj(registro.CadenaMan))
                 Return CInt(cmd.ExecuteScalar())
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "bitacoraDAO.Registrar")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "bitacoraDAO.Registrar")
         End Try
     End Function
 
@@ -96,8 +97,9 @@ Public Class bitacoraDAO
                 End Using
             End Using
             Return lista
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "bitacoraDAO.Listar")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "bitacoraDAO.Listar")
         End Try
     End Function
 
@@ -116,8 +118,9 @@ Public Class bitacoraDAO
                 End Using
             End Using
             Return Nothing
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "bitacoraDAO.ObtenerPorId")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "bitacoraDAO.ObtenerPorId")
         End Try
     End Function
 
@@ -137,14 +140,19 @@ Public Class bitacoraDAO
     End Function
 
     Private Shared Function Leer(dr As SqlDataReader) As Bitacora
-        Return New Bitacora With {
-            .IdMan = dr.GetInt32(dr.GetOrdinal("idMan")),
-            .FechaMan = dr.GetDateTime(dr.GetOrdinal("fechaMan")),
-            .HoraMan = dr.GetString(dr.GetOrdinal("horaMan")),
-            .IdUsuario = dr.GetInt32(dr.GetOrdinal("idUsuario")),
-            .Objeto = dr.GetString(dr.GetOrdinal("objeto")),
-            .Accion = AccionVisible(dr.GetString(dr.GetOrdinal("accion"))),
-            .CadenaMan = If(dr.IsDBNull(dr.GetOrdinal("cadenaMan")), Nothing, dr.GetString(dr.GetOrdinal("cadenaMan")))
-        }
+        Try
+            Return New Bitacora With {
+                .IdMan = dr.GetInt32(dr.GetOrdinal("idMan")),
+                .FechaMan = dr.GetDateTime(dr.GetOrdinal("fechaMan")),
+                .HoraMan = dr.GetString(dr.GetOrdinal("horaMan")),
+                .IdUsuario = dr.GetInt32(dr.GetOrdinal("idUsuario")),
+                .Objeto = dr.GetString(dr.GetOrdinal("objeto")),
+                .Accion = AccionVisible(dr.GetString(dr.GetOrdinal("accion"))),
+                .CadenaMan = If(dr.IsDBNull(dr.GetOrdinal("cadenaMan")), Nothing, dr.GetString(dr.GetOrdinal("cadenaMan")))
+            }
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "bitacoraDAO.Leer")
+        End Try
     End Function
 End Class

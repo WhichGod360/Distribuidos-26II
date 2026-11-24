@@ -8,9 +8,8 @@ Public Class prestamoNegocio
         Try
             seguridadNegocio.ExigirPersonal()
             Return dao.buscarLectores(If(texto, "").Trim())
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar los préstamos.", ex)
         End Try
     End Function
@@ -19,9 +18,8 @@ Public Class prestamoNegocio
         Try
             seguridadNegocio.ExigirAccesoLector(idLector)
             Return PrepararConsulta(dao.listar("Todos", "", Date.Today, idLector))
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar los préstamos.", ex)
         End Try
     End Function
@@ -32,9 +30,8 @@ Public Class prestamoNegocio
             Dim estados = {"Todos", "Activos", "Vencidos", "Devueltos"}
             If Not estados.Contains(filtro) Then Throw New ArgumentException("El filtro de préstamos no es válido.")
             Return FiltrarConsulta(PrepararConsulta(dao.listar("Todos", "", Date.Today)), filtro, If(texto, "").Trim(), 0, 0, Date.Today)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar los préstamos.", ex)
         End Try
     End Function
@@ -50,28 +47,36 @@ Public Class prestamoNegocio
             End If
             ValidarFechasPrestamo(fechaInicio, fechaFin, Date.Today)
             Return dao.registrar(idLector, idBibliotecario, idsEjemplares, fechaInicio.Date, fechaFin.Date, reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al registrar los préstamos.", ex)
         End Try
     End Function
 
     Public Function registrar(idLector As Integer, idBibliotecario As Integer, idEjemplar As Integer,
                               fechaInicio As Date, fechaFin As Date) As Integer
-        Return registrar(idLector, idBibliotecario, New List(Of Integer) From {idEjemplar}, fechaInicio, fechaFin)
+        Try
+            Return registrar(idLector, idBibliotecario, New List(Of Integer) From {idEjemplar}, fechaInicio, fechaFin)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo registrar el préstamo.", ex)
+        End Try
     End Function
 
     Public Function registrar(idLector As Integer, idBibliotecario As Integer, idsEjemplares As IList(Of Integer), fechaInicio As Date) As Integer
-        Return registrar(idLector, idBibliotecario, idsEjemplares, fechaInicio, PoliticaPrestamo.FechaLimite(fechaInicio))
+        Try
+            Return registrar(idLector, idBibliotecario, idsEjemplares, fechaInicio, PoliticaPrestamo.FechaLimite(fechaInicio))
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo registrar el préstamo.", ex)
+        End Try
     End Function
 
     Public Function registrar(idLector As Integer, idBibliotecario As Integer, idEjemplar As Integer, fechaInicio As Date) As Integer
         Try
             Return registrar(idLector, idBibliotecario, idEjemplar, fechaInicio, PoliticaPrestamo.FechaLimite(fechaInicio))
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al registrar los préstamos.", ex)
         End Try
     End Function
@@ -83,9 +88,8 @@ Public Class prestamoNegocio
             If fechaRetorno.Date > Date.Today Then Throw New ArgumentException("La devolución no puede tener una fecha futura.")
             Dim calculo = dao.PrevisualizarDevolucion(idPrestamo, fechaRetorno.Date, reglas)
             Return dao.DevolverConfirmado(idPrestamo, idBibliotecario, fechaRetorno.Date, calculo, reglas).DiasRetraso
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al devolver los préstamos.", ex)
         End Try
     End Function
@@ -95,9 +99,8 @@ Public Class prestamoNegocio
             seguridadNegocio.ExigirPersonal()
             If idPrestamo <= 0 Then Throw New ArgumentException("Selecciona un préstamo.")
             Return dao.PrevisualizarDevolucion(idPrestamo, fechaRetorno.Date, reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al calcular la devolución de los préstamos.", ex)
         End Try
     End Function
@@ -107,9 +110,8 @@ Public Class prestamoNegocio
             seguridadNegocio.ExigirOperador(SesionUsuario.IdUsuario)
             If calculo Is Nothing Then Throw New ArgumentException("Actualiza el cálculo de devolución.")
             Return dao.DevolverConfirmado(calculo.IdPrestamo, SesionUsuario.IdUsuario, calculo.FechaRetorno, calculo, reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al devolver los préstamos.", ex)
         End Try
     End Function

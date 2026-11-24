@@ -8,9 +8,8 @@ Public Class dashboardNegocio
             If Not {"Todos", "Activos", "Vencidos", "Devueltos"}.Contains(estado) Then Throw New ArgumentException("Selecciona un estado válido.")
             seguridadNegocio.ExigirPersonal()
             Return New dashboardDAO().consultar(desde.Date, hasta.Date, idCategoria, estado, Date.Today)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar el resumen de la biblioteca.", ex)
         End Try
     End Function
@@ -21,9 +20,8 @@ Public Class dashboardNegocio
             Dim resultado As New List(Of Categoria) From {New Categoria With {.IdCategoria = 0, .NombreCategoria = "Todas las categorías"}}
             resultado.AddRange(New dashboardDAO().listarCategorias())
             Return resultado
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar el resumen de la biblioteca.", ex)
         End Try
     End Function

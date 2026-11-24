@@ -1,5 +1,6 @@
 Imports capaDatos
 Imports System.Net.Mail
+Imports System.Text.RegularExpressions
 Imports System.Security.Cryptography
 
 Public Class usuarioNegocio
@@ -19,9 +20,8 @@ Public Class usuarioNegocio
             For Each anterior In usuarioDao.LeerRespuestasAnteriores()
                 If Not PasswordHasher.IsHash(anterior.Value) Then usuarioDao.MigrarRespuesta(anterior.Key, anterior.Value, RespuestaSeguridadHasher.Hash(anterior.Value))
             Next
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al preparar la seguridad de las cuentas.", ex)
         End Try
     End Sub
@@ -29,16 +29,14 @@ Public Class usuarioNegocio
     Public Function IniciarSesion(email As String, contrasena As String) As Usuario
         Try
             SesionUsuario.Cerrar()
-            PrepararSeguridad()
 
-            If String.IsNullOrWhiteSpace(email) Then
-                Throw New ArgumentException("Debe ingresar su correo electrónico.")
-            End If
+            ValidarCorreo(email)
 
             If String.IsNullOrWhiteSpace(contrasena) Then
                 Throw New ArgumentException("Debe ingresar su contraseña.")
             End If
 
+            PrepararSeguridad()
             Dim usuarioLogueado As Usuario = usuarioDao.ObtenerCredenciales(email.Trim())
             If usuarioLogueado IsNot Nothing Then
                 Dim anterior = usuarioLogueado.Contrasena
@@ -64,18 +62,15 @@ Public Class usuarioNegocio
             AuditoriaDAO.RegistrarEvento(usuarioLogueado.IdUsuario, "Acceso", "SELECT", "Inicio de sesión aceptado")
             SesionUsuario.Iniciar(usuarioLogueado)
             Return usuarioLogueado
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error inesperado al iniciar sesión.", ex)
         End Try
     End Function
 
     Public Function ObtenerPregunta(email As String) As String
         Try
-            If String.IsNullOrWhiteSpace(email) Then
-                Throw New ArgumentException("Debe ingresar un correo electrónico.")
-            End If
+            ValidarCorreo(email)
 
             PrepararSeguridad()
             Dim pregunta As String = usuarioDao.ObtenerPreguntaSeguridad(email.Trim())
@@ -84,16 +79,15 @@ Public Class usuarioNegocio
             End If
 
             Return pregunta
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al obtener la pregunta de seguridad.", ex)
         End Try
     End Function
 
     Public Function ValidarRespuesta(email As String, respuesta As String) As String
         Try
-            If String.IsNullOrWhiteSpace(email) OrElse email.Trim().Length > 100 Then Throw New ArgumentException("Ingresa un correo válido.")
+            ValidarCorreo(email)
             If String.IsNullOrWhiteSpace(respuesta) Then
                 Throw New ArgumentException("Por favor, ingrese su respuesta de seguridad.")
             End If
@@ -113,27 +107,15 @@ Public Class usuarioNegocio
                 autorizaciones.Add(autorizacion, New AutorizacionRecuperacion With {.Identidad = identidad, .Vence = Date.UtcNow.AddMinutes(5)})
             End SyncLock
             Return autorizacion
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al validar la respuesta.", ex)
         End Try
     End Function
 
     Public Sub CambiarContrasena(email As String, nuevaClave As String, confirmarClave As String, autorizacion As String)
         Try
-            If String.IsNullOrWhiteSpace(nuevaClave) OrElse String.IsNullOrWhiteSpace(confirmarClave) Then
-                Throw New ArgumentException("Debe completar ambos campos de contraseña.")
-            End If
-
-            If nuevaClave <> confirmarClave Then
-                Throw New ArgumentException("Las contraseñas no coinciden.")
-            End If
-
-            If nuevaClave.Length < 8 OrElse Not nuevaClave.Any(AddressOf Char.IsUpper) OrElse Not nuevaClave.Any(AddressOf Char.IsDigit) Then
-                Throw New ArgumentException("La contraseña no cumple con los requisitos mínimos de seguridad.")
-            End If
-
+            ValidarCorreo(email)
             ValidarClave(nuevaClave, confirmarClave)
             Dim validada As AutorizacionRecuperacion = Nothing
             SyncLock autorizaciones
@@ -151,9 +133,8 @@ Public Class usuarioNegocio
             If Not actualizado Then
                 Throw New InvalidOperationException("La cuenta cambió después de la verificación. Inicia nuevamente la recuperación.")
             End If
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al cambiar la contraseña.", ex)
         End Try
     End Sub
@@ -162,32 +143,11 @@ Public Class usuarioNegocio
         Try
             ValidarDatos(nuevoUsuario, False)
             ValidarAlta(nuevoUsuario, confirmacionClave)
-            PrepararSeguridad()
-
-            If String.IsNullOrWhiteSpace(nuevoUsuario.NumeroDniUsuario) OrElse nuevoUsuario.NumeroDniUsuario.Trim().Length <> 8 OrElse Not IsNumeric(nuevoUsuario.NumeroDniUsuario) Then
-                Throw New ArgumentException("El DNI debe contener exactamente 8 dígitos numéricos.")
-            End If
-
-            If String.IsNullOrWhiteSpace(nuevoUsuario.NombreUsuario) Then
-                Throw New ArgumentException("Debe ingresar los nombres.")
-            End If
-
-            If String.IsNullOrWhiteSpace(nuevoUsuario.ApPaterno) Then
-                Throw New ArgumentException("Debe ingresar el apellido paterno.")
-            End If
-
-            If String.IsNullOrWhiteSpace(nuevoUsuario.ApMaterno) Then
-                Throw New ArgumentException("Debe ingresar el apellido materno.")
-            End If
-
             If Not nuevoUsuario.GeneroUsuario.HasValue Then
                 Throw New ArgumentException("Debe seleccionar un género.")
             End If
 
-            If String.IsNullOrWhiteSpace(nuevoUsuario.EmailUsuario) Then
-                Throw New ArgumentException("Debe ingresar un correo electrónico.")
-            End If
-
+            PrepararSeguridad()
             If usuarioDao.ExisteDNI(nuevoUsuario.NumeroDniUsuario.Trim()) Then
                 Throw New InvalidOperationException("El número de DNI ingresado ya se encuentra registrado.")
             End If
@@ -196,33 +156,12 @@ Public Class usuarioNegocio
                 Throw New InvalidOperationException("El correo electrónico ingresado ya se encuentra registrado.")
             End If
 
-            If String.IsNullOrWhiteSpace(nuevoUsuario.Contrasena) OrElse String.IsNullOrWhiteSpace(confirmacionClave) Then
-                Throw New ArgumentException("Debe ingresar y confirmar su contraseña.")
-            End If
-
-            If nuevoUsuario.Contrasena <> confirmacionClave Then
-                Throw New ArgumentException("Las contraseñas no coinciden.")
-            End If
-
-            If nuevoUsuario.Contrasena.Length < 8 OrElse Not nuevoUsuario.Contrasena.Any(AddressOf Char.IsUpper) OrElse Not nuevoUsuario.Contrasena.Any(AddressOf Char.IsDigit) Then
-                Throw New ArgumentException("La contraseña no cumple con los requisitos mínimos de seguridad.")
-            End If
-
-            If String.IsNullOrWhiteSpace(nuevoUsuario.PreguntaSegura) Then
-                Throw New ArgumentException("Debe escribir una pregunta de seguridad.")
-            End If
-
-            If String.IsNullOrWhiteSpace(nuevoUsuario.RptaSegura) Then
-                Throw New ArgumentException("Debe ingresar la respuesta a su pregunta de seguridad.")
-            End If
-
             Dim guardado As Boolean = usuarioDao.RegistrarLector(nuevoUsuario, PasswordHasher.Hash(nuevoUsuario.Contrasena), RespuestaSeguridadHasher.Hash(nuevoUsuario.RptaSegura))
             If Not guardado Then
                 Throw New InvalidOperationException("No se pudo completar el registro del usuario.")
             End If
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al registrar el nuevo lector.", ex)
         End Try
     End Sub
@@ -240,9 +179,8 @@ Public Class usuarioNegocio
             If Not {"Todos", "Activo", "Inactivo"}.Contains(estado) Then Throw New ArgumentException("Selecciona un estado válido.")
             If idRol < 0 Then Throw New ArgumentException("Selecciona un rol válido.")
             Return usuarioDao.ListarUsuarios(If(texto, "").Trim(), idRol, estado)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al listar los usuarios.", ex)
         End Try
     End Function
@@ -254,9 +192,8 @@ Public Class usuarioNegocio
             Dim usuario As Usuario = usuarioDao.ObtenerUsuario(idUsuario)
             If usuario Is Nothing Then Throw New InvalidOperationException("El usuario ya no existe.")
             Return usuario
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al obtener el usuario.", ex)
         End Try
     End Function
@@ -265,9 +202,8 @@ Public Class usuarioNegocio
         Try
             seguridadNegocio.ExigirAdministrador()
             Return usuarioDao.ListarRoles()
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al listar los roles.", ex)
         End Try
     End Function
@@ -278,14 +214,14 @@ Public Class usuarioNegocio
             ValidarDatos(usuario, True)
             ValidarAlta(usuario, confirmacionClave)
             PrepararSeguridad()
-            Try
-                If Not usuarioDao.CrearUsuario(usuario, administrador, PasswordHasher.Hash(usuario.Contrasena), RespuestaSeguridadHasher.Hash(usuario.RptaSegura), reglas) Then Throw New InvalidOperationException("No se pudo crear el usuario.")
-            Catch ex As AccesoDatosException When ex.NumeroSql = 2601 OrElse ex.NumeroSql = 2627
-                Throw New ArgumentException("El correo o DNI ya está registrado.", ex)
-            End Try
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
+            Dim claveHash = PasswordHasher.Hash(usuario.Contrasena)
+            Dim respuestaHash = RespuestaSeguridadHasher.Hash(usuario.RptaSegura)
+            If Not usuarioDao.CrearUsuario(usuario, administrador, claveHash, respuestaHash, reglas) Then
+                Throw New InvalidOperationException("No se pudo crear el usuario.")
+            End If
         Catch ex As Exception
+            If EsDuplicado(ex) Then Throw New ArgumentException("El correo o DNI ya está registrado.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al crear el usuario.", ex)
         End Try
     End Sub
@@ -295,27 +231,27 @@ Public Class usuarioNegocio
             Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
             ValidarDatos(usuario, True)
             If usuario.IdUsuario <= 0 Then Throw New ArgumentException("Selecciona un usuario válido.")
-            Try
-                If Not usuarioDao.ActualizarUsuario(usuario, administrador, reglas) Then Throw New InvalidOperationException("No se pudo actualizar el usuario.")
-            Catch ex As AccesoDatosException When ex.NumeroSql = 2601 OrElse ex.NumeroSql = 2627
-                Throw New ArgumentException("El correo o DNI pertenece a otra cuenta.", ex)
-            End Try
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
+            If Not usuarioDao.ActualizarUsuario(usuario, administrador, reglas) Then Throw New InvalidOperationException("No se pudo actualizar el usuario.")
         Catch ex As Exception
+            If EsDuplicado(ex) Then Throw New ArgumentException("El correo o DNI pertenece a otra cuenta.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al actualizar el usuario.", ex)
         End Try
     End Sub
+
+    Private Shared Function EsDuplicado(ex As Exception) As Boolean
+        Dim errorDatos = TryCast(ex, AccesoDatosException)
+        Return errorDatos IsNot Nothing AndAlso (errorDatos.NumeroSql = 2601 OrElse errorDatos.NumeroSql = 2627)
+    End Function
 
     Public Sub CambiarEstadoUsuario(idUsuario As Integer, estado As String)
         Try
             Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
             If idUsuario <= 0 Then Throw New ArgumentException("Selecciona un usuario.")
             If Not {"Activo", "Inactivo"}.Contains(estado) Then Throw New ArgumentException("Selecciona Activo o Inactivo.")
-            If Not usuarioDao.CambiarEstadoUsuario(idUsuario, estado, administrador, reglas) Then Throw New InvalidOperationException("No se pudo cambiar el estado.")
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
+            If Not usuarioDao.CambiarEstadoUsuario(idUsuario, estado, administrador, reglas) Then Throw New InvalidOperationException("El usuario ya no existe.")
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al cambiar el estado del usuario.", ex)
         End Try
     End Sub
@@ -324,9 +260,8 @@ Public Class usuarioNegocio
         Try
             seguridadNegocio.ExigirAdministrador()
             Return usuarioDao.ListarLectoresPendientes(If(texto, "").Trim())
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al listar los lectores pendientes.", ex)
         End Try
     End Function
@@ -336,9 +271,8 @@ Public Class usuarioNegocio
             Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
             If idUsuario <= 0 Then Throw New ArgumentException("Selecciona un lector.")
             If Not usuarioDao.AprobarLector(idUsuario, administrador, reglas) Then Throw New InvalidOperationException("El lector ya no está pendiente de aprobación. Actualiza la lista.")
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al aprobar al lector.", ex)
         End Try
     End Sub
@@ -348,9 +282,8 @@ Public Class usuarioNegocio
             Dim administrador As Integer = seguridadNegocio.ExigirAdministrador()
             If idUsuario <= 0 Then Throw New ArgumentException("Selecciona un lector.")
             If Not usuarioDao.RechazarLector(idUsuario, administrador, reglas) Then Throw New InvalidOperationException("El lector ya no está pendiente de aprobación. Actualiza la lista.")
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al rechazar al lector.", ex)
         End Try
     End Sub
@@ -373,21 +306,32 @@ Public Class usuarioNegocio
             New KeyValuePair(Of String, String)("apellido paterno", usuario.ApPaterno),
             New KeyValuePair(Of String, String)("apellido materno", usuario.ApMaterno)}
             If String.IsNullOrWhiteSpace(campo.Value) OrElse campo.Value.Trim().Length > 100 Then Throw New ArgumentException("Ingresa " & campo.Key & " (máximo 100 caracteres).")
+            If Not Regex.IsMatch(campo.Value.Trim(), "\A(?=.*\p{L})[\p{L}\p{M}\p{Zs}\p{Pd}.'’]+\z") Then
+                Throw New ArgumentException("Revisa el campo " & campo.Key & ". Usa letras, espacios, guiones, puntos o apóstrofos.")
+            End If
         Next
         Dim dni As String = If(usuario.NumeroDniUsuario, "").Trim()
         If dni.Length <> 8 OrElse dni.Any(Function(c) c < "0"c OrElse c > "9"c) Then Throw New ArgumentException("El DNI debe contener exactamente ocho dígitos.")
-        Dim email As String = If(usuario.EmailUsuario, "").Trim()
-        If email.Length = 0 OrElse email.Length > 100 Then Throw New ArgumentException("Ingresa un correo válido (máximo 100 caracteres).")
-        Try
-            If New MailAddress(email).Address <> email Then Throw New FormatException()
-        Catch ex As FormatException
-            Throw New ArgumentException("El formato del correo electrónico no es válido.")
-        End Try
+        ValidarCorreo(usuario.EmailUsuario)
         If usuario.FechaNacimientoUsuario.HasValue AndAlso usuario.FechaNacimientoUsuario.Value.Date > Date.Today Then Throw New ArgumentException("La fecha de nacimiento no puede ser futura.")
         If requiereRol Then
             If usuario.IdRolUsuario <= 0 Then Throw New ArgumentException("Selecciona un rol.")
             If Not {"Activo", "Inactivo"}.Contains(usuario.EstadoUsuario) Then Throw New ArgumentException("Selecciona Activo o Inactivo.")
         End If
+    End Sub
+
+    Private Shared Sub ValidarCorreo(valor As String)
+        Dim correo = If(valor, "").Trim()
+        If correo.Length = 0 OrElse correo.Length > 100 Then Throw New ArgumentException("Ingresa un correo válido de hasta 100 caracteres.")
+        Try
+            Dim direccion As New MailAddress(correo)
+            If direccion.Address <> correo OrElse correo.Any(AddressOf Char.IsWhiteSpace) OrElse
+               Not direccion.Host.Contains(".") OrElse direccion.Host.StartsWith(".") OrElse direccion.Host.EndsWith(".") Then
+                Throw New FormatException()
+            End If
+        Catch ex As FormatException
+            Throw New ArgumentException("El formato del correo electrónico no es válido.", ex)
+        End Try
     End Sub
 
     Private Shared Sub ValidarAlta(usuario As Usuario, confirmacion As String)

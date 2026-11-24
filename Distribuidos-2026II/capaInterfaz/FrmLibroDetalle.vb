@@ -22,9 +22,6 @@ Public Class FrmLibroDetalle
         dtpAnio.ShowUpDown = True
     End Sub
 
-    ' =====================================================================
-    '  DATOS EXPUESTOS AL FORMULARIO QUE LO LLAMA
-    ' =====================================================================
     Public ReadOnly Property Titulo As String
         Get
             Return txtTitulo.Text.Trim()
@@ -73,9 +70,6 @@ Public Class FrmLibroDetalle
         End Get
     End Property
 
-    ' =====================================================================
-    '  MODO EDICIÓN  (si no se llama, el formulario funciona como "Agregar")
-    ' =====================================================================
     Public Sub CargarParaEditar(id As Integer, titulo As String, editorial As String, fechaPublicacion As Date,
                                 autores As IEnumerable(Of String), categorias As IEnumerable(Of String),
                                 publico As String, totalEjemplares As Integer, disponibles As Integer,
@@ -112,9 +106,6 @@ Public Class FrmLibroDetalle
         _modificado = False
     End Sub
 
-    ' =====================================================================
-    '  EVENTOS
-    ' =====================================================================
     Private Sub FrmLibroDetalle_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         If ContextoDiseno.Activo(Me) Then Return
         ConfigurarDiseno()
@@ -133,7 +124,7 @@ Public Class FrmLibroDetalle
         e.Graphics.DrawRectangle(Pens.Silver, 0, 0, Width - 1, Height - 1)
     End Sub
 
-    Private Sub Marcar(sender As Object, e As EventArgs) Handles txtTitulo.TextChanged, txtEditorial.TextChanged, dtpAnio.ValueChanged, cboPublico.SelectedIndexChanged, nudCantidad.ValueChanged, chkActivo.CheckedChanged
+    Private Sub MarcarCambiosPendientes(sender As Object, e As EventArgs) Handles txtTitulo.TextChanged, txtEditorial.TextChanged, dtpAnio.ValueChanged, cboPublico.SelectedIndexChanged, nudCantidad.ValueChanged, chkActivo.CheckedChanged
         _modificado = True
     End Sub
 
@@ -185,13 +176,15 @@ Public Class FrmLibroDetalle
 
     Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
+            Dim idsAutores = negocio.ResolverAutores(Autores)
+            Dim idsCategorias = negocio.ResolverCategorias(Categorias)
             Dim guardado As Boolean
             If _idLibro = 0 Then
                 guardado = negocio.agregarLibroCompleto(Titulo, Editorial, CShort(Anio.Year), Publico,
-                    Activo, negocio.ResolverAutores(Autores), negocio.ResolverCategorias(Categorias), CantidadEjemplares)
+                    Activo, idsAutores, idsCategorias, CantidadEjemplares)
             Else
                 guardado = negocio.actualizarLibroCompleto(_idLibro, Titulo, Editorial, CShort(Anio.Year), Publico,
-                    Activo, negocio.ResolverAutores(Autores), negocio.ResolverCategorias(Categorias))
+                    Activo, idsAutores, idsCategorias)
             End If
             If Not guardado Then Throw New InvalidOperationException("No se pudo guardar el libro.")
             _modificado = False
@@ -201,7 +194,7 @@ Public Class FrmLibroDetalle
         End Try
     End Sub
 
-    Private Sub Salir(sender As Object, e As EventArgs) Handles btnCancelar.Click
+    Private Sub btnCancelar_Click(sender As Object, e As EventArgs) Handles btnCancelar.Click
         If _modificado Then
             Dim r = FrmConfirmacion.Mostrar(Me, TipoConfirmacion.Advertencia, "Tienes cambios sin guardar",
                         "Si sales ahora, se perderán los cambios que hiciste en este formulario.",
@@ -212,7 +205,7 @@ Public Class FrmLibroDetalle
         DialogResult = DialogResult.Cancel
     End Sub
 
-    Private Sub AlCerrar(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+    Private Sub FrmLibroDetalle_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If Not _modificado OrElse (DialogResult <> DialogResult.Cancel AndAlso DialogResult <> DialogResult.None) Then Return
         If FrmConfirmacion.Mostrar(Me, TipoConfirmacion.Advertencia, "Cambios sin guardar",
             "Se perderán los cambios del formulario.", "Salir sin guardar", "Seguir editando") <> DialogResult.OK Then
@@ -223,9 +216,6 @@ Public Class FrmLibroDetalle
         End If
     End Sub
 
-    ' =====================================================================
-    '  AUXILIARES
-    ' =====================================================================
 
     Private Function ObtenerChips(panel As FlowLayoutPanel) As List(Of String)
         Dim lista As New List(Of String)

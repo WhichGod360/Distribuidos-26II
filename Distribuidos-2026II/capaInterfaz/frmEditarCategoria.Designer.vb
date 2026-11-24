@@ -30,8 +30,8 @@ Partial Class frmEditarCategoria
         Me.bloque_chkEstado = New System.Windows.Forms.Panel()
         Me.etiqueta_chkEstado = New System.Windows.Forms.Label()
         Me.accionesEditor = New System.Windows.Forms.FlowLayoutPanel()
-        Me.Button10 = New System.Windows.Forms.Button()
-        Me.Button11 = New System.Windows.Forms.Button()
+        Me.btnGuardar = New System.Windows.Forms.Button()
+        Me.btnCancelar = New System.Windows.Forms.Button()
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.encabezado.SuspendLayout()
         Me.textoEncabezado.SuspendLayout()
@@ -138,48 +138,48 @@ Partial Class frmEditarCategoria
         Me.accionesEditor.Dock = System.Windows.Forms.DockStyle.Fill
         Me.accionesEditor.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft
         Me.accionesEditor.Padding = New System.Windows.Forms.Padding(0, 12, 0, 0)
-        Me.Button10.Name = "Button10"
-        Me.Button10.Text = "Guardar"
-        Me.Button10.Size = New System.Drawing.Size(170, 38)
-        Me.Button10.AutoSize = False
-        Me.Button10.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button10.FlatAppearance.BorderSize = 0
-        Me.Button10.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(47, 72, 92)
-        Me.Button10.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(35, 56, 72)
-        Me.Button10.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(222, 226, 231)
-        Me.Button10.BackColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.Button10.ForeColor = System.Drawing.Color.White
-        Me.Button10.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
-        Me.Button10.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.Button10.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
-        Me.Button10.UseVisualStyleBackColor = False
-        Me.Button10.Width = 155
-        Me.Button11.Name = "Button11"
-        Me.Button11.Text = "Cancelar"
-        Me.Button11.Size = New System.Drawing.Size(170, 38)
-        Me.Button11.AutoSize = False
-        Me.Button11.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.Button11.FlatAppearance.BorderSize = 1
-        Me.Button11.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.Button11.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
-        Me.Button11.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
-        Me.Button11.BackColor = System.Drawing.Color.White
-        Me.Button11.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.Button11.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
-        Me.Button11.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.Button11.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
-        Me.Button11.UseVisualStyleBackColor = False
-        Me.Button11.Width = 140
-        Me.Button11.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.accionesEditor.Controls.Add(Me.Button10)
-        Me.accionesEditor.Controls.Add(Me.Button11)
+        Me.btnGuardar.Name = "btnGuardar"
+        Me.btnGuardar.Text = "Guardar"
+        Me.btnGuardar.Size = New System.Drawing.Size(170, 38)
+        Me.btnGuardar.AutoSize = False
+        Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnGuardar.FlatAppearance.BorderSize = 0
+        Me.btnGuardar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(47, 72, 92)
+        Me.btnGuardar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(35, 56, 72)
+        Me.btnGuardar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(222, 226, 231)
+        Me.btnGuardar.BackColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnGuardar.ForeColor = System.Drawing.Color.White
+        Me.btnGuardar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnGuardar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnGuardar.UseVisualStyleBackColor = False
+        Me.btnGuardar.Width = 155
+        Me.btnCancelar.Name = "btnCancelar"
+        Me.btnCancelar.Text = "Cancelar"
+        Me.btnCancelar.Size = New System.Drawing.Size(170, 38)
+        Me.btnCancelar.AutoSize = False
+        Me.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnCancelar.FlatAppearance.BorderSize = 1
+        Me.btnCancelar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnCancelar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnCancelar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnCancelar.BackColor = System.Drawing.Color.White
+        Me.btnCancelar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnCancelar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnCancelar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnCancelar.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnCancelar.UseVisualStyleBackColor = False
+        Me.btnCancelar.Width = 140
+        Me.btnCancelar.DialogResult = System.Windows.Forms.DialogResult.Cancel
+        Me.accionesEditor.Controls.Add(Me.btnGuardar)
+        Me.accionesEditor.Controls.Add(Me.btnCancelar)
         Me.cuerpoEditor.Controls.Add(Me.camposEditor)
         Me.layoutEditor.Controls.Add(Me.encabezado, 0, 0)
         Me.layoutEditor.Controls.Add(Me.cuerpoEditor, 0, 1)
         Me.layoutEditor.Controls.Add(Me.accionesEditor, 0, 2)
         Me.Controls.Add(Me.layoutEditor)
-        Me.AcceptButton = Me.Button10
-        Me.CancelButton = Me.Button11
+        Me.AcceptButton = Me.btnGuardar
+        Me.CancelButton = Me.btnCancelar
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi
         Me.Font = New System.Drawing.Font("Segoe UI", 10.0!)
@@ -228,6 +228,6 @@ Partial Class frmEditarCategoria
     Friend WithEvents bloque_chkEstado As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_chkEstado As System.Windows.Forms.Label
     Friend WithEvents accionesEditor As System.Windows.Forms.FlowLayoutPanel
-    Friend WithEvents Button10 As System.Windows.Forms.Button
-    Friend WithEvents Button11 As System.Windows.Forms.Button
+    Friend WithEvents btnGuardar As System.Windows.Forms.Button
+    Friend WithEvents btnCancelar As System.Windows.Forms.Button
 End Class

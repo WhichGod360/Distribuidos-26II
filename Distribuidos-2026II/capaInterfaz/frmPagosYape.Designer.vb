@@ -19,6 +19,7 @@ Partial Class frmPagosYape
         Me.filtros = New Panel()
         Me.lblBuscar = New Label()
         Me.txtBuscar = New TextBox()
+        Me.btnBuscar = New Button()
         Me.lblEstado = New Label()
         Me.cboEstado = New ComboBox()
         Me.acciones = New FlowLayoutPanel()
@@ -73,6 +74,7 @@ Partial Class frmPagosYape
         Me.filtros.Controls.Add(Me.txtBuscar)
         Me.filtros.Controls.Add(Me.lblEstado)
         Me.filtros.Controls.Add(Me.cboEstado)
+        Me.filtros.Controls.Add(Me.btnBuscar)
 
         ' lblBuscar
         Me.lblBuscar.Name = "lblBuscar"
@@ -104,6 +106,12 @@ Partial Class frmPagosYape
         Me.cboEstado.DropDownStyle = ComboBoxStyle.DropDownList
         Me.cboEstado.AccessibleName = "Estado del reporte"
         Me.cboEstado.Items.AddRange(New Object() {"En revisión", "Confirmados", "Denegados", "Todos"})
+
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.Location = New Point(486, 18)
+        Me.btnBuscar.Size = New Size(92, 32)
+        Me.btnBuscar.TabIndex = 2
 
         ' acciones
         Me.acciones.Name = "acciones"
@@ -267,6 +275,7 @@ Partial Class frmPagosYape
     Friend WithEvents filtros As Panel
     Friend WithEvents lblBuscar As Label
     Friend WithEvents txtBuscar As TextBox
+    Friend WithEvents btnBuscar As Button
     Friend WithEvents lblEstado As Label
     Friend WithEvents cboEstado As ComboBox
     Friend WithEvents acciones As FlowLayoutPanel

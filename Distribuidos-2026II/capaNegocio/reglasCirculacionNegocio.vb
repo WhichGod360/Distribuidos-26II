@@ -28,6 +28,10 @@ Public NotInheritable Class reglasCirculacionNegocio
         If prestamosAbiertos > 0 Then Throw New InvalidOperationException("El ejemplar ya tiene un préstamo sin cerrar. Actualiza la disponibilidad.")
     End Sub
 
+    Public Sub ValidarTituloUnico(esNuevo As Boolean) Implements IReglasCirculacion.ValidarTituloUnico
+        If Not esNuevo Then Throw New ArgumentException("Selecciona un ejemplar por título.")
+    End Sub
+
     Public Sub ValidarVentanilla(solicitudesVigentes As Integer, capacidad As Integer) Implements IReglasCirculacion.ValidarVentanilla
         If solicitudesVigentes > 0 Then Throw New InvalidOperationException("El lector tiene una solicitud vigente. Aprueba y entrega el carrito desde Solicitudes, o cancela la solicitud primero.")
         If capacidad <= 0 Then Throw New InvalidOperationException("No hay disponibilidad libre de reservas para ventanilla.")

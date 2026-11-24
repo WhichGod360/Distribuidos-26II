@@ -9,6 +9,7 @@ Public Class frmDetallePenalizacion
     Private ReadOnly negocio As New detallePenalizacionNegocio()
     Private ReadOnly negocioPen As New penalizacionNegocio()
     Private listaActual As New List(Of DetallePenalizacion)()
+    Private textoBuscado As String = ""
     Private cargando As Boolean = True
     Private ReadOnly idPenalizacionInicial As Integer
 
@@ -18,6 +19,7 @@ Public Class frmDetallePenalizacion
 
     Public Sub New(idPenalizacion As Integer)
         InitializeComponent()
+        MantenimientoUI.EstilizarBoton(btnBuscar)
         cboEstadoPago.DisplayMember = "Value"
         cboEstadoPago.ValueMember = "Key"
         cboEstadoPago.DataSource = New KeyValuePair(Of String, String)() {
@@ -33,8 +35,6 @@ Public Class frmDetallePenalizacion
         End If
         MantenimientoUI.EstilizarBoton(btnRevisarYape)
         MantenimientoUI.EstilizarBoton(btnActualizarCargos)
-        AddHandler btnRevisarYape.Click, AddressOf AbrirRevisionYape
-        AddHandler btnActualizarCargos.Click, Sub() ActualizarDatos()
         For Each columna As DataGridViewColumn In DataGridView1.Columns
             columna.MinimumWidth = If(columna.Name = "colDescripcion", 190, 100)
         Next
@@ -77,7 +77,7 @@ Public Class frmDetallePenalizacion
 
     Private Sub Filtrar()
         If cargando Then Return
-        Dim texto = buscar.Text.Trim()
+        Dim texto = textoBuscado
         Dim estado = If(TryCast(cboEstadoPago.SelectedValue, String), "")
         DataGridView1.Rows.Clear()
         For Each d In listaActual
@@ -112,8 +112,8 @@ Public Class frmDetallePenalizacion
         End Using
     End Sub
 
-    Private Sub buscar_TextChanged(sender As Object, e As EventArgs) Handles buscar.TextChanged
-        If Not IsHandleCreated Then Return
+    Private Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
+        textoBuscado = buscar.Text.Trim()
         Filtrar()
     End Sub
 
@@ -130,7 +130,11 @@ Public Class frmDetallePenalizacion
         AbrirEditor(Seleccionado())
     End Sub
 
-    Private Sub AbrirRevisionYape(sender As Object, e As EventArgs)
+    Private Sub btnActualizarCargos_Click(sender As Object, e As EventArgs) Handles btnActualizarCargos.Click
+        ActualizarDatos()
+    End Sub
+
+    Private Sub btnRevisarYape_Click(sender As Object, e As EventArgs) Handles btnRevisarYape.Click
         Using revision As New frmPagosYape()
             MantenimientoUI.MostrarDialogo(revision, Me)
         End Using

@@ -1,14 +1,11 @@
-Imports capaDatos
 Imports capaNegocio
 
 Public Class frmAgregarCategoria
 
-    Private negocio As New categoriaNegocio()
+    Private ReadOnly negocio As New categoriaNegocio()
 
     Public Sub New()
         InitializeComponent()
-        Button10.Text = "Guardar"
-        chkEstado.Checked = True
     End Sub
 
     Private Sub frmAgregarCategoria_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -16,7 +13,7 @@ Public Class frmAgregarCategoria
         txtNombre.Focus()
     End Sub
 
-    Private Sub Button10_Click(sender As Object, e As EventArgs) Handles Button10.Click
+    Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
             If negocio.agregarCategoria(txtNombre.Text, If(chkEstado.Checked, 1, 0)) Then
                 DialogResult = DialogResult.OK

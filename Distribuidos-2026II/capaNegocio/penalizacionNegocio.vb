@@ -8,10 +8,9 @@ Public Class penalizacionNegocio
         Try
             seguridadNegocio.ExigirPersonal()
             Return dao.listarTodos()
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
-            Throw New Exception("Ocurrió un error al consultar las penalizaciones.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo listar los tipos de penalización.", ex)
         End Try
     End Function
 
@@ -19,21 +18,20 @@ Public Class penalizacionNegocio
         Try
             seguridadNegocio.ExigirPersonal()
             Return dao.buscar(texto, estado)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
-            Throw New Exception("Ocurrió un error al consultar las penalizaciones.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo buscar los tipos de penalización.", ex)
         End Try
     End Function
 
     Public Function buscarPorId(idPenalizacion As Integer) As Penalizacion
         Try
+            If idPenalizacion <= 0 Then Throw New ArgumentException("Selecciona un tipo de penalización válido.")
             seguridadNegocio.ExigirPersonal()
             Return dao.buscarPorId(idPenalizacion)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
-            Throw New Exception("Ocurrió un error al consultar las penalizaciones.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo obtener el tipo de penalización.", ex)
         End Try
     End Function
 
@@ -42,43 +40,43 @@ Public Class penalizacionNegocio
             Dim operador = seguridadNegocio.ExigirPersonal()
             Validar(tipo, monto, diasDesde)
             Return dao.agregarPenalizacion(tipo, descripcion, monto, estado, operador, reglas, diasDesde)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
-            Throw New Exception("Ocurrió un error al registrar las penalizaciones.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo registrar el tipo de penalización.", ex)
         End Try
     End Function
 
     Public Function actualizarPenalizacion(idPenalizacion As Integer, tipo As String, descripcion As String, monto As Decimal, estado As Boolean, Optional diasDesde As Integer? = Nothing) As Boolean
         Try
+            If idPenalizacion <= 0 Then Throw New ArgumentException("Selecciona un tipo de penalización válido.")
             Dim operador = seguridadNegocio.ExigirPersonal()
             Validar(tipo, monto, diasDesde)
-            Return dao.actualizarPenalizacion(idPenalizacion, tipo, descripcion, monto, estado, operador, reglas, diasDesde)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
+            If Not dao.actualizarPenalizacion(idPenalizacion, tipo, descripcion, monto, estado, operador, reglas, diasDesde) Then
+                Throw New InvalidOperationException("El tipo ya no existe.")
+            End If
+            Return True
         Catch ex As Exception
-            Throw New Exception("Ocurrió un error al actualizar las penalizaciones.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo actualizar el tipo de penalización.", ex)
         End Try
     End Function
 
     Public Function cambiarEstado(idPenalizacion As Integer, estado As Boolean) As Boolean
         Try
+            If idPenalizacion <= 0 Then Throw New ArgumentException("Selecciona un tipo de penalización válido.")
             Dim operador = seguridadNegocio.ExigirPersonal()
             Return dao.cambiarEstado(idPenalizacion, estado, operador, reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
-            Throw New Exception("Ocurrió un error al actualizar las penalizaciones.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudo cambiar el estado del tipo de penalización.", ex)
         End Try
     End Function
     Public Function listarActivas() As List(Of Penalizacion)
         Try
-            seguridadNegocio.ExigirPersonal()
-            Return dao.buscar("", True)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
+            Return buscar("", True)
         Catch ex As Exception
-            Throw New Exception("Ocurrió un error al consultar las penalizaciones.", ex)
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw New Exception("No se pudieron listar las penalizaciones activas.", ex)
         End Try
     End Function
 

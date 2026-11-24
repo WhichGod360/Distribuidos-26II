@@ -21,6 +21,7 @@ Partial Class frmPenalizacion
         Me.lblTituloVista = New System.Windows.Forms.Label()
         Me.lblDescripcionVista = New System.Windows.Forms.Label()
         Me.layoutVista = New System.Windows.Forms.TableLayoutPanel()
+        Me.btnBuscar = New System.Windows.Forms.Button()
         Me.barraFiltros = New System.Windows.Forms.FlowLayoutPanel()
         Me.txtBuscar = New System.Windows.Forms.TextBox()
         Me.bloque_txtBuscar = New System.Windows.Forms.Panel()
@@ -29,11 +30,11 @@ Partial Class frmPenalizacion
         Me.bloque_cboFiltroEstado = New System.Windows.Forms.Panel()
         Me.etiqueta_cboFiltroEstado = New System.Windows.Forms.Label()
         Me.barraAcciones = New System.Windows.Forms.FlowLayoutPanel()
-        Me.btnNuevo = New System.Windows.Forms.Button()
-        Me.btnGuardar = New System.Windows.Forms.Button()
+        Me.btnAgregar = New System.Windows.Forms.Button()
+        Me.btnEditar = New System.Windows.Forms.Button()
         Me.btnCambiarEstado = New System.Windows.Forms.Button()
         Me.btnVerDetalles = New System.Windows.Forms.Button()
-        Me.DataGridView1 = New System.Windows.Forms.DataGridView()
+        Me.tablaPenalizaciones = New System.Windows.Forms.DataGridView()
         Me.DataGridView1Cabecera = New System.Windows.Forms.DataGridViewCellStyle()
         Me.DataGridView1Celdas = New System.Windows.Forms.DataGridViewCellStyle()
         Me.DataGridView1Alternas = New System.Windows.Forms.DataGridViewCellStyle()
@@ -42,9 +43,10 @@ Partial Class frmPenalizacion
         Me.colMonto = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colDescripcion = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.colEstado = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.colTramo = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.lblResumen = New System.Windows.Forms.Label()
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.tablaPenalizaciones, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.encabezado.SuspendLayout()
         Me.textoEncabezado.SuspendLayout()
         Me.layoutVista.SuspendLayout()
@@ -139,45 +141,61 @@ Partial Class frmPenalizacion
         Me.bloque_cboFiltroEstado.Controls.Add(Me.cboFiltroEstado)
         Me.bloque_cboFiltroEstado.Controls.Add(Me.etiqueta_cboFiltroEstado)
         Me.barraFiltros.Controls.Add(Me.bloque_cboFiltroEstado)
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.Size = New System.Drawing.Size(96, 32)
+        Me.btnBuscar.AutoSize = False
+        Me.btnBuscar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBuscar.FlatAppearance.BorderSize = 1
+        Me.btnBuscar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnBuscar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnBuscar.BackColor = System.Drawing.Color.White
+        Me.btnBuscar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnBuscar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(0, 20, 10, 6)
+        Me.btnBuscar.UseVisualStyleBackColor = False
+        Me.barraFiltros.Controls.Add(Me.btnBuscar)
         Me.barraAcciones.Name = "barraAcciones"
         Me.barraAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraAcciones.AutoSize = True
         Me.barraAcciones.WrapContents = True
         Me.barraAcciones.Margin = New System.Windows.Forms.Padding(0, 4, 0, 10)
-        Me.btnNuevo.Name = "btnNuevo"
-        Me.btnNuevo.Text = "Agregar penalización"
-        Me.btnNuevo.Size = New System.Drawing.Size(170, 38)
-        Me.btnNuevo.AutoSize = False
-        Me.btnNuevo.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnNuevo.FlatAppearance.BorderSize = 0
-        Me.btnNuevo.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(47, 72, 92)
-        Me.btnNuevo.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(35, 56, 72)
-        Me.btnNuevo.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(222, 226, 231)
-        Me.btnNuevo.BackColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.btnNuevo.ForeColor = System.Drawing.Color.White
-        Me.btnNuevo.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
-        Me.btnNuevo.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.btnNuevo.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
-        Me.btnNuevo.UseVisualStyleBackColor = False
-        Me.btnNuevo.Enabled = True
-        Me.barraAcciones.Controls.Add(Me.btnNuevo)
-        Me.btnGuardar.Name = "btnGuardar"
-        Me.btnGuardar.Text = "Editar"
-        Me.btnGuardar.Size = New System.Drawing.Size(170, 38)
-        Me.btnGuardar.AutoSize = False
-        Me.btnGuardar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
-        Me.btnGuardar.FlatAppearance.BorderSize = 1
-        Me.btnGuardar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.btnGuardar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
-        Me.btnGuardar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
-        Me.btnGuardar.BackColor = System.Drawing.Color.White
-        Me.btnGuardar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
-        Me.btnGuardar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
-        Me.btnGuardar.Cursor = System.Windows.Forms.Cursors.Hand
-        Me.btnGuardar.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
-        Me.btnGuardar.UseVisualStyleBackColor = False
-        Me.btnGuardar.Enabled = False
-        Me.barraAcciones.Controls.Add(Me.btnGuardar)
+        Me.btnAgregar.Name = "btnAgregar"
+        Me.btnAgregar.Text = "Agregar penalización"
+        Me.btnAgregar.Size = New System.Drawing.Size(170, 38)
+        Me.btnAgregar.AutoSize = False
+        Me.btnAgregar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnAgregar.FlatAppearance.BorderSize = 0
+        Me.btnAgregar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(47, 72, 92)
+        Me.btnAgregar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(35, 56, 72)
+        Me.btnAgregar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(222, 226, 231)
+        Me.btnAgregar.BackColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnAgregar.ForeColor = System.Drawing.Color.White
+        Me.btnAgregar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnAgregar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnAgregar.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnAgregar.UseVisualStyleBackColor = False
+        Me.btnAgregar.Enabled = True
+        Me.barraAcciones.Controls.Add(Me.btnAgregar)
+        Me.btnEditar.Name = "btnEditar"
+        Me.btnEditar.Text = "Editar"
+        Me.btnEditar.Size = New System.Drawing.Size(170, 38)
+        Me.btnEditar.AutoSize = False
+        Me.btnEditar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnEditar.FlatAppearance.BorderSize = 1
+        Me.btnEditar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnEditar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnEditar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnEditar.BackColor = System.Drawing.Color.White
+        Me.btnEditar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnEditar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnEditar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnEditar.Margin = New System.Windows.Forms.Padding(0, 0, 10, 4)
+        Me.btnEditar.UseVisualStyleBackColor = False
+        Me.btnEditar.Enabled = False
+        Me.barraAcciones.Controls.Add(Me.btnEditar)
         Me.btnCambiarEstado.Name = "btnCambiarEstado"
         Me.btnCambiarEstado.Text = "Desactivar"
         Me.btnCambiarEstado.Size = New System.Drawing.Size(170, 38)
@@ -212,24 +230,24 @@ Partial Class frmPenalizacion
         Me.btnVerDetalles.UseVisualStyleBackColor = False
         Me.btnVerDetalles.Enabled = False
         Me.barraAcciones.Controls.Add(Me.btnVerDetalles)
-        Me.DataGridView1.Name = "DataGridView1"
-        Me.DataGridView1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.DataGridView1.ReadOnly = True
-        Me.DataGridView1.AllowUserToAddRows = False
-        Me.DataGridView1.AllowUserToDeleteRows = False
-        Me.DataGridView1.MultiSelect = False
-        Me.DataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
-        Me.DataGridView1.RowHeadersVisible = False
-        Me.DataGridView1.AutoGenerateColumns = False
-        Me.DataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
-        Me.DataGridView1.BackgroundColor = System.Drawing.Color.White
-        Me.DataGridView1.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.DataGridView1.GridColor = System.Drawing.Color.FromArgb(232, 236, 240)
-        Me.DataGridView1.EnableHeadersVisualStyles = False
-        Me.DataGridView1.ColumnHeadersHeight = 40
-        Me.DataGridView1.RowTemplate.Height = 36
-        Me.DataGridView1.Margin = New System.Windows.Forms.Padding(0)
-        Me.DataGridView1.AccessibleName = "Tabla de resultados"
+        Me.tablaPenalizaciones.Name = "tablaPenalizaciones"
+        Me.tablaPenalizaciones.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.tablaPenalizaciones.ReadOnly = True
+        Me.tablaPenalizaciones.AllowUserToAddRows = False
+        Me.tablaPenalizaciones.AllowUserToDeleteRows = False
+        Me.tablaPenalizaciones.MultiSelect = False
+        Me.tablaPenalizaciones.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect
+        Me.tablaPenalizaciones.RowHeadersVisible = False
+        Me.tablaPenalizaciones.AutoGenerateColumns = False
+        Me.tablaPenalizaciones.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill
+        Me.tablaPenalizaciones.BackgroundColor = System.Drawing.Color.White
+        Me.tablaPenalizaciones.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.tablaPenalizaciones.GridColor = System.Drawing.Color.FromArgb(232, 236, 240)
+        Me.tablaPenalizaciones.EnableHeadersVisualStyles = False
+        Me.tablaPenalizaciones.ColumnHeadersHeight = 40
+        Me.tablaPenalizaciones.RowTemplate.Height = 36
+        Me.tablaPenalizaciones.Margin = New System.Windows.Forms.Padding(0)
+        Me.tablaPenalizaciones.AccessibleName = "Tabla de resultados"
         Me.DataGridView1Cabecera.BackColor = System.Drawing.Color.FromArgb(226, 234, 240)
         Me.DataGridView1Cabecera.ForeColor = System.Drawing.Color.FromArgb(47, 72, 92)
         Me.DataGridView1Cabecera.Font = New System.Drawing.Font("Segoe UI Semibold", 9.0!, System.Drawing.FontStyle.Regular)
@@ -237,49 +255,57 @@ Partial Class frmPenalizacion
         Me.DataGridView1Celdas.SelectionForeColor = System.Drawing.Color.FromArgb(47, 72, 92)
         Me.DataGridView1Celdas.NullValue = "—"
         Me.DataGridView1Alternas.BackColor = System.Drawing.Color.FromArgb(247, 249, 250)
-        Me.DataGridView1.ColumnHeadersDefaultCellStyle = Me.DataGridView1Cabecera
-        Me.DataGridView1.DefaultCellStyle = Me.DataGridView1Celdas
-        Me.DataGridView1.AlternatingRowsDefaultCellStyle = Me.DataGridView1Alternas
+        Me.tablaPenalizaciones.ColumnHeadersDefaultCellStyle = Me.DataGridView1Cabecera
+        Me.tablaPenalizaciones.DefaultCellStyle = Me.DataGridView1Celdas
+        Me.tablaPenalizaciones.AlternatingRowsDefaultCellStyle = Me.DataGridView1Alternas
         Me.colId.Name = "colId"
         Me.colId.HeaderText = "ID"
-        Me.colId.DataPropertyName = ""
+        Me.colId.DataPropertyName = "IdPenalizacion"
         Me.colId.Width = 10
         Me.colId.FillWeight = 10
         Me.colId.ReadOnly = True
         Me.colId.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colId)
+        Me.tablaPenalizaciones.Columns.Add(Me.colId)
         Me.colTipo.Name = "colTipo"
         Me.colTipo.HeaderText = "Tipo"
-        Me.colTipo.DataPropertyName = ""
+        Me.colTipo.DataPropertyName = "TipoPenalizacion"
         Me.colTipo.Width = 23
         Me.colTipo.FillWeight = 23
         Me.colTipo.ReadOnly = True
         Me.colTipo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colTipo)
+        Me.tablaPenalizaciones.Columns.Add(Me.colTipo)
         Me.colMonto.Name = "colMonto"
         Me.colMonto.HeaderText = "Monto"
-        Me.colMonto.DataPropertyName = ""
+        Me.colMonto.DataPropertyName = "MontoPenalizacion"
         Me.colMonto.Width = 12
         Me.colMonto.FillWeight = 12
+        Me.colMonto.DefaultCellStyle.Format = "'S/ '#,##0.00"
         Me.colMonto.ReadOnly = True
         Me.colMonto.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colMonto)
+        Me.tablaPenalizaciones.Columns.Add(Me.colMonto)
         Me.colDescripcion.Name = "colDescripcion"
         Me.colDescripcion.HeaderText = "Descripción"
-        Me.colDescripcion.DataPropertyName = ""
+        Me.colDescripcion.DataPropertyName = "DescripcionPenalizacion"
         Me.colDescripcion.Width = 37
         Me.colDescripcion.FillWeight = 37
         Me.colDescripcion.ReadOnly = True
         Me.colDescripcion.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colDescripcion)
+        Me.tablaPenalizaciones.Columns.Add(Me.colDescripcion)
         Me.colEstado.Name = "colEstado"
         Me.colEstado.HeaderText = "Estado"
-        Me.colEstado.DataPropertyName = ""
+        Me.colEstado.DataPropertyName = "EstadoTexto"
         Me.colEstado.Width = 18
         Me.colEstado.FillWeight = 18
         Me.colEstado.ReadOnly = True
         Me.colEstado.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
-        Me.DataGridView1.Columns.Add(Me.colEstado)
+        Me.tablaPenalizaciones.Columns.Add(Me.colEstado)
+        Me.colTramo.Name = "colTramo"
+        Me.colTramo.HeaderText = "Aplicación"
+        Me.colTramo.DataPropertyName = "TramoTexto"
+        Me.colTramo.FillWeight = 20
+        Me.colTramo.ReadOnly = True
+        Me.colTramo.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable
+        Me.tablaPenalizaciones.Columns.Add(Me.colTramo)
         Me.lblResumen.Name = "lblResumen"
         Me.lblResumen.Text = "Sin datos cargados. Abre la pantalla para consultar."
         Me.lblResumen.ForeColor = System.Drawing.Color.FromArgb(120, 120, 120)
@@ -290,7 +316,7 @@ Partial Class frmPenalizacion
         Me.layoutVista.Controls.Add(Me.encabezado, 0, 0)
         Me.layoutVista.Controls.Add(Me.barraFiltros, 0, 1)
         Me.layoutVista.Controls.Add(Me.barraAcciones, 0, 2)
-        Me.layoutVista.Controls.Add(Me.DataGridView1, 0, 3)
+        Me.layoutVista.Controls.Add(Me.tablaPenalizaciones, 0, 3)
         Me.layoutVista.Controls.Add(Me.lblResumen, 0, 4)
         Me.Controls.Add(Me.layoutVista)
         Me.AutoScaleDimensions = New System.Drawing.SizeF(96.0!, 96.0!)
@@ -301,7 +327,7 @@ Partial Class frmPenalizacion
         Me.Name = "frmPenalizacion"
         Me.Text = "Penalizaciones"
         CType(Me.imagenModulo, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DataGridView1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.tablaPenalizaciones, System.ComponentModel.ISupportInitialize).EndInit()
         Me.barraAcciones.ResumeLayout(False)
         Me.barraAcciones.PerformLayout()
         Me.bloque_cboFiltroEstado.ResumeLayout(False)
@@ -325,6 +351,7 @@ Partial Class frmPenalizacion
     Friend WithEvents lblTituloVista As System.Windows.Forms.Label
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents layoutVista As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
     Friend WithEvents txtBuscar As System.Windows.Forms.TextBox
     Friend WithEvents bloque_txtBuscar As System.Windows.Forms.Panel
@@ -333,11 +360,11 @@ Partial Class frmPenalizacion
     Friend WithEvents bloque_cboFiltroEstado As System.Windows.Forms.Panel
     Friend WithEvents etiqueta_cboFiltroEstado As System.Windows.Forms.Label
     Friend WithEvents barraAcciones As System.Windows.Forms.FlowLayoutPanel
-    Friend WithEvents btnNuevo As System.Windows.Forms.Button
-    Friend WithEvents btnGuardar As System.Windows.Forms.Button
+    Friend WithEvents btnAgregar As System.Windows.Forms.Button
+    Friend WithEvents btnEditar As System.Windows.Forms.Button
     Friend WithEvents btnCambiarEstado As System.Windows.Forms.Button
     Friend WithEvents btnVerDetalles As System.Windows.Forms.Button
-    Friend WithEvents DataGridView1 As System.Windows.Forms.DataGridView
+    Friend WithEvents tablaPenalizaciones As System.Windows.Forms.DataGridView
     Friend WithEvents DataGridView1Cabecera As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents DataGridView1Celdas As System.Windows.Forms.DataGridViewCellStyle
     Friend WithEvents DataGridView1Alternas As System.Windows.Forms.DataGridViewCellStyle
@@ -345,6 +372,7 @@ Partial Class frmPenalizacion
     Friend WithEvents colTipo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colMonto As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colDescripcion As System.Windows.Forms.DataGridViewTextBoxColumn
+    Friend WithEvents colTramo As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colEstado As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents lblResumen As System.Windows.Forms.Label
 End Class

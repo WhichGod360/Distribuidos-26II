@@ -1,3 +1,4 @@
+Imports capaDatos
 Imports System.Data.SqlClient
 
 Friend NotInheritable Class EsquemaPago
@@ -9,8 +10,9 @@ Friend NotInheritable Class EsquemaPago
                     Throw New InvalidOperationException("Falta el estado de pago de las penalizaciones. Aplica la actualización 002 y revisa los pagos anteriores antes de registrar préstamos.")
                 End If
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "EsquemaPago.ExigirColumna")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "EsquemaPago.ExigirColumna")
         End Try
     End Sub
 End Class

@@ -4,9 +4,11 @@ Imports Utiles
 Public Class frmPagosYape
     Private ReadOnly negocio As New pagoYapeNegocio()
     Private reportes As DataTable
+    Private textoBuscado As String = ""
 
     Public Sub New()
         InitializeComponent()
+        MantenimientoUI.EstilizarBoton(btnBuscar)
         If ContextoDiseno.Activo(Me) Then Return
         cboEstado.DisplayMember = "Value"
         cboEstado.ValueMember = "Key"
@@ -21,7 +23,8 @@ Public Class frmPagosYape
         CargarReportes()
     End Sub
 
-    Private Sub BuscarReportes(sender As Object, e As EventArgs) Handles txtBuscar.TextChanged
+    Private Sub btnBuscar_Click(sender As Object, e As EventArgs) Handles btnBuscar.Click
+        textoBuscado = txtBuscar.Text.Trim()
         MostrarFilas()
     End Sub
 
@@ -61,7 +64,7 @@ Public Class frmPagosYape
 
     Private Sub MostrarFilas()
         If reportes Is Nothing Then Return
-        Dim criterio = txtBuscar.Text.Trim()
+        Dim criterio = textoBuscado
         tablaReportes.Rows.Clear()
         For Each reporte As DataRow In reportes.Rows
             Dim id = reporte.Field(Of Integer)("IdPago")

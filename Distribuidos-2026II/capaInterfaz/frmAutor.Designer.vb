@@ -8,11 +8,6 @@ Partial Class frmAutor
     Friend WithEvents colFechaFallecimientoAutor As System.Windows.Forms.DataGridViewTextBoxColumn
     Friend WithEvents colBiografiaAutor As System.Windows.Forms.DataGridViewTextBoxColumn
 
-    ' --- Declaración de controles de filtro adicionales a nivel de clase ---
-    Friend WithEvents txtBuscarNacionalidad As System.Windows.Forms.TextBox
-    Friend WithEvents bloque_txtBuscarNacionalidad As System.Windows.Forms.Panel
-    Friend WithEvents etiqueta_txtBuscarNacionalidad As System.Windows.Forms.Label
-
     Private components As System.ComponentModel.IContainer
     <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(disposing As Boolean)
@@ -32,6 +27,7 @@ Partial Class frmAutor
         Me.lblTituloVista = New System.Windows.Forms.Label()
         Me.lblDescripcionVista = New System.Windows.Forms.Label()
         Me.layoutVista = New System.Windows.Forms.TableLayoutPanel()
+        Me.btnBuscar = New System.Windows.Forms.Button()
         Me.barraFiltros = New System.Windows.Forms.FlowLayoutPanel()
         Me.txtBuscarAutor = New System.Windows.Forms.TextBox()
         Me.bloque_txtBuscarAutor = New System.Windows.Forms.Panel()
@@ -113,7 +109,7 @@ Partial Class frmAutor
         Me.barraFiltros.AutoSize = True
         Me.barraFiltros.WrapContents = True
         Me.txtBuscarAutor.Name = "txtBuscarAutor"
-        Me.txtBuscarAutor.PlaceholderText = "Buscar..."
+        Me.txtBuscarAutor.PlaceholderText = "Nombre o nacionalidad"
         Me.bloque_txtBuscarAutor.Name = "bloque_txtBuscarAutor"
         Me.bloque_txtBuscarAutor.Dock = System.Windows.Forms.DockStyle.None
         Me.bloque_txtBuscarAutor.Size = New System.Drawing.Size(320, 58)
@@ -130,6 +126,22 @@ Partial Class frmAutor
         Me.bloque_txtBuscarAutor.Controls.Add(Me.txtBuscarAutor)
         Me.bloque_txtBuscarAutor.Controls.Add(Me.etiqueta_txtBuscarAutor)
         Me.barraFiltros.Controls.Add(Me.bloque_txtBuscarAutor)
+        Me.btnBuscar.Name = "btnBuscar"
+        Me.btnBuscar.Text = "Buscar"
+        Me.btnBuscar.Size = New System.Drawing.Size(96, 32)
+        Me.btnBuscar.AutoSize = False
+        Me.btnBuscar.FlatStyle = System.Windows.Forms.FlatStyle.Flat
+        Me.btnBuscar.FlatAppearance.BorderSize = 1
+        Me.btnBuscar.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(240, 244, 247)
+        Me.btnBuscar.FlatAppearance.MouseDownBackColor = System.Drawing.Color.FromArgb(225, 232, 238)
+        Me.btnBuscar.BackColor = System.Drawing.Color.White
+        Me.btnBuscar.ForeColor = System.Drawing.Color.FromArgb(59, 91, 115)
+        Me.btnBuscar.Font = New System.Drawing.Font("Segoe UI Semibold", 10.0!, System.Drawing.FontStyle.Regular)
+        Me.btnBuscar.Cursor = System.Windows.Forms.Cursors.Hand
+        Me.btnBuscar.Margin = New System.Windows.Forms.Padding(0, 20, 10, 6)
+        Me.btnBuscar.UseVisualStyleBackColor = False
+        Me.barraFiltros.Controls.Add(Me.btnBuscar)
         Me.barraAcciones.Name = "barraAcciones"
         Me.barraAcciones.Dock = System.Windows.Forms.DockStyle.Fill
         Me.barraAcciones.AutoSize = True
@@ -310,6 +322,7 @@ Partial Class frmAutor
     Friend WithEvents lblTituloVista As System.Windows.Forms.Label
     Friend WithEvents lblDescripcionVista As System.Windows.Forms.Label
     Friend WithEvents layoutVista As System.Windows.Forms.TableLayoutPanel
+    Friend WithEvents btnBuscar As System.Windows.Forms.Button
     Friend WithEvents barraFiltros As System.Windows.Forms.FlowLayoutPanel
     Friend WithEvents txtBuscarAutor As System.Windows.Forms.TextBox
     Friend WithEvents bloque_txtBuscarAutor As System.Windows.Forms.Panel

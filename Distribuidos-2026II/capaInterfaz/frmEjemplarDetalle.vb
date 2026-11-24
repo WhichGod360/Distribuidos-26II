@@ -1,5 +1,4 @@
 Imports capaNegocio
-Imports Utiles
 
 Public Class frmEjemplarDetalle
     Private ReadOnly idLibro As Integer
@@ -11,10 +10,10 @@ Public Class frmEjemplarDetalle
     Public Sub New(idLibro As Integer, titulo As String)
         Me.New()
         Me.idLibro = idLibro
-        libro.Text = titulo
+        txtLibro.Text = titulo
     End Sub
 
-    Private Sub Guardar_Click(sender As Object, e As EventArgs) Handles guardar.Click
+    Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
             If Not New ejemplarNegocio().agregar(idLibro) Then Throw New InvalidOperationException("No se pudo agregar el ejemplar.")
             DialogResult = DialogResult.OK

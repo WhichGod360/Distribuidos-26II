@@ -1,6 +1,5 @@
 Imports capaDatos
 Imports capaNegocio
-Imports Utiles
 
 Public Class frmPenalizacionEditar
 
@@ -26,7 +25,7 @@ Public Class frmPenalizacionEditar
         End If
     End Sub
 
-    Private Sub Guardar_Click(sender As Object, e As EventArgs) Handles guardar.Click
+    Private Sub btnGuardar_Click(sender As Object, e As EventArgs) Handles btnGuardar.Click
         Try
             Dim dias As Integer? = If(esMora.Checked, CInt(diasDesde.Value), CType(Nothing, Integer?))
             Dim ok = If(penalizacion Is Nothing,

@@ -51,63 +51,89 @@ Public Class solicitudPrestamoDAO
                     Return solicitud
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.solicitar")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.solicitar")
         End Try
     End Function
 
     Public Function listar(Optional idLector As Integer = 0) As List(Of SolicitudPrestamo)
-        Return AuditoriaDAO.Consultar("SolicitudPrestamo", If(idLector > 0, "SELECT", "LISTADO"), $"Consultar solicitudes | lector={idLector}",
-            Function()
-                Try
-                    Dim resultado As New Dictionary(Of Integer, SolicitudPrestamo)()
-                    Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
-                        DisponibilidadReserva.ExigirEsquema(cn)
-                        Dim query As String = "SELECT s.*, u.nombre_usuario+' '+u.ap_paterno+' '+u.ap_materno AS lector, u.numero_dni_usuario, " &
-                            "a.nombre_usuario+' '+a.ap_paterno+' '+a.ap_materno AS aprobador, d.id_detalle_solicitud,d.id_libro,d.id_prestamo,l.titulo_libro, " &
-                            "CASE WHEN s.estado_solicitud IN ('Pendiente','Aprobada') AND s.fecha_limite_retiro<=SYSUTCDATETIME() THEN 'Vencida' ELSE s.estado_solicitud END AS estado_actual " &
-                            "FROM SolicitudPrestamo s JOIN Usuario u ON u.id_usuario=s.id_usuario LEFT JOIN Usuario a ON a.id_usuario=s.id_aprobador " &
-                            "JOIN DetalleSolicitudPrestamo d ON d.id_solicitud=s.id_solicitud JOIN Libro l ON l.id_libro=d.id_libro " &
-                            "WHERE (@lector=0 OR s.id_usuario=@lector) ORDER BY s.id_solicitud DESC,d.id_detalle_solicitud"
-                        Using cmd As New SqlCommand(query, cn)
-                            cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
-                            Using dr As SqlDataReader = cmd.ExecuteReader()
-                                While dr.Read()
-                                    Dim id = CInt(dr("id_solicitud"))
-                                    If Not resultado.ContainsKey(id) Then
-                                        resultado.Add(id, New SolicitudPrestamo With {
-                                            .IdSolicitud = id, .IdUsuario = CInt(dr("id_usuario")), .NombreLector = CStr(dr("lector")),
-                                            .DniLector = CStr(dr("numero_dni_usuario")), .FechaSolicitud = CDate(dr("fecha_solicitud")),
-                                            .FechaLimiteRetiro = CDate(dr("fecha_limite_retiro")), .EstadoSolicitud = CStr(dr("estado_solicitud")),
-                                            .EstadoActual = CStr(dr("estado_actual")), .NombreAprobador = If(IsDBNull(dr("aprobador")), "", CStr(dr("aprobador"))),
-                                            .FechaAprobacion = If(IsDBNull(dr("fecha_aprobacion")), CType(Nothing, Date?), CDate(dr("fecha_aprobacion"))),
-                                            .IdAprobador = If(IsDBNull(dr("id_aprobador")), CType(Nothing, Integer?), CInt(dr("id_aprobador"))),
-                                            .FechaCierre = If(IsDBNull(dr("fecha_cierre")), CType(Nothing, Date?), CDate(dr("fecha_cierre")))})
-                                    End If
-                                    resultado(id).Detalles.Add(New DetalleSolicitudPrestamo With {
-                                        .IdDetalle = CInt(dr("id_detalle_solicitud")), .IdSolicitud = id, .IdLibro = CInt(dr("id_libro")),
-                                        .TituloLibro = CStr(dr("titulo_libro")), .IdPrestamo = If(IsDBNull(dr("id_prestamo")), CType(Nothing, Integer?), CInt(dr("id_prestamo")))})
-                                End While
-                            End Using
-                        End Using
+        Try
+            Return listar(idLector, 0)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.listar")
+        End Try
+    End Function
+
+    Public Function listar(idLector As Integer, idSolicitud As Integer) As List(Of SolicitudPrestamo)
+        Try
+            Dim actor = SesionUsuario.IdUsuario
+            Dim resultado As New Dictionary(Of Integer, SolicitudPrestamo)()
+            Using cn As SqlConnection = Conexion.ObtenerInstancia().CrearConexionIndependiente()
+                DisponibilidadReserva.ExigirEsquema(cn)
+                Dim query As String = "SELECT s.id_solicitud,s.id_usuario,s.fecha_solicitud,s.fecha_limite_retiro,s.estado_solicitud,s.fecha_aprobacion,s.id_aprobador,s.fecha_cierre, CONCAT(u.nombre_usuario,' ',u.ap_paterno,' ',u.ap_materno) AS lector, u.numero_dni_usuario, " &
+                    "LTRIM(RTRIM(CONCAT(a.nombre_usuario,' ',a.ap_paterno,' ',a.ap_materno))) AS aprobador, d.id_detalle_solicitud,d.id_libro,d.id_prestamo,l.titulo_libro, " &
+                    "CASE WHEN s.estado_solicitud IN ('Pendiente','Aprobada') AND s.fecha_limite_retiro<=SYSUTCDATETIME() THEN 'Vencida' ELSE s.estado_solicitud END AS estado_actual " &
+                    "FROM SolicitudPrestamo s JOIN Usuario u ON u.id_usuario=s.id_usuario LEFT JOIN Usuario a ON a.id_usuario=s.id_aprobador " &
+                    "JOIN DetalleSolicitudPrestamo d ON d.id_solicitud=s.id_solicitud JOIN Libro l ON l.id_libro=d.id_libro " &
+                    "WHERE (@lector=0 OR s.id_usuario=@lector) AND (@solicitud=0 OR s.id_solicitud=@solicitud) ORDER BY s.id_solicitud DESC,d.id_detalle_solicitud"
+                Using cmd As New SqlCommand(query, cn)
+                    cmd.Parameters.Add("@lector", SqlDbType.Int).Value = idLector
+                    cmd.Parameters.Add("@solicitud", SqlDbType.Int).Value = idSolicitud
+                    Using dr As SqlDataReader = cmd.ExecuteReader()
+                        While dr.Read()
+                            Dim id = CInt(dr("id_solicitud"))
+                            If Not resultado.ContainsKey(id) Then
+                                resultado.Add(id, New SolicitudPrestamo With {
+                                    .IdSolicitud = id, .IdUsuario = CInt(dr("id_usuario")), .NombreLector = CStr(dr("lector")),
+                                    .DniLector = CStr(dr("numero_dni_usuario")), .FechaSolicitud = CDate(dr("fecha_solicitud")),
+                                    .FechaLimiteRetiro = CDate(dr("fecha_limite_retiro")), .EstadoSolicitud = CStr(dr("estado_solicitud")),
+                                    .EstadoActual = CStr(dr("estado_actual")), .NombreAprobador = If(IsDBNull(dr("aprobador")), "", CStr(dr("aprobador"))),
+                                    .FechaAprobacion = If(IsDBNull(dr("fecha_aprobacion")), CType(Nothing, Date?), CDate(dr("fecha_aprobacion"))),
+                                    .IdAprobador = If(IsDBNull(dr("id_aprobador")), CType(Nothing, Integer?), CInt(dr("id_aprobador"))),
+                                    .FechaCierre = If(IsDBNull(dr("fecha_cierre")), CType(Nothing, Date?), CDate(dr("fecha_cierre")))})
+                            End If
+                            resultado(id).Detalles.Add(New DetalleSolicitudPrestamo With {
+                                .IdDetalle = CInt(dr("id_detalle_solicitud")), .IdSolicitud = id, .IdLibro = CInt(dr("id_libro")),
+                                .TituloLibro = CStr(dr("titulo_libro")), .IdPrestamo = If(IsDBNull(dr("id_prestamo")), CType(Nothing, Integer?), CInt(dr("id_prestamo")))})
+                        End While
                     End Using
-                    Return resultado.Values.ToList()
-                Catch ex As SqlException
-                    Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.listar")
-                End Try
-            End Function)
+                End Using
+            End Using
+            AuditoriaDAO.RegistrarEvento(actor, "SolicitudPrestamo", If(idLector > 0 OrElse idSolicitud > 0, "SELECT", "LISTADO"), $"Consultar solicitudes | lector={idLector}; solicitud={idSolicitud}")
+            Return resultado.Values.ToList()
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.listar")
+        End Try
     End Function
 
     Public Sub aprobar(idSolicitud As Integer, idOperador As Integer, reglas As IReglasCirculacion)
-        CambiarEstado(idSolicitud, idOperador, "Aprobada", True, reglas)
+        Try
+            CambiarEstado(idSolicitud, idOperador, "Aprobada", True, reglas)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.aprobar")
+        End Try
     End Sub
 
     Public Sub cancelar(idSolicitud As Integer, idLector As Integer, reglas As IReglasCirculacion)
-        CambiarEstado(idSolicitud, idLector, "Cancelada", False, reglas)
+        Try
+            CambiarEstado(idSolicitud, idLector, "Cancelada", False, reglas)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.cancelar")
+        End Try
     End Sub
 
     Public Sub rechazar(idSolicitud As Integer, idOperador As Integer, reglas As IReglasCirculacion)
-        CambiarEstado(idSolicitud, idOperador, "Rechazada", True, reglas)
+        Try
+            CambiarEstado(idSolicitud, idOperador, "Rechazada", True, reglas)
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.rechazar")
+        End Try
     End Sub
 
     Private Sub CambiarEstado(idSolicitud As Integer, idOperador As Integer, estado As String, personal As Boolean, reglas As IReglasCirculacion)
@@ -145,7 +171,7 @@ Public Class solicitudPrestamoDAO
                         Next
                         query = "UPDATE SolicitudPrestamo SET estado_solicitud='Aprobada',fecha_aprobacion=SYSUTCDATETIME(),id_aprobador=@operador WHERE id_solicitud=@id AND estado_solicitud='Pendiente' AND fecha_limite_retiro>SYSUTCDATETIME()"
                     Else
-                        query = "UPDATE SolicitudPrestamo SET estado_solicitud=CASE WHEN fecha_limite_retiro<=SYSUTCDATETIME() THEN 'Vencida' ELSE @estado END,fecha_cierre=SYSUTCDATETIME() WHERE id_solicitud=@id AND estado_solicitud IN ('Pendiente','Aprobada')"
+                        query = "UPDATE SolicitudPrestamo SET estado_solicitud=@estado,fecha_cierre=SYSUTCDATETIME() WHERE id_solicitud=@id AND estado_solicitud IN ('Pendiente','Aprobada') AND fecha_limite_retiro>SYSUTCDATETIME()"
                     End If
                     Using cmd As New SqlCommand(query, cn, tx)
                         cmd.Parameters.Add("@id", SqlDbType.Int).Value = idSolicitud
@@ -157,8 +183,9 @@ Public Class solicitudPrestamoDAO
                     tx.Commit()
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.CambiarEstado")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.CambiarEstado")
         End Try
     End Sub
 
@@ -230,8 +257,9 @@ Public Class solicitudPrestamoDAO
                     Return prestamos
                 End Using
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.entregar")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.entregar")
         End Try
     End Function
 
@@ -244,8 +272,9 @@ Public Class solicitudPrestamoDAO
                 If valor Is Nothing Then Throw New InvalidOperationException("La solicitud no existe.")
                 Return CInt(valor)
             End Using
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.ObtenerLector")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.ObtenerLector")
         End Try
     End Function
 
@@ -263,8 +292,9 @@ Public Class solicitudPrestamoDAO
             End Using
             If resultado.Count = 0 Then Throw New InvalidOperationException("La solicitud no contiene libros.")
             Return resultado
-        Catch ex As SqlException
-            Throw ErroresDAO.Traducir(ex, "solicitudPrestamoDAO.LibrosSolicitud")
+        Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
+            Throw ErroresDAO.ParaMantenimiento(ex, "solicitudPrestamoDAO.LibrosSolicitud")
         End Try
     End Function
 End Class

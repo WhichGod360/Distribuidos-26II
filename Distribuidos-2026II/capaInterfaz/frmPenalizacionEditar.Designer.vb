@@ -22,8 +22,8 @@ Partial Class frmPenalizacionEditar
         lblDescripcionVista = New Label()
         cuerpoEditor = New Panel()
         accionesEditor = New FlowLayoutPanel()
-        cancelar = New Button()
-        guardar = New Button()
+        btnCancelar = New Button()
+        btnGuardar = New Button()
         camposEditor = New TableLayoutPanel()
         bloque_tipo = New Panel()
         etiqueta_tipo = New Label()
@@ -116,46 +116,46 @@ Partial Class frmPenalizacionEditar
         accionesEditor.Padding = New Padding(0, 12, 0, 0)
         accionesEditor.FlowDirection = FlowDirection.RightToLeft
         accionesEditor.WrapContents = False
-        accionesEditor.Controls.Add(cancelar)
-        accionesEditor.Controls.Add(guardar)
+        accionesEditor.Controls.Add(btnCancelar)
+        accionesEditor.Controls.Add(btnGuardar)
         accionesEditor.TabIndex = 2
         '
-        ' cancelar
+        ' btnCancelar
         '
-        cancelar.Name = "cancelar"
-        cancelar.Text = "Cancelar"
-        cancelar.Size = New Size(138, 36)
-        cancelar.Margin = New Padding(10, 0, 0, 0)
-        cancelar.TabIndex = 1
-        cancelar.Cursor = Cursors.Hand
-        cancelar.Font = New Font("Segoe UI Semibold", 10.0F)
-        cancelar.FlatStyle = FlatStyle.Flat
-        cancelar.UseVisualStyleBackColor = False
-        cancelar.BackColor = Color.White
-        cancelar.ForeColor = Color.FromArgb(59, 91, 115)
-        cancelar.FlatAppearance.BorderSize = 1
-        cancelar.FlatAppearance.BorderColor = Color.FromArgb(59, 91, 115)
-        cancelar.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 244, 247)
-        cancelar.FlatAppearance.MouseDownBackColor = Color.FromArgb(225, 232, 238)
-        cancelar.DialogResult = DialogResult.Cancel
+        btnCancelar.Name = "btnCancelar"
+        btnCancelar.Text = "Cancelar"
+        btnCancelar.Size = New Size(138, 36)
+        btnCancelar.Margin = New Padding(10, 0, 0, 0)
+        btnCancelar.TabIndex = 1
+        btnCancelar.Cursor = Cursors.Hand
+        btnCancelar.Font = New Font("Segoe UI Semibold", 10.0F)
+        btnCancelar.FlatStyle = FlatStyle.Flat
+        btnCancelar.UseVisualStyleBackColor = False
+        btnCancelar.BackColor = Color.White
+        btnCancelar.ForeColor = Color.FromArgb(59, 91, 115)
+        btnCancelar.FlatAppearance.BorderSize = 1
+        btnCancelar.FlatAppearance.BorderColor = Color.FromArgb(59, 91, 115)
+        btnCancelar.FlatAppearance.MouseOverBackColor = Color.FromArgb(240, 244, 247)
+        btnCancelar.FlatAppearance.MouseDownBackColor = Color.FromArgb(225, 232, 238)
+        btnCancelar.DialogResult = DialogResult.Cancel
         '
-        ' guardar
+        ' btnGuardar
         '
-        guardar.Name = "guardar"
-        guardar.Text = "Guardar"
-        guardar.Size = New Size(138, 36)
-        guardar.Margin = New Padding(10, 0, 0, 0)
-        guardar.TabIndex = 0
-        guardar.Cursor = Cursors.Hand
-        guardar.Font = New Font("Segoe UI Semibold", 10.0F)
-        guardar.FlatStyle = FlatStyle.Flat
-        guardar.UseVisualStyleBackColor = False
-        guardar.BackColor = Color.FromArgb(59, 91, 115)
-        guardar.ForeColor = Color.White
-        guardar.FlatAppearance.BorderSize = 0
-        guardar.FlatAppearance.BorderColor = Color.FromArgb(59, 91, 115)
-        guardar.FlatAppearance.MouseOverBackColor = Color.FromArgb(47, 72, 92)
-        guardar.FlatAppearance.MouseDownBackColor = Color.FromArgb(35, 56, 72)
+        btnGuardar.Name = "btnGuardar"
+        btnGuardar.Text = "Guardar"
+        btnGuardar.Size = New Size(138, 36)
+        btnGuardar.Margin = New Padding(10, 0, 0, 0)
+        btnGuardar.TabIndex = 0
+        btnGuardar.Cursor = Cursors.Hand
+        btnGuardar.Font = New Font("Segoe UI Semibold", 10.0F)
+        btnGuardar.FlatStyle = FlatStyle.Flat
+        btnGuardar.UseVisualStyleBackColor = False
+        btnGuardar.BackColor = Color.FromArgb(59, 91, 115)
+        btnGuardar.ForeColor = Color.White
+        btnGuardar.FlatAppearance.BorderSize = 0
+        btnGuardar.FlatAppearance.BorderColor = Color.FromArgb(59, 91, 115)
+        btnGuardar.FlatAppearance.MouseOverBackColor = Color.FromArgb(47, 72, 92)
+        btnGuardar.FlatAppearance.MouseDownBackColor = Color.FromArgb(35, 56, 72)
         '
         ' Me
         '
@@ -171,8 +171,8 @@ Partial Class frmPenalizacionEditar
         Me.MinimizeBox = False
         Me.ShowInTaskbar = False
         Me.StartPosition = FormStartPosition.CenterParent
-        Me.AcceptButton = guardar
-        Me.CancelButton = cancelar
+        Me.AcceptButton = btnGuardar
+        Me.CancelButton = btnCancelar
         Me.Controls.Add(layoutEditor)
         '
         ' camposEditor
@@ -419,8 +419,8 @@ Partial Class frmPenalizacionEditar
     Friend WithEvents lblDescripcionVista As Label
     Friend WithEvents cuerpoEditor As Panel
     Friend WithEvents accionesEditor As FlowLayoutPanel
-    Friend WithEvents cancelar As Button
-    Friend WithEvents guardar As Button
+    Friend WithEvents btnCancelar As Button
+    Friend WithEvents btnGuardar As Button
     Friend WithEvents camposEditor As TableLayoutPanel
     Friend WithEvents bloque_tipo As Panel
     Friend WithEvents etiqueta_tipo As Label

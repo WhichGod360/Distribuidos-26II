@@ -8,9 +8,8 @@ Public Class solicitudPrestamoNegocio
         Try
             ValidarCarrito(idsLibros)
             Return dao.solicitar(seguridadNegocio.ExigirLector(), idsLibros.ToList(), reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al registrar las solicitudes.", ex)
         End Try
     End Function
@@ -18,9 +17,8 @@ Public Class solicitudPrestamoNegocio
     Public Function listarMias() As List(Of SolicitudPrestamo)
         Try
             Return PrepararConsulta(dao.listar(seguridadNegocio.ExigirLector()))
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar las solicitudes.", ex)
         End Try
     End Function
@@ -29,9 +27,8 @@ Public Class solicitudPrestamoNegocio
         Try
             seguridadNegocio.ExigirAccesoLector(idLector)
             Return PrepararConsulta(dao.listar(idLector))
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar las solicitudes.", ex)
         End Try
     End Function
@@ -40,9 +37,8 @@ Public Class solicitudPrestamoNegocio
         Try
             seguridadNegocio.ExigirPersonal()
             Return PrepararConsulta(dao.listar())
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al consultar las solicitudes.", ex)
         End Try
     End Function
@@ -51,9 +47,8 @@ Public Class solicitudPrestamoNegocio
         Try
             ValidarId(idSolicitud)
             dao.cancelar(idSolicitud, seguridadNegocio.ExigirLector(), reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al cancelar las solicitudes.", ex)
         End Try
     End Sub
@@ -62,9 +57,8 @@ Public Class solicitudPrestamoNegocio
         Try
             ValidarId(idSolicitud)
             dao.aprobar(idSolicitud, seguridadNegocio.ExigirPersonal(), reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al aprobar las solicitudes.", ex)
         End Try
     End Sub
@@ -73,9 +67,8 @@ Public Class solicitudPrestamoNegocio
         Try
             ValidarId(idSolicitud)
             dao.rechazar(idSolicitud, seguridadNegocio.ExigirPersonal(), reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al rechazar las solicitudes.", ex)
         End Try
     End Sub
@@ -87,9 +80,8 @@ Public Class solicitudPrestamoNegocio
                 ejemplares.Values.Any(Function(id) id <= 0) OrElse ejemplares.Values.Distinct().Count() <> ejemplares.Count Then Throw New ArgumentException("Selecciona una copia distinta y válida para cada título.")
             Dim inicio = Date.Today
             Return dao.entregar(idSolicitud, seguridadNegocio.ExigirPersonal(), New Dictionary(Of Integer, Integer)(ejemplares), inicio, prestamoNegocio.FechaLimite(inicio), reglas)
-        Catch ex As Exception When TypeOf ex Is ArgumentException OrElse TypeOf ex Is InvalidOperationException OrElse TypeOf ex Is UnauthorizedAccessException
-            Throw
         Catch ex As Exception
+            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("Ocurrió un error al entregar las solicitudes.", ex)
         End Try
     End Function
