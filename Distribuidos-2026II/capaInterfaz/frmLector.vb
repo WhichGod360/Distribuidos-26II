@@ -367,7 +367,7 @@ Public Class frmLector
         Try
             Dim cargo = pagos.CargoMio(id)
             Dim historial As DataTable = Nothing
-            If Not pagoYapeNegocio.ModoDemoSolicitado() AndAlso pagos.Disponible() Then
+            If pagos.Disponible() Then
                 historial = pagos.HistorialMio(id)
             End If
             Using pago As New frmPagarYape(id, cargo, historial)

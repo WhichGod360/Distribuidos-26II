@@ -16,7 +16,7 @@ Public Class avisoLectorNegocio
     Public Shared Function ConsultarDecisionesPago() As List(Of AvisoLector)
         Try
             Dim pagos As New pagoYapeNegocio()
-            If pagoYapeNegocio.ModoDemoSolicitado() OrElse Not pagos.Disponible() Then Return New List(Of AvisoLector)()
+            If Not pagos.Disponible() Then Return New List(Of AvisoLector)()
             Return pagos.AvisosMios()
         Catch ex As Exception
             If ErroresMantenimiento.TieneMensaje(ex) Then Throw

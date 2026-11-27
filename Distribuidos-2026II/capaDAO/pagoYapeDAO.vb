@@ -22,16 +22,6 @@ Public Class pagoYapeDAO
         End Try
     End Function
 
-    Public Function DemoDisponible() As Boolean
-        Try
-            If Not Conexion.ObtenerInstancia().AdmitePagoDemo() Then Return False
-            Return ExisteEsquema("SELECT CASE WHEN OBJECT_ID(N'dbo.PagoDemoPenalizacion',N'U') IS NOT NULL THEN 1 ELSE 0 END")
-        Catch ex As Exception
-            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
-            Throw ErroresDAO.ParaMantenimiento(ex, "pagoYapeDAO.DemoDisponible")
-        End Try
-    End Function
-
     Private Shared Function ExisteEsquema(consulta As String) As Boolean
         Try
             Using cn = Conexion.ObtenerInstancia().CrearConexionIndependiente()
@@ -135,46 +125,6 @@ Public Class pagoYapeDAO
             Throw ErroresDAO.ParaMantenimiento(ex, "pagoYapeDAO.Revisar")
         End Try
     End Sub
-
-    Public Function ConfirmarDemo(id As Integer, lector As Integer, importe As Decimal, transaccion As Guid) As Boolean
-        Try
-            Dim conexionActual = Conexion.ObtenerInstancia()
-            If Not conexionActual.AdmitePagoDemo() Then Throw New UnauthorizedAccessException("La simulación solo está disponible en LocalDB.")
-            Using cn = conexionActual.CrearConexionIndependiente()
-                Using tx = cn.BeginTransaction(IsolationLevel.Serializable)
-                    Dim consulta = "SELECT 1 FROM dbo.PagoDemoPenalizacion WITH (UPDLOCK,HOLDLOCK) WHERE id_detalle_penalizacion=@id " &
-                        "AND id_lector=@lector AND monto=@monto AND id_transaccion=@transaccion"
-                    Using cmd As New SqlCommand(consulta, cn, tx)
-                        cmd.Parameters.AddRange({ParametroId("@id", id), ParametroId("@lector", lector), Monto("@monto", importe),
-                            New SqlParameter("@transaccion", SqlDbType.UniqueIdentifier) With {.Value = transaccion}})
-                        If cmd.ExecuteScalar() IsNot Nothing Then Return False
-                    End Using
-
-                    Dim sql = "UPDATE dp SET estado_pago_detalle='Pagada' FROM dbo.DetallePenalizacion dp " &
-                        "JOIN dbo.Prestamo p ON p.id_prestamo=dp.id_prestamo JOIN dbo.Usuario u ON u.id_usuario=p.id_usuario " &
-                        "JOIN dbo.RolUsuario r ON r.id_rol_usuario=u.id_rol_usuario " &
-                        "WHERE dp.id_detalle_penalizacion=@id AND dp.estado_pago_detalle='Pendiente' AND dp.monto_aplicado=@monto " &
-                        "AND p.id_usuario=@lector AND u.estado_usuario='Activo' AND r.nombre_rol_usuario IN ('Estudiante','Lector')"
-                    Using cmd As New SqlCommand(sql, cn, tx)
-                        cmd.Parameters.AddRange({ParametroId("@id", id), ParametroId("@lector", lector), Monto("@monto", importe)})
-                        If cmd.ExecuteNonQuery() <> 1 Then Throw New InvalidOperationException("El cargo cambió o ya no admite este pago de demostración.")
-                    End Using
-
-                    Using cmd As New SqlCommand("INSERT dbo.PagoDemoPenalizacion(id_detalle_penalizacion,id_lector,monto,id_transaccion) VALUES(@id,@lector,@monto,@transaccion)", cn, tx)
-                        cmd.Parameters.AddRange({ParametroId("@id", id), ParametroId("@lector", lector), Monto("@monto", importe),
-                            New SqlParameter("@transaccion", SqlDbType.UniqueIdentifier) With {.Value = transaccion}})
-                        cmd.ExecuteNonQuery()
-                    End Using
-                    AuditoriaDAO.Registrar(cn, tx, lector, "PagoDemo", "UPDATE", $"SIMULACIÓN | confirmar pago | cargo={id}; importe={importe:0.00}")
-                    tx.Commit()
-                    Return True
-                End Using
-            End Using
-        Catch ex As Exception
-            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
-            Throw ErroresDAO.ParaMantenimiento(ex, "pagoYapeDAO.ConfirmarDemo")
-        End Try
-    End Function
 
     Private Shared Function Consultar(detalle As String, sql As String, ParamArray parametros As SqlParameter()) As DataTable
         Try

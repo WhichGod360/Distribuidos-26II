@@ -47,15 +47,6 @@ Public Class Conexion
         ' cadenaConexion = "Data Source=.\SQLEXPRESS01;Initial Catalog=distribuidos-II;Integrated Security=SSPI;TrustServerCertificate=True;"
     End Sub
 
-    Public Function AdmitePagoDemo() As Boolean
-        If Environment.GetEnvironmentVariable("BIBLIOTECA_PAGO_DEMO") <> "1" Then Return False
-        Dim configuracion As New SqlConnectionStringBuilder(cadenaConexion)
-        Return configuracion.IntegratedSecurity AndAlso
-            String.Equals(configuracion.DataSource, "(localdb)\MSSQLLocalDB", StringComparison.OrdinalIgnoreCase) AndAlso
-            (String.Equals(configuracion.InitialCatalog, "LecturaePruebas", StringComparison.OrdinalIgnoreCase) OrElse
-             configuracion.InitialCatalog.StartsWith("LecturaePruebas_", StringComparison.OrdinalIgnoreCase))
-    End Function
-
     ' Cada operación concurrente debe ser dueña de su conexión y transacción.
     Public Function CrearConexionIndependiente() As SqlConnection
         Dim cn As SqlConnection = Nothing

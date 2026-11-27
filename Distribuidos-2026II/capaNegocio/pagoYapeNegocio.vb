@@ -5,22 +5,9 @@ Imports capaDatos
 Public Class pagoYapeNegocio
     Private ReadOnly dao As New pagoYapeDAO()
 
-    Public Shared Function ModoDemoSolicitado() As Boolean
-        Return Environment.GetEnvironmentVariable("BIBLIOTECA_PAGO_DEMO") = "1"
-    End Function
-
     Public Function Disponible() As Boolean
         Try
             Return dao.Disponible()
-        Catch ex As Exception
-            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
-            Throw New Exception("No se pudo consultar los reportes de pago.", ex)
-        End Try
-    End Function
-
-    Public Function DemoDisponible() As Boolean
-        Try
-            Return dao.DemoDisponible()
         Catch ex As Exception
             If ErroresMantenimiento.TieneMensaje(ex) Then Throw
             Throw New Exception("No se pudo consultar los reportes de pago.", ex)
@@ -90,7 +77,6 @@ Public Class pagoYapeNegocio
 
     Public Sub Registrar(id As Integer, importe As Decimal, nombre As String, celular As String, codigo As String)
         Try
-            If ModoDemoSolicitado() Then Throw New InvalidOperationException("Los reportes de Yape están deshabilitados en la demostración.")
             Dim lector = seguridadNegocio.ExigirLector()
             ValidarId(id)
             ValidarImporte(importe)
@@ -121,20 +107,6 @@ Public Class pagoYapeNegocio
             Throw New Exception("No se pudo revisar el reporte de pago.", ex)
         End Try
     End Sub
-
-    ' La web valida el comprobante firmado antes de llamar a esta operación de prueba.
-    Public Function ConfirmarDemo(id As Integer, lector As Integer, importe As Decimal, transaccion As Guid) As Boolean
-        Try
-            ValidarId(id)
-            If lector <= 0 OrElse transaccion = Guid.Empty Then Throw New ArgumentException("El QR de demostración no es válido.")
-            ValidarImporte(importe)
-            If Not DemoDisponible() Then Throw New UnauthorizedAccessException("La demostración está deshabilitada.")
-            Return dao.ConfirmarDemo(id, lector, importe, transaccion)
-        Catch ex As Exception
-            If ErroresMantenimiento.TieneMensaje(ex) Then Throw
-            Throw New Exception("No se pudo confirmar el pago de demostración.", ex)
-        End Try
-    End Function
 
     Private Shared Sub ValidarId(id As Integer)
         If id <= 0 Then Throw New ArgumentException("Selecciona un registro válido.")
